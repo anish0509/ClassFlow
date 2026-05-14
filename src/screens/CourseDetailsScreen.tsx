@@ -66,7 +66,7 @@ const CourseDetailsScreen: React.FC<CourseDetailsScreenProps> = ({
     courses, 
     tasks, 
     loadTasks, 
-    toggleTaskStatus,
+    completeTask,
     markAttendance,
     removeAttendance
   } = useTimetableStore();
@@ -165,11 +165,11 @@ const CourseDetailsScreen: React.FC<CourseDetailsScreenProps> = ({
 
   const handleToggleTask = useCallback(async (taskId: string) => {
     try {
-      await toggleTaskStatus(taskId);
+      await completeTask(taskId);
     } catch (error) {
       console.error("Failed to complete task:", error);
     }
-  }, [toggleTaskStatus]);
+  }, [completeTask]);
 
   // Quick-Tap Retroactive Calendar Trigger
   const handleCalendarDayPress = useCallback((day: Date) => {

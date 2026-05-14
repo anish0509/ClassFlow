@@ -14,6 +14,8 @@ export const initializeNotifications = async (): Promise<boolean> => {
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
       }),
     });
     handlerConfigured = true;
@@ -66,6 +68,7 @@ export const scheduleClassReminder = async (
   const trigger: Notifications.DateTriggerInput = {
     type: Notifications.SchedulableTriggerInputTypes.DATE,
     date: triggerDate,
+    channelId: ANDROID_CHANNEL_ID,
   };
 
   const id = await Notifications.scheduleNotificationAsync({
@@ -73,8 +76,6 @@ export const scheduleClassReminder = async (
       title: `${classItem.shortName || classItem.courseName || "Class"} starts soon`,
       body: `${classItem.startTime} in ${classItem.room || "room"}`,
       data: { classId: classItem.id, courseId: classItem.courseId },
-      sound: undefined,
-      channelId: ANDROID_CHANNEL_ID,
     },
     trigger,
   });
@@ -91,7 +92,7 @@ export const scheduleRecurringClassReminder = async (
 ): Promise<string | null> => {
   try {
     const dayOfWeekStr = classItem.dayOfWeek.toUpperCase().trim();
-    const weekday = dayMap[dayOfWeekStr];
+    let weekday = dayMap[dayOfWeekStr];
     if (!weekday) return null;
 
     // Parse HH:MM
@@ -118,6 +119,7 @@ export const scheduleRecurringClassReminder = async (
       weekday: weekday,
       hour: triggerHour,
       minute: triggerMin,
+      channelId: ANDROID_CHANNEL_ID,
     };
 
     const id = await Notifications.scheduleNotificationAsync({
@@ -125,8 +127,6 @@ export const scheduleRecurringClassReminder = async (
         title: `${classItem.shortName || classItem.courseName || "Class"} begins soon`,
         body: `${classItem.startTime} in ${classItem.room || "room"}`,
         data: { classId: classItem.id, type: 'recurring' },
-        sound: undefined,
-        channelId: ANDROID_CHANNEL_ID,
       },
       trigger,
     });
@@ -149,6 +149,7 @@ export const scheduleDailySummaryReminder = async (
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
       minute,
+      channelId: ANDROID_CHANNEL_ID,
     };
 
     const id = await Notifications.scheduleNotificationAsync({
@@ -156,8 +157,6 @@ export const scheduleDailySummaryReminder = async (
         title: "📋 Good Morning! Today's Schedule",
         body: "Tap to view today's classes and planned activities.",
         data: { type: 'daily_summary' },
-        sound: undefined,
-        channelId: ANDROID_CHANNEL_ID,
       },
       trigger,
     });
@@ -185,6 +184,7 @@ export const scheduleTaskReminder = async (
   const trigger: Notifications.DateTriggerInput = {
     type: Notifications.SchedulableTriggerInputTypes.DATE,
     date: triggerDate,
+    channelId: ANDROID_CHANNEL_ID,
   };
 
   const id = await Notifications.scheduleNotificationAsync({
@@ -194,8 +194,6 @@ export const scheduleTaskReminder = async (
         ? `${task.courseName} due ${task.dueDate}`
         : `Due ${task.dueDate}`,
       data: { taskId: task.id, courseId: task.courseId },
-      sound: undefined,
-      channelId: ANDROID_CHANNEL_ID,
     },
     trigger,
   });

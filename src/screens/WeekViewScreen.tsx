@@ -660,7 +660,7 @@ const WeekViewScreen: React.FC = () => {
     gridTasks: Record<string, Task[]>,
     activeTodayIndex: number,
     activeIsCurrentWeek: boolean,
-    refToUse?: React.RefObject<ScrollView>
+    refToUse?: React.RefObject<ScrollView | null>
   ) => {
     return (
       <View style={{ flex: 1 }}>

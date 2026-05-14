@@ -1,10 +1,6 @@
 import React, { useRef, useEffect, useMemo } from "react";
 import { StyleSheet, View, Animated, TouchableOpacity, Dimensions } from "react-native";
 
-// ─────────────────────────────────────────────────────────────────────────
-// 💎 Elite Global Typography Auto-Injection Engine
-// Intercepts StyleSheet creation and enforces Outfit (headers) / Inter (body)
-// ─────────────────────────────────────────────────────────────────────────
 const originalCreate = StyleSheet.create;
 const injectTypography = (styles: any) => {
   if (!styles || typeof styles !== "object") return styles;
@@ -306,7 +302,6 @@ export default function App() {
               contentStyle: { backgroundColor: colors.background.start }, 
               // Universally maintain state memory across ALL layer stack cycles to cure pops!
               freezeOnBlur: false,
-              detachPreviousScreen: false, 
             }}
           >
             <Stack.Screen name="MainTabs" component={TabNavigator} />

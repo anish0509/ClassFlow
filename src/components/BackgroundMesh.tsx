@@ -8,16 +8,16 @@ const BackgroundMesh = () => {
 
   // Dynamically adjust ambient light intensities based on theme darkness
   const topOrb = isDark 
-    ? ['rgba(100, 180, 255, 0.12)', 'rgba(100, 180, 255, 0.04)', 'transparent']
-    : ['rgba(100, 180, 255, 0.22)', 'rgba(100, 180, 255, 0.08)', 'transparent'];
+    ? ['rgba(100, 180, 255, 0.12)', 'rgba(100, 180, 255, 0.04)', 'transparent'] as const
+    : ['rgba(100, 180, 255, 0.22)', 'rgba(100, 180, 255, 0.08)', 'transparent'] as const;
 
   const bottomOrb = isDark
-    ? ['rgba(160, 100, 255, 0.10)', 'rgba(160, 100, 255, 0.03)', 'transparent']
-    : ['rgba(160, 100, 255, 0.18)', 'rgba(160, 100, 255, 0.06)', 'transparent'];
+    ? ['rgba(160, 100, 255, 0.10)', 'rgba(160, 100, 255, 0.03)', 'transparent'] as const
+    : ['rgba(160, 100, 255, 0.18)', 'rgba(160, 100, 255, 0.06)', 'transparent'] as const;
 
   const rightOrb = isDark
-    ? ['rgba(255, 255, 255, 0.06)', 'transparent']
-    : ['rgba(255, 255, 255, 0.12)', 'transparent'];
+    ? ['rgba(255, 255, 255, 0.06)', 'transparent'] as const
+    : ['rgba(255, 255, 255, 0.12)', 'transparent'] as const;
 
   return (
     <View style={[StyleSheet.absoluteFill, { backgroundColor: "transparent" }]} pointerEvents="none">
