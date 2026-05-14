@@ -12,8 +12,7 @@
       "backgroundColor": "#0f172a"
     },
     "ios": {
-      "supportsTablet": true,
-      "statusBarStyle": "light"
+      "supportsTablet": true
     },
     "android": {
       "package": "com.anish18.unitimetable",
