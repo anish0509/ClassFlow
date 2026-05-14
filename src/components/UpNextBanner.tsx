@@ -69,6 +69,7 @@ export const UpNextBanner: React.FC<UpNextBannerProps> = ({
           styles.glowLayer, 
           { 
             backgroundColor: accentColor,
+            shadowColor: accentColor, // Dynamic native glow
             opacity: glowOpacity,
             transform: [{ scale: glowScale }]
           }
@@ -131,7 +132,10 @@ const styles = StyleSheet.create({
   glowLayer: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 24,
-    filter: "blur(10px)",
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 18,
+    shadowOpacity: 0.8,
+    elevation: 6, // Android glow engine fallback
   },
   cardBlur: {
     borderRadius: 20,

@@ -1194,8 +1194,17 @@ export const restoreBackupData = async (data: any) => {
     if (Array.isArray(data.attendance)) {
       for (const a of data.attendance) {
         await database.runAsync(
-          `INSERT INTO attendance (id, classId, date, status, semesterId, isLegacy, notes) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [a.id, a.classId, a.date, a.status, a.semesterId, a.isLegacy ? 1 : 0, a.notes || '']
+          `INSERT INTO attendance (id, classId, courseId, date, status, markedAt, notes, shiftedToDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            a.id, 
+            a.classId, 
+            a.courseId || '', // Protect against empty fields
+            a.date, 
+            a.status, 
+            a.markedAt || new Date().toISOString(), 
+            a.notes || null, 
+            a.shiftedToDate || null
+          ]
         );
       }
     }
