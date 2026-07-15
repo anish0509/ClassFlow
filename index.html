@@ -32,6 +32,13 @@
     <div class="blob blob-purple"></div>
     <div class="blob blob-pink"></div>
 
+    <!-- Zoom Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <span id="lightbox-close" class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" alt="Zoomed Screenshot">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+
     <!-- Navigation Header -->
     <header class="navbar-header">
         <div class="navbar-container">
@@ -48,12 +55,35 @@
                 </svg>
                 <span>ClassFlow</span>
             </a>
+            
             <nav class="nav-links">
                 <a href="#showcase">Showcase</a>
                 <a href="#features">Features</a>
                 <a href="#developer">Developer</a>
             </nav>
-            <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-primary-neon">Get App</a>
+            
+            <div class="navbar-right">
+                <!-- Theme Switcher Toggle -->
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <!-- Sun Icon -->
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Moon Icon -->
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-primary-neon">Get App</a>
+            </div>
         </div>
     </header>
 
@@ -72,26 +102,28 @@
                     <a href="https://github.com/anish0509/ClassFlow" target="_blank" class="btn-hero-secondary">View Source</a>
                 </div>
                 
-                <!-- Stats Row -->
+                <!-- Stats Row with Glass Dividers -->
                 <div class="hero-stats-row">
                     <div class="stat-item">
                         <div class="stat-num">500+</div>
                         <div class="stat-label">Downloads</div>
                     </div>
+                    <div class="stat-divider"></div>
                     <div class="stat-item">
                         <div class="stat-num">4.8★</div>
                         <div class="stat-label">Rating</div>
                     </div>
+                    <div class="stat-divider"></div>
                     <div class="stat-item">
                         <div class="stat-num">100%</div>
                         <div class="stat-label">Ad-Free</div>
                     </div>
                 </div>
 
-                <!-- Hero Centered Glow Phone Mockup -->
+                <!-- Hero Centered 3D Glow Phone Mockup -->
                 <div class="hero-mockup-centered">
                     <div class="glow-halo"></div>
-                    <div class="phone-frame hero-phone">
+                    <div class="phone-frame hero-phone zoomable-image" data-caption="Home Dashboard Screen">
                         <img src="assets/screen1.jpg" alt="ClassFlow Home Dashboard" class="phone-screen">
                     </div>
                 </div>
@@ -103,62 +135,76 @@
             <div class="tagline-badge">Interface Gallery</div>
             <h2 class="section-title">A schedule manager that feels <br>right at home <span class="gradient-text">on your device</span>.</h2>
             <p class="section-desc">
-                ClassFlow integrates natively with your device's theme and system settings, featuring gorgeous contrast-adaptive widgets and interactive timeline grids.
+                ClassFlow integrates natively with your device's theme and system settings, featuring gorgeous contrast-adaptive widgets and interactive timeline grids. Click any card to expand.
             </p>
             
-            <!-- Horizontal scrolling/flex mockup deck -->
-            <div class="showcase-deck">
+            <!-- Showcase wrapper with navigation arrows -->
+            <div class="showcase-wrapper">
+                <button id="slide-prev" class="nav-arrow prev-arrow" aria-label="Previous Image">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
                 
-                <div class="deck-item">
-                    <div class="phone-frame">
-                        <img src="assets/screen1.jpg" alt="Home Dashboard Screen" class="phone-screen">
+                <div class="showcase-deck" id="showcase-deck">
+                    
+                    <div class="deck-item">
+                        <div class="phone-frame zoomable-image" data-caption="Home Dashboard: quick access to remaining class times, course schedules, and attendance metrics.">
+                            <img src="assets/screen1.jpg" alt="Home Dashboard Screen" class="phone-screen">
+                        </div>
+                        <div class="deck-label">
+                            <h4>Home Dashboard</h4>
+                            <p>Live countdowns & attendance stats</p>
+                        </div>
                     </div>
-                    <div class="deck-label">
-                        <h4>Home Dashboard</h4>
-                        <p>Live countdowns & attendance stats</p>
+
+                    <div class="deck-item">
+                        <div class="phone-frame zoomable-image" data-caption="Week Schedule: full visual hourly schedule representation for room navigation.">
+                            <img src="assets/screen2.jpg" alt="Weekly Grid View" class="phone-screen">
+                        </div>
+                        <div class="deck-label">
+                            <h4>Week Schedule</h4>
+                            <p>Full color-coded weekly calendar</p>
+                        </div>
                     </div>
+
+                    <div class="deck-item">
+                        <div class="phone-frame zoomable-image" data-caption="My Courses: visual rings showing target attendance present rates.">
+                            <img src="assets/screen3.jpg" alt="My Courses Screen" class="phone-screen">
+                        </div>
+                        <div class="deck-label">
+                            <h4>My Courses</h4>
+                            <p>Detailed attendance records & limits</p>
+                        </div>
+                    </div>
+
+                    <div class="deck-item">
+                        <div class="phone-frame zoomable-image" data-caption="Pending Tasks: list of homework and projects sorted by urgency.">
+                            <img src="assets/screen4.jpg" alt="Tasks Screen" class="phone-screen">
+                        </div>
+                        <div class="deck-label">
+                            <h4>Pending Tasks</h4>
+                            <p>Homework & tests sorted by urgency</p>
+                        </div>
+                    </div>
+
+                    <div class="deck-item">
+                        <div class="phone-frame zoomable-image" data-caption="Live Device Capture: active screenshot captured directly via ADB from the test device.">
+                            <img src="assets/screen_home.png" alt="Live Device Capture" class="phone-screen">
+                        </div>
+                        <div class="deck-label">
+                            <h4>Live Capture</h4>
+                            <p>Active screen synced via ADB</p>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="deck-item">
-                    <div class="phone-frame">
-                        <img src="assets/screen2.jpg" alt="Weekly Grid View" class="phone-screen">
-                    </div>
-                    <div class="deck-label">
-                        <h4>Week Schedule</h4>
-                        <p>Full color-coded weekly calendar</p>
-                    </div>
-                </div>
-
-                <div class="deck-item">
-                    <div class="phone-frame">
-                        <img src="assets/screen3.jpg" alt="My Courses Screen" class="phone-screen">
-                    </div>
-                    <div class="deck-label">
-                        <h4>My Courses</h4>
-                        <p>Detailed attendance records & limits</p>
-                    </div>
-                </div>
-
-                <div class="deck-item">
-                    <div class="phone-frame">
-                        <img src="assets/screen4.jpg" alt="Tasks Screen" class="phone-screen">
-                    </div>
-                    <div class="deck-label">
-                        <h4>Pending Tasks</h4>
-                        <p>Homework & tests sorted by urgency</p>
-                    </div>
-                </div>
-
-                <div class="deck-item">
-                    <div class="phone-frame">
-                        <img src="assets/screen_home.png" alt="Live Device Capture" class="phone-screen">
-                    </div>
-                    <div class="deck-label">
-                        <h4>Live Capture</h4>
-                        <p>Active screen synced via ADB</p>
-                    </div>
-                </div>
-
+                <button id="slide-next" class="nav-arrow next-arrow" aria-label="Next Image">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </section>
 
