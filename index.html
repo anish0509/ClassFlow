@@ -1,3 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassFlow — Your Timetable, Beautifully Organized</title>
+    <meta name="description" content="An open-source Android app to manage your lectures, track class attendance, and organize tasks under a unified glass design.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ClassFlow — Your Timetable, Beautifully Organized">
+    <meta property="og:description" content="An open-source Android app to manage your lectures, track class attendance, and organize tasks.">
+    <meta property="og:image" content="https://classflow.pages.dev/assets/screen1.jpg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Zoom Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <span id="lightbox-close" class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" alt="Zoomed Screenshot">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="navbar-header">
+        <div class="navbar-container">
+            <a href="#" class="nav-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="6" fill="#10b981" />
+                    <path d="M12 5L13.5 10.5L19 12L13.5 13.5L12 19L10.5 13.5L5 12L10.5 10.5L12 5Z" fill="white" />
+                </svg>
+                <span>ClassFlow</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="#showcase">Screenshots</a>
+                <a href="#features">Features</a>
+                <a href="#developer">Developer</a>
+            </nav>
+            
+            <div class="navbar-right">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-get-app">Get App</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-container">
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="tagline-badge">Open Source Android App</div>
+                <h1 class="hero-title">Your college schedule,<br>beautifully organized.</h1>
+                <p class="hero-desc">
+                    Manage your lectures, track class attendance targets, and organize homework assignments under a clean, unified frosted glass interface.
+                </p>
+                <div class="hero-actions">
+                    <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-primary">Download APK</a>
+                    <a href="https://github.com/anish0509/ClassFlow" target="_blank" class="btn-secondary">View on GitHub</a>
+                </div>
+                
+                <!-- Stats Row -->
+                <div class="hero-stats-row">
+                    <div class="stat-item">
+                        <div class="stat-num">500+</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">4.8★</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">100%</div>
+                        <div class="stat-label">Free & Ad-Free</div>
+                    </div>
+                </div>
+
+                <!-- Hero Main Screenshot Mockup -->
+                <div class="hero-screenshot-wrapper">
+                    <img src="assets/screen1.jpg" alt="ClassFlow Home Screen" class="hero-screenshot">
+                </div>
+            </div>
+        </section>
+
         <!-- Section 2: 3D Screenshot Stack Showcase -->
         <section id="showcase" class="showcase-section">
             <h2 class="section-title">Explore ClassFlow</h2>
@@ -61,3 +170,75 @@
                 </div>
             </div>
         </section>
+
+        <!-- Section 3: Features List -->
+        <section id="features" class="features-section">
+            <h2 class="section-title">Core Features</h2>
+            <p class="section-desc">The application is built for speed, offline reliability, and deep Android customization.</p>
+            
+            <div class="features-grid">
+                
+                <div class="feature-card">
+                    <h3>Unified Week Layout</h3>
+                    <p>Features perfect Saturday grid mapping with clean overflow layouts, ensuring weekend lectures remain visible and aligned.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Wallpaper-Adaptive Widgets</h3>
+                    <p>Scans system wallpaper color palettes programmatically to swap widget text colors (deep dark vs neon white) maintaining readability.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Study Mode Auto-Mute</h3>
+                    <p>Silences incoming call and message alerts automatically during scheduled lecture intervals using native System services.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Attendance Analytics</h3>
+                    <p>Provides visual rings showing target present ratios, letting you monitor necessary class attendance criteria.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Offline SQLite Engine</h3>
+                    <p>Saves all courses, classes, and tasks locally to your storage for lightning-fast retrievals without requiring internet access.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>System Calendar Exporter</h3>
+                    <p>Instantly exports your timetable to Google Calendar or system calendar databases with one tap from the settings panel.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Developer Section -->
+        <section id="developer" class="developer-section">
+            <h2 class="section-title">Developer</h2>
+            <p class="section-desc">ClassFlow is designed and engineered by Anish Kumar.</p>
+            
+            <div class="developer-card">
+                <div class="dev-info">
+                    <h3>Anish Kumar</h3>
+                    <p>Creator & Lead Engineer of ClassFlow</p>
+                </div>
+                <div class="dev-links">
+                    <a href="https://github.com/anish0509" target="_blank" class="dev-btn">GitHub</a>
+                    <a href="https://www.linkedin.com/in/anish-kumar-94331a324?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="dev-btn">LinkedIn</a>
+                    <a href="https://www.instagram.com/anish.___18__?igsh=MXBmdGowbDFjdjV0cQ==" target="_blank" class="dev-btn">Instagram</a>
+                    <a href="mailto:anish.kmr0509@gmail.com" class="dev-btn">Email</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>ClassFlow — your academic schedule companion, everywhere.</p>
+        <p class="copyright">&copy; 2026 ClassFlow. All rights reserved.</p>
+    </footer>
+
+    <!-- Interactive script file -->
+    <script src="script.js"></script>
+</body>
+</html>
