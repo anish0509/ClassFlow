@@ -276,34 +276,47 @@ body.light-theme .hero-screenshot {
     line-height: 1.5;
 }
 
-.screenshot-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+.screenshot-scroll-container {
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    padding: 20px 10px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none;  /* Hide scrollbar for IE/Edge */
+    mask-image: linear-gradient(to right, transparent, white 4%, white 96%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, white 4%, white 96%, transparent);
 }
 
-.screenshot-card {
+.screenshot-scroll-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+.scroll-item {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: 230px; /* Clean size for screenshots */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
 }
 
-.screenshot-card .img-wrapper {
-    max-width: 240px;
-    border-radius: 16px;
+.scroll-item .img-wrapper {
+    width: 100%;
+    border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
     margin-bottom: 16px;
     transition: transform 0.2s ease;
 }
 
-body.light-theme .screenshot-card .img-wrapper {
+body.light-theme .scroll-item .img-wrapper {
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
 }
 
-.screenshot-card:hover .img-wrapper {
+.scroll-item:hover .img-wrapper {
     transform: translateY(-4px);
 }
 
@@ -313,13 +326,13 @@ body.light-theme .screenshot-card .img-wrapper {
     pointer-events: none;
 }
 
-.screenshot-card h4 {
+.scroll-item h4 {
     font-size: 1.05rem;
     font-weight: 700;
     margin-bottom: 6px;
 }
 
-.screenshot-card p {
+.scroll-item p {
     font-size: 0.85rem;
     color: var(--text-secondary);
     max-width: 220px;
