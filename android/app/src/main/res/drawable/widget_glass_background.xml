@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 1. Frosted base: high-translucency neutral dark glass (40% down to 25% opacity) -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#661A1A1E"
+                android:centerColor="#50161618"
+                android:endColor="#35121214"
+                android:angle="270" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+
+    <!-- 2. Speclar glossy shine (top-left specular light reflection) -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#38FFFFFF"
+                android:centerColor="#0CFFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="300" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+
+    <!-- 3. Inner soft rim glow for physical glass thickness -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#00FFFFFF"
+                android:endColor="#0BFFFFFF"
+                android:angle="135" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+
+    <!-- 4. Crisp outer highlight rim border -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="28dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#48FFFFFF" />
+        </shape>
+    </item>
+
+</layer-list>
