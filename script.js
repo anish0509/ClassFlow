@@ -30,17 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const lightboxImg = document.getElementById("lightbox-img");
     const lightboxCap = document.getElementById("lightbox-caption");
     const lightboxClose = document.getElementById("lightbox-close");
-    const zoomableFrames = document.querySelectorAll(".zoomable-image");
+    const zoomableElements = document.querySelectorAll(".img-wrapper, .hero-screenshot-wrapper");
 
-    zoomableFrames.forEach(frame => {
-        frame.addEventListener("click", () => {
-            const innerImg = frame.querySelector(".phone-screen");
-            const captionText = frame.getAttribute("data-caption");
-
+    zoomableElements.forEach(element => {
+        element.style.cursor = "zoom-in";
+        element.addEventListener("click", () => {
+            const innerImg = element.querySelector("img");
             if (innerImg && lightbox && lightboxImg) {
                 lightbox.style.display = "block";
                 lightboxImg.src = innerImg.src;
-                if (lightboxCap) lightboxCap.textContent = captionText || "";
+                if (lightboxCap) lightboxCap.textContent = innerImg.alt || "";
                 
                 // Add class to prevent background scrolling
                 document.body.style.overflow = "hidden";
