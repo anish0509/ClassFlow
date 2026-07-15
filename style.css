@@ -276,67 +276,156 @@ body.light-theme .hero-screenshot {
     line-height: 1.5;
 }
 
-.screenshot-scroll-container {
-    display: flex;
-    gap: 28px;
-    overflow-x: auto;
-    padding: 20px 10px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
-    -ms-overflow-style: none;  /* Hide scrollbar for IE/Edge */
-    mask-image: linear-gradient(to right, transparent, white 4%, white 96%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, white 4%, white 96%, transparent);
-}
-
-.screenshot-scroll-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome/Safari */
-}
-
-.scroll-item {
-    scroll-snap-align: start;
-    flex: 0 0 auto;
-    width: 230px; /* Clean size for screenshots */
+/* 3D Screenshot Stack Showcase */
+.screenshot-stack-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    max-width: 600px;
+    margin: 40px auto 0;
+    position: relative;
 }
 
-.scroll-item .img-wrapper {
+.screenshot-stack {
+    position: relative;
+    width: 230px;
+    height: 470px;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    margin-bottom: 24px;
+}
+
+.stack-card {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    border-radius: 18px;
-    overflow: hidden;
+    height: 100%;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    margin-bottom: 16px;
-    transition: transform 0.2s ease;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    cursor: zoom-in;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, z-index 0.6s;
+    background-color: var(--card-bg);
 }
 
-body.light-theme .scroll-item .img-wrapper {
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
-}
-
-.scroll-item:hover .img-wrapper {
-    transform: translateY(-4px);
-}
-
-.gallery-img {
+.stack-img {
     width: 100%;
-    display: block;
+    height: 100%;
+    object-fit: cover;
     pointer-events: none;
 }
 
-.scroll-item h4 {
-    font-size: 1.05rem;
+.stack-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(11, 12, 14, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-primary);
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.85rem;
     font-weight: 700;
-    margin-bottom: 6px;
 }
 
-.scroll-item p {
-    font-size: 0.85rem;
+body.light-theme .stack-label {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* 3D Overlapping Card States */
+.stack-card.active {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.stack-card.next {
+    transform: translate3d(28px, 0, -40px) scale(0.94);
+    opacity: 0.8;
+    z-index: 9;
+    pointer-events: none;
+}
+
+.stack-card.next-2 {
+    transform: translate3d(56px, 0, -80px) scale(0.88);
+    opacity: 0.5;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.stack-card.next-3 {
+    transform: translate3d(84px, 0, -120px) scale(0.82);
+    opacity: 0.2;
+    z-index: 7;
+    pointer-events: none;
+}
+
+.stack-card.hidden-left {
+    transform: translate3d(-150px, 0, -60px) scale(0.9);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.stack-card.hidden-right {
+    transform: translate3d(150px, 0, -60px) scale(0.9);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Off-stack hidden cards */
+.stack-card.hidden {
+    transform: translate3d(200px, 0, -200px) scale(0.7);
+    opacity: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.stack-caption-box {
+    text-align: center;
+    max-width: 480px;
+    min-height: 50px;
+    margin: 12px auto;
+}
+
+.stack-caption-box p {
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    max-width: 220px;
-    line-height: 1.4;
+    line-height: 1.5;
+}
+
+.stack-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.stack-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 4px 15px var(--glass-shadow);
+}
+
+.stack-btn:hover {
+    background-color: var(--btn-hover);
+    border-color: var(--text-secondary);
 }
 
 /* Features Grid */
