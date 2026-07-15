@@ -24,26 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 2. Horizontal Scroll Deck Arrow Controls
-    // ==========================================
-    const deck = document.getElementById("showcase-deck");
-    const prevBtn = document.getElementById("slide-prev");
-    const nextBtn = document.getElementById("slide-next");
-
-    if (deck && prevBtn && nextBtn) {
-        prevBtn.addEventListener("click", () => {
-            // Scroll left by 320px (one card + gap offset)
-            deck.scrollBy({ left: -320, behavior: "smooth" });
-        });
-
-        nextBtn.addEventListener("click", () => {
-            // Scroll right by 320px
-            deck.scrollBy({ left: 320, behavior: "smooth" });
-        });
-    }
-
-    // ==========================================
-    // 3. Zoom Lightbox Modal Logic
+    // 2. Zoom Lightbox Modal Logic
     // ==========================================
     const lightbox = document.getElementById("lightbox-modal");
     const lightboxImg = document.getElementById("lightbox-img");
@@ -96,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 4. Scroll Reveal Animation for Feature Cards
+    // 3. Scroll Reveal Animation for Feature Cards
     // ==========================================
     const featureCards = document.querySelectorAll(".feature-card");
     

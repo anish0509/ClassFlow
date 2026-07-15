@@ -20,7 +20,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="style.css">
@@ -65,8 +65,7 @@
             <div class="navbar-right">
                 <!-- Theme Switcher Toggle -->
                 <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <!-- Sun Icon -->
-                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -77,8 +76,7 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <!-- Moon Icon -->
-                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
@@ -130,101 +128,94 @@
             </div>
         </section>
 
-        <!-- Section 2: Screenshot Gallery Showcase (Matches Reference Layout) -->
+        <!-- Section 2: Screenshot Bento Grid Showcase -->
         <section id="showcase" class="showcase-section">
             <div class="tagline-badge">Interface Gallery</div>
-            <h2 class="section-title">A schedule manager that feels <br>right at home <span class="gradient-text">on your device</span>.</h2>
+            <h2 class="section-title">Designed for Visual Harmony</h2>
             <p class="section-desc">
-                ClassFlow integrates natively with your device's theme and system settings, featuring gorgeous contrast-adaptive widgets and interactive timeline grids. Click any card to expand.
+                ClassFlow integrates hardware-accelerated layouts, contrast-adaptive widgets, and interactive grids. Click any card to expand screenshot.
             </p>
             
-            <!-- Showcase wrapper with navigation arrows -->
-            <div class="showcase-wrapper">
-                <button id="slide-prev" class="nav-arrow prev-arrow" aria-label="Previous Image">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
+            <!-- Modern Bento Grid Layout -->
+            <div class="bento-grid">
                 
-                <div class="showcase-deck" id="showcase-deck">
-                    
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="Home Dashboard: quick access to remaining class times, course schedules, and attendance metrics.">
-                            <img src="assets/screen1.jpg" alt="Home Dashboard Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>Home Dashboard</h4>
-                            <p>Live countdowns & attendance stats</p>
-                        </div>
+                <!-- Card 1: Home Dashboard (Span 2) -->
+                <div class="bento-card span-2 zoomable-image" data-caption="Home Dashboard: quick access to remaining class times, course schedules, and attendance metrics.">
+                    <div class="bento-text">
+                        <h4>Home Dashboard</h4>
+                        <p>Live countdowns, current class reminders & attendance summaries in a gorgeous frosted glass overlay.</p>
                     </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="Week Schedule: full visual hourly schedule representation for room navigation.">
-                            <img src="assets/screen2.jpg" alt="Weekly Grid View" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>Week Schedule</h4>
-                            <p>Full color-coded weekly calendar</p>
-                        </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen1.jpg" alt="Home Dashboard Screen" class="phone-screen">
                     </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="My Courses: visual rings showing target attendance present rates.">
-                            <img src="assets/screen3.jpg" alt="My Courses Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>My Courses</h4>
-                            <p>Detailed attendance records & limits</p>
-                        </div>
-                    </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="Pending Tasks: list of homework and projects sorted by urgency.">
-                            <img src="assets/screen4.jpg" alt="Tasks Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>Pending Tasks</h4>
-                            <p>Homework & tests sorted by urgency</p>
-                        </div>
-                    </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="Settings Panel: customize semesters, set notification reminders, toggle study mode, and configure calendar sync.">
-                            <img src="assets/screen5.jpg" alt="Settings Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>Settings</h4>
-                            <p>App settings & semester limits</p>
-                        </div>
-                    </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="Help & Guide: full feature documentation and FAQs for new students.">
-                            <img src="assets/screen_help.png" alt="Help & Guide Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>Help & Guide</h4>
-                            <p>Guides & student helper resources</p>
-                        </div>
-                    </div>
-
-                    <div class="deck-item">
-                        <div class="phone-frame zoomable-image" data-caption="About Screen: view app version details, credits, and links to the official code repository.">
-                            <img src="assets/screen_about.jpg" alt="About Screen" class="phone-screen">
-                        </div>
-                        <div class="deck-label">
-                            <h4>About Developer</h4>
-                            <p>Developer profiles & legal info</p>
-                        </div>
-                    </div>
-
                 </div>
 
-                <button id="slide-next" class="nav-arrow next-arrow" aria-label="Next Image">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
+                <!-- Card 2: Weekly Schedule (Span 1) -->
+                <div class="bento-card zoomable-image" data-caption="Week Schedule: full visual hourly schedule representation for room navigation.">
+                    <div class="bento-text">
+                        <h4>Week Schedule</h4>
+                        <p>A full color-coded visual calendar grid mapping times, lecture rooms, and teachers.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen2.jpg" alt="Weekly Grid View" class="phone-screen">
+                    </div>
+                </div>
+
+                <!-- Card 3: My Courses (Span 1) -->
+                <div class="bento-card zoomable-image" data-caption="My Courses: visual rings showing target attendance present rates.">
+                    <div class="bento-text">
+                        <h4>My Courses</h4>
+                        <p>Detailed attendance counters with adjustable limits and interactive status tracker rings.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen3.jpg" alt="My Courses Screen" class="phone-screen">
+                    </div>
+                </div>
+
+                <!-- Card 4: Tasks Screen (Span 2) -->
+                <div class="bento-card span-2 zoomable-image" data-caption="Pending Tasks: list of homework and projects sorted by urgency.">
+                    <div class="bento-text">
+                        <h4>Pending Tasks</h4>
+                        <p>Track homework, exams, and project deadlines sorted automatically by academic urgency level.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen4.jpg" alt="Tasks Screen" class="phone-screen">
+                    </div>
+                </div>
+
+                <!-- Card 5: Settings Panel (Span 1) -->
+                <div class="bento-card zoomable-image" data-caption="Settings Panel: customize semesters, set notification reminders, toggle study mode, and configure calendar sync.">
+                    <div class="bento-text">
+                        <h4>Settings Control</h4>
+                        <p>Toggle Study Mode, set notification thresholds, sync events, and customize semester dates.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen5.jpg" alt="Settings Screen" class="phone-screen">
+                    </div>
+                </div>
+
+                <!-- Card 6: Help & Guide (Span 1) -->
+                <div class="bento-card zoomable-image" data-caption="Help & Guide: full feature documentation and FAQs for new students.">
+                    <div class="bento-text">
+                        <h4>Help & FAQ</h4>
+                        <p>Quick start guides, student FAQs, and instructions to get the most out of your timetable.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen_help.png" alt="Help Screen" class="phone-screen">
+                    </div>
+                </div>
+
+                <!-- Card 7: About Screen (Span 1) -->
+                <div class="bento-card zoomable-image" data-caption="About Screen: view app version details, credits, and links to the official code repository.">
+                    <div class="bento-text">
+                        <h4>About & Easter Eggs</h4>
+                        <p>Discover developer info and customize glass blur physics with hidden lab sliders.</p>
+                    </div>
+                    <div class="bento-phone-frame">
+                        <img src="assets/screen_about.jpg" alt="About Screen" class="phone-screen">
+                    </div>
+                </div>
+
             </div>
         </section>
 
