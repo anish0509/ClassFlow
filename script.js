@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
-    // 1. Interactive Timetable Day Switcher
+    // 1. Interactive Timetable Day Switcher (Matches Real App Screenshots)
     // ==========================================
     const dayCols = document.querySelectorAll(".mock-day-col");
     const classItem = document.getElementById("mock-class-item");
@@ -10,12 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const timelineDot = document.querySelector(".mock-timeline-dot");
 
     const dayData = {
-        MON: { title: "Computer Networks", subtitle: "09:00 AM - 10:30 AM • Lab 3", attendance: "92%", color: "#3b82f6", timelineOffset: "20%" },
-        TUE: { title: "Database Systems", subtitle: "11:00 AM - 12:30 PM • Room 402", attendance: "88%", color: "#a855f7", timelineOffset: "40%" },
-        WED: { title: "Operating Systems", subtitle: "02:00 PM - 03:30 PM • Seminar Hall", attendance: "95%", color: "#10b981", timelineOffset: "65%" },
-        THU: { title: "Mobile App Dev", subtitle: "09:00 AM - 10:30 AM • Lab 1", attendance: "90%", color: "#ec4899", timelineOffset: "20%" },
-        FRI: { title: "Software Eng", subtitle: "11:00 AM - 12:30 PM • Room 204", attendance: "85%", color: "#3b82f6", timelineOffset: "40%" },
-        SAT: { title: "Study Lab & Tasks", subtitle: "09:00 AM - 12:00 PM • Remote", attendance: "100%", color: "#10b981", timelineOffset: "30%" }
+        MON: { title: "DSa (Data Structures)", subtitle: "09:00 AM - 09:50 AM • Room A18 • Indu", attendance: "100%", color: "#10b981", timelineOffset: "20%" },
+        TUE: { title: "ML (Machine Learning)", subtitle: "10:00 AM - 10:50 AM • Room A18 • Hari", attendance: "80%", color: "#ec4899", timelineOffset: "45%" },
+        WED: { title: "Quant (Quantitative)", subtitle: "11:00 AM - 11:50 AM • Room A17 • Pathak", attendance: "OVER", color: "#3b82f6", timelineOffset: "70%" },
+        THU: { title: "ic253 (Intelligent Systems)", subtitle: "09:00 AM - 09:50 AM • Room A17 • Admin", attendance: "90%", color: "#a855f7", timelineOffset: "20%" },
+        FRI: { title: "ep301 (Embedded Systems)", subtitle: "11:00 AM - 11:50 AM • Room A17 • Staff", attendance: "85%", color: "#3b82f6", timelineOffset: "70%" },
+        SAT: { title: "Self Study & Lab tasks", subtitle: "No scheduled lectures today", attendance: "FREE", color: "#10b981", timelineOffset: "50%" }
     };
 
     dayCols.forEach(col => {
@@ -41,14 +41,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 const colorBar = classItem.querySelector(".mock-class-color");
                 if (colorBar) colorBar.style.backgroundColor = data.color;
                 
-                // Update attendance indicator color depending on percent
-                const pct = parseInt(data.attendance);
-                if (pct >= 90) {
+                // Update attendance indicator color depending on percent/state
+                if (data.attendance === "OVER") {
+                    classAttendance.style.color = "#94a3b8";
+                    classAttendance.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
+                } else if (data.attendance === "FREE") {
                     classAttendance.style.color = "#10b981";
                     classAttendance.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
                 } else {
-                    classAttendance.style.color = "#3b82f6";
-                    classAttendance.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    const pct = parseInt(data.attendance);
+                    if (pct >= 90) {
+                        classAttendance.style.color = "#10b981";
+                        classAttendance.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
+                    } else {
+                        classAttendance.style.color = "#3b82f6";
+                        classAttendance.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    }
                 }
 
                 // Smooth slide timeline dot
@@ -81,8 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const isLight = wallpaper === "light-marble" || wallpaper === "bright-sunset";
             showAndroidToast(
                 isLight 
-                    ? `Wallpaper light colors detected. Contrast adaptive widgets set to Dark Text.` 
-                    : `Wallpaper dark colors detected. Contrast adaptive widgets set to Light/Neon.`
+                    ? `Wallpaper light colors detected. Widgets inverting to dark high-contrast text.` 
+                    : `Wallpaper dark colors detected. Widgets loading in neon/white layouts.`
             );
         });
     });
@@ -110,10 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
     dndToggle.addEventListener("change", () => {
         if (dndToggle.checked) {
             shieldEffect.classList.add("active");
-            showAndroidToast("Study Mode Engaged. Notifications Auto-Muted 🛡️");
+            showAndroidToast("Study Mode Active: Silencing All Incoming Alerts 🛡️");
         } else {
             shieldEffect.classList.remove("active");
-            showAndroidToast("Study Mode Disabled. Alerts Restored.");
+            showAndroidToast("Study Mode Inactive: Restoring Device Ringtones.");
         }
     });
 
@@ -143,29 +151,27 @@ document.addEventListener("DOMContentLoaded", () => {
         if (dndToggle.checked) {
             // Block/silence animation sequence
             setTimeout(() => {
-                // Visual bounce / shield impact effect
                 notif.style.transform = "translateY(-10px) scale(0.95)";
-                notif.style.borderColor = "var(--color-purple)";
-                notif.style.boxShadow = "0 0 15px rgba(168, 85, 247, 0.4)";
+                notif.style.borderColor = "var(--color-green)";
+                notif.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.4)";
                 
-                // Flash the purple shield in response
+                // Flash the shield in response
                 shieldEffect.style.borderColor = "#fff";
-                shieldEffect.style.boxShadow = "0 0 35px rgba(168, 85, 247, 0.9)";
+                shieldEffect.style.boxShadow = "0 0 35px rgba(16, 185, 129, 0.9)";
                 
                 setTimeout(() => {
-                    shieldEffect.style.borderColor = "var(--color-purple)";
-                    shieldEffect.style.boxShadow = "0 0 20px rgba(168, 85, 247, 0.4)";
+                    shieldEffect.style.borderColor = "var(--color-green)";
+                    shieldEffect.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.4)";
                     
                     notif.classList.add("fade-out");
                     setTimeout(() => notif.remove(), 400);
                 }, 300);
 
-                showAndroidToast(`[Blocked] Incoming alert from '${item.sender}' silenced.`);
+                showAndroidToast(`[Blocked] Spam alert from '${item.sender}' silenced.`);
             }, 600);
         } else {
             // DND inactive: Play vibration/disturbance animation
             setTimeout(() => {
-                // Vibration animation
                 glassPhone.style.transform = "rotate(1deg) scale(1.01)";
                 setTimeout(() => {
                     glassPhone.style.transform = "rotate(-1deg) scale(1.01)";
@@ -232,22 +238,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (glassCard) {
         glassCard.addEventListener("mousemove", (e) => {
             const rect = glassCard.getBoundingClientRect();
-            const x = e.clientX - rect.left; // Mouse position x inside element
-            const y = e.clientY - rect.top;  // Mouse position y inside element
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            // Calculate rotation offsets (Max 12 degrees tilt)
             const rotateX = ((centerY - y) / centerY) * 12;
             const rotateY = ((x - centerX) / centerX) * 12;
             
-            // Apply perspective rotation matrix
             glassCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
         });
         
         glassCard.addEventListener("mouseleave", () => {
-            // Reset to default on exit
             glassCard.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
         });
     }
@@ -266,13 +269,12 @@ document.addEventListener("DOMContentLoaded", () => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add("reveal-active");
-                observer.unobserve(entry.target); // Animate once
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
     
     featureCards.forEach((card, index) => {
-        // Initial setup for reveal styling
         card.style.opacity = "0";
         card.style.transform = "translateY(30px)";
         card.style.transition = `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.1}s`;
@@ -280,7 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
         revealObserver.observe(card);
     });
     
-    // Helper stylesheet injector for Observer reveals
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
         .feature-card.reveal-active {
