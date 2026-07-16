@@ -65,28 +65,7 @@ class TimetableRepository @Inject constructor(
         context.sendBroadcast(updateTasksIntent)
     }
 
-    private suspend fun syncCalendarIfEnabled() = withContext(ioDispatcher) {
-        try {
-            val enabled = appSettings.calendarSyncEnabled.value
-            if (enabled) {
-                val semester = getActiveSemester()
-                if (semester != null) {
-                    val classes = getClassesBySemester(semester.id)
-                    val courses = getCoursesBySemester(semester.id).associateBy { it.id }
-                    com.anish18.classflow.utils.CalendarSyncHelper.syncTimetableToCalendar(
-                        context = context,
-                        classes = classes,
-                        courses = courses,
-                        semester = semester
-                    )
-                } else {
-                    com.anish18.classflow.utils.CalendarSyncHelper.clearAllSyncedEvents(context)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+
 
     // Semesters
     val allSemestersFlow: Flow<List<Semester>> = semesterDao.getAllSemestersFlow()
@@ -100,22 +79,18 @@ class TimetableRepository @Inject constructor(
     
     suspend fun insertSemester(semester: Semester) = withContext(ioDispatcher) {
         semesterDao.insertSemester(semester)
-        syncCalendarIfEnabled()
     }
     
     suspend fun updateSemester(semester: Semester) = withContext(ioDispatcher) {
         semesterDao.updateSemester(semester)
-        syncCalendarIfEnabled()
     }
     
     suspend fun deleteSemester(semester: Semester) = withContext(ioDispatcher) {
         semesterDao.deleteSemester(semester)
-        syncCalendarIfEnabled()
     }
     
     suspend fun setActiveSemester(semesterId: String) = withContext(ioDispatcher) {
         semesterDao.setActiveSemester(semesterId)
-        syncCalendarIfEnabled()
     }
 
     // Courses (dynamically filtered by active semester)
@@ -138,12 +113,10 @@ class TimetableRepository @Inject constructor(
     
     suspend fun insertCourse(course: Course) = withContext(ioDispatcher) {
         courseDao.insertCourse(course)
-        syncCalendarIfEnabled()
     }
     
     suspend fun updateCourse(course: Course) = withContext(ioDispatcher) {
         courseDao.updateCourse(course)
-        syncCalendarIfEnabled()
     }
     
     suspend fun deleteCourse(course: Course) = withContext(ioDispatcher) {
@@ -156,7 +129,6 @@ class TimetableRepository @Inject constructor(
             e.printStackTrace()
         }
         courseDao.deleteCourse(course)
-        syncCalendarIfEnabled()
     }
 
     fun getAttachmentsForCourseFlow(courseId: String): Flow<List<com.anish18.classflow.data.model.CourseAttachment>> =
@@ -188,17 +160,14 @@ class TimetableRepository @Inject constructor(
 
     suspend fun insertClass(classSession: ClassSession) = withContext(ioDispatcher) {
         classSessionDao.insertClass(classSession)
-        syncCalendarIfEnabled()
     }
     
     suspend fun updateClass(classSession: ClassSession) = withContext(ioDispatcher) {
         classSessionDao.updateClass(classSession)
-        syncCalendarIfEnabled()
     }
     
     suspend fun deleteClass(classSession: ClassSession) = withContext(ioDispatcher) {
         classSessionDao.deleteClass(classSession)
-        syncCalendarIfEnabled()
     }
 
     // Attendance

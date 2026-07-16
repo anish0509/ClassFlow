@@ -144,59 +144,7 @@ fun SettingsScreen(
         120 to "2 hours before",
         240 to "4 hours before"
     )
-
     val studyModeEnabled by viewModel.studyModeEnabled.collectAsState()
-    val calendarSyncEnabled by viewModel.calendarSyncEnabled.collectAsState()
-    var pendingCalendarSyncState by remember { mutableStateOf<Boolean?>(null) }
-
-    val calendarPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val readGranted = permissions[android.Manifest.permission.READ_CALENDAR] ?: false
-        val writeGranted = permissions[android.Manifest.permission.WRITE_CALENDAR] ?: false
-        if (readGranted && writeGranted) {
-            val targetState = pendingCalendarSyncState ?: true
-            if (targetState) {
-                viewModel.syncToCalendar(context) { success ->
-                    if (success) {
-                        viewModel.setCalendarSyncEnabled(true)
-                        Toast.makeText(context, "Timetable synced to Google Calendar!", Toast.LENGTH_SHORT).show()
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse("content://com.android.calendar/time")
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else {
-                        Toast.makeText(context, "Failed to sync to calendar.", Toast.LENGTH_LONG).show()
-                    }
-                }
-            } else {
-                viewModel.clearAllCalendarEvents(context) { success ->
-                    if (success) {
-                        viewModel.setCalendarSyncEnabled(false)
-                        Toast.makeText(context, "Calendar sync disabled & cleared.", Toast.LENGTH_SHORT).show()
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse("content://com.android.calendar/time")
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    } else {
-                        Toast.makeText(context, "Failed to clear calendar events.", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        } else {
-            Toast.makeText(context, "Calendar permissions are required to sync.", Toast.LENGTH_LONG).show()
-        }
-    }
 
     // File Picker for restoring JSON backups
     val jsonFilePickerLauncher = rememberLauncherForActivityResult(
@@ -426,76 +374,8 @@ fun SettingsScreen(
                             iconTint = NeonOrange,
                             title = "Holiday Manager",
                             subtitle = if (holidayCount > 0) "$holidayCount day${if (holidayCount > 1) "s" else ""} marked" else "Mark university holidays",
-                            onClick = { showHolidayManager = true }
-                        )
-                        HorizontalDivider(
-                            color = FrostedGlassBorder.copy(alpha = 0.10f),
-                            thickness = 0.8.dp,
-                            modifier = Modifier.padding(start = 70.dp)
-                        )
-                        SettingItem(
-                            icon = Icons.Default.Sync,
-                            iconTint = NeonYellow,
-                            title = "Sync with Google Calendar",
-                            subtitle = "Export semester timetable to Google Calendar",
                             shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                            trailingContent = {
-                                GlassSwitch(
-                                    checked = calendarSyncEnabled,
-                                    onCheckedChange = { enabled ->
-                                        val permissions = arrayOf(
-                                            android.Manifest.permission.READ_CALENDAR,
-                                            android.Manifest.permission.WRITE_CALENDAR
-                                        )
-                                        val hasPermission = permissions.all {
-                                            androidx.core.content.ContextCompat.checkSelfPermission(context, it) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                                        }
-
-                                        if (hasPermission) {
-                                            if (enabled) {
-                                                viewModel.syncToCalendar(context) { success ->
-                                                    if (success) {
-                                                        viewModel.setCalendarSyncEnabled(true)
-                                                        Toast.makeText(context, "Timetable synced to Google Calendar!", Toast.LENGTH_SHORT).show()
-                                                        try {
-                                                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                                                data = Uri.parse("content://com.android.calendar/time")
-                                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                            }
-                                                            context.startActivity(intent)
-                                                        } catch (e: Exception) {
-                                                            e.printStackTrace()
-                                                        }
-                                                    } else {
-                                                        Toast.makeText(context, "Failed to sync to calendar.", Toast.LENGTH_LONG).show()
-                                                    }
-                                                }
-                                            } else {
-                                                viewModel.clearAllCalendarEvents(context) { success ->
-                                                    if (success) {
-                                                        viewModel.setCalendarSyncEnabled(false)
-                                                        Toast.makeText(context, "Calendar sync disabled & cleared.", Toast.LENGTH_SHORT).show()
-                                                        try {
-                                                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                                                data = Uri.parse("content://com.android.calendar/time")
-                                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                            }
-                                                            context.startActivity(intent)
-                                                        } catch (e: Exception) {
-                                                            e.printStackTrace()
-                                                        }
-                                                    } else {
-                                                        Toast.makeText(context, "Failed to clear calendar events.", Toast.LENGTH_LONG).show()
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            pendingCalendarSyncState = enabled
-                                            calendarPermissionLauncher.launch(permissions)
-                                        }
-                                    }
-                                )
-                            }
+                            onClick = { showHolidayManager = true }
                         )
                     }
                 }

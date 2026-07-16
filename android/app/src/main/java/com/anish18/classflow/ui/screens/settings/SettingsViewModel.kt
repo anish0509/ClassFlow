@@ -69,11 +69,7 @@ class SettingsViewModel @Inject constructor(
         appSettings.setStudyModeEnabled(enabled)
     }
 
-    val calendarSyncEnabled: StateFlow<Boolean> = appSettings.calendarSyncEnabled
 
-    fun setCalendarSyncEnabled(enabled: Boolean) {
-        appSettings.setCalendarSyncEnabled(enabled)
-    }
 
     val dailyDigestEnabled: StateFlow<Boolean> = appSettings.dailyDigestEnabled
 
@@ -82,17 +78,7 @@ class SettingsViewModel @Inject constructor(
         com.anish18.classflow.utils.AlarmScheduler.scheduleDailyDigest(appContext, enabled)
     }
 
-    fun clearAllCalendarEvents(context: android.content.Context, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val success = com.anish18.classflow.utils.CalendarSyncHelper.clearAllSyncedEvents(context)
-                onResult(success)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onResult(false)
-            }
-        }
-    }
+
 
     /**
      * Force-reschedule all class and task alarms immediately.
@@ -154,26 +140,7 @@ class SettingsViewModel @Inject constructor(
         appSettings.setShowTasksOnTimetable(show)
     }
 
-    fun syncToCalendar(context: android.content.Context, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val semester = activeSemester.value ?: return@launch onResult(false)
-                val classes = repository.activeClassesFlow.first()
-                val courses = repository.activeCoursesFlow.first().associateBy { it.id }
-                
-                val success = com.anish18.classflow.utils.CalendarSyncHelper.syncTimetableToCalendar(
-                    context = context,
-                    classes = classes,
-                    courses = courses,
-                    semester = semester
-                )
-                onResult(success)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onResult(false)
-            }
-        }
-    }
+
 
     fun addSemester(name: String, startDate: String, endDate: String) {
         viewModelScope.launch {

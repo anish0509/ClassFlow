@@ -80,13 +80,7 @@ class AppSettings @Inject constructor(
         prefs.edit().putInt("saved_ringer_mode", mode).apply()
     }
 
-    private val _calendarSyncEnabled = MutableStateFlow(prefs.getBoolean("calendar_sync_enabled", false))
-    val calendarSyncEnabled: StateFlow<Boolean> = _calendarSyncEnabled.asStateFlow()
 
-    fun setCalendarSyncEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean("calendar_sync_enabled", enabled).apply()
-        _calendarSyncEnabled.value = enabled
-    }
 
     // ─── Recent Rooms ────────────────────────────────────────────────────────────
     private val RECENT_ROOMS_KEY = "recent_rooms"
