@@ -51,4 +51,4 @@ Designed and engineered by **Anish Kumar**.
 * **Instagram**: [@anish.___18__](https://www.instagram.com/anish.___18__?igsh=MXBmdGowbDFjdjV0cQ==)
 * **LinkedIn**: [anish-kumar-94331a324](https://www.linkedin.com/in/anish-kumar-94331a324?utm_source=share_via&utm_content=profile&utm_medium=member_android)
 * **Email**: [anish.kmr0509@gmail.com](mailto:anish.kmr0509@gmail.com)
-* **GitHub**: [github.com/anish18](https://github.com/anish18)
+* **GitHub**: [github.com/anish0509](https://github.com/anish0509)
