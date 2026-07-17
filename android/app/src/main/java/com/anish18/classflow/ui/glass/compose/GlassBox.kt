@@ -139,8 +139,8 @@ fun GlassBox(
             }
         },
         update = { glass ->
-            // Reference updateKey so Compose recomposition triggers this block
-            val trigger = updateKey
+            @Suppress("UNUSED_EXPRESSION")
+            updateKey
 
             with(density) {
                 glass.setIOR(ior)

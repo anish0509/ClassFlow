@@ -81,8 +81,6 @@ fun MyClassesScreen(
     var endTimeForNewClass by remember { mutableStateOf("09:50") }
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
-    val backgroundHazeState = LocalHazeState.current
-    val screenHazeState = LocalScreenHazeState.current
     val localHazeState = remember { HazeState() }
 
     Box(modifier = Modifier.fillMaxSize()) {

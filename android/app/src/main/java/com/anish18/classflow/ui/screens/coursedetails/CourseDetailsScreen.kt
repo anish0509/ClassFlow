@@ -10,6 +10,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -139,7 +142,6 @@ fun CourseDetailsScreen(
         }
     }
 
-    val screenHazeState = LocalScreenHazeState.current
     val targetRequirement = course?.minAttendanceRequirement ?: 75
 
     // Attendance stats
@@ -168,7 +170,7 @@ fun CourseDetailsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             GlassIconButton(
-                icon = Icons.Default.ArrowBack,
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
                 onClick = onBack,
                 size = 40.dp,
@@ -818,7 +820,7 @@ fun CourseDetailsScreen(
                                 .size(36.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.KeyboardArrowLeft,
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = "Previous Month",
                                 tint = TextPrimary
                             )
@@ -845,7 +847,7 @@ fun CourseDetailsScreen(
                                 .size(36.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 contentDescription = "Next Month",
                                 tint = TextPrimary
                             )
@@ -1196,7 +1198,6 @@ fun CourseDetailsScreen(
 
             // ------------------ SECTION: ATTACHMENTS ------------------
             val attachments by viewModel.attachments.collectAsState()
-            val context = LocalContext.current
 
             val filePickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()

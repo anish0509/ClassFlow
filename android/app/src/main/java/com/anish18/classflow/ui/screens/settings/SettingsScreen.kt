@@ -91,8 +91,6 @@ fun SettingsScreen(
 ) {
     val semesters by viewModel.semesters.collectAsState()
     val activeSemester by viewModel.activeSemester.collectAsState()
-    val screenHazeState = LocalScreenHazeState.current
-    val backgroundHazeState = LocalHazeState.current
     val localHazeState = remember { HazeState() }
 
     val context = androidx.compose.ui.platform.LocalContext.current

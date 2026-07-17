@@ -2,6 +2,7 @@ package com.anish18.classflow.data.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -19,6 +20,10 @@ import androidx.room.PrimaryKey
             childColumns = ["semesterId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["courseId"]),
+        Index(value = ["semesterId"])
     ]
 )
 data class ClassSession(
