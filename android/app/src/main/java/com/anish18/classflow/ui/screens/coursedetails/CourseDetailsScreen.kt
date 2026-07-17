@@ -145,12 +145,64 @@ fun CourseDetailsScreen(
     val targetRequirement = course?.minAttendanceRequirement ?: 75
 
     // Attendance stats
-    val totalMarked = attendance.size
     val presentCount = attendance.count { it.status == "present" }
     val absentCount = attendance.count { it.status == "absent" }
-    
-    val attendancePct = if (presentCount + absentCount > 0) {
-        (presentCount.toFloat() / (presentCount + absentCount).toFloat() * 100).toInt()
+
+    val unmarkedCount = remember(classes, attendance, activeSemester) {
+        val semStart = activeSemester?.let {
+            try { java.time.LocalDate.parse(it.startDate) } catch (e: Exception) { null }
+        }
+        val semEnd = activeSemester?.let {
+            try { java.time.LocalDate.parse(it.endDate) } catch (e: Exception) { null }
+        }
+        if (semStart == null || classes.isEmpty()) {
+            0
+        } else {
+            val today = java.time.LocalDate.now()
+            val endLimit = if (semEnd != null && semEnd.isBefore(today)) semEnd else today
+            
+            val scheduledPastDates = mutableListOf<java.time.LocalDate>()
+            var current: java.time.LocalDate = semStart
+            while (!current.isAfter(endLimit)) {
+                val currentDayOfWeek = when (current.dayOfWeek) {
+                    java.time.DayOfWeek.MONDAY -> "Monday"
+                    java.time.DayOfWeek.TUESDAY -> "Tuesday"
+                    java.time.DayOfWeek.WEDNESDAY -> "Wednesday"
+                    java.time.DayOfWeek.THURSDAY -> "Thursday"
+                    java.time.DayOfWeek.FRIDAY -> "Friday"
+                    java.time.DayOfWeek.SATURDAY -> "Saturday"
+                    java.time.DayOfWeek.SUNDAY -> "Sunday"
+                }
+                
+                val hasClass = classes.any { session ->
+                    val d = session.dayOfWeek
+                    val normalized = when {
+                        d.startsWith("MON", ignoreCase = true) -> "Monday"
+                        d.startsWith("TUE", ignoreCase = true) -> "Tuesday"
+                        d.startsWith("WED", ignoreCase = true) -> "Wednesday"
+                        d.startsWith("THU", ignoreCase = true) -> "Thursday"
+                        d.startsWith("FRI", ignoreCase = true) -> "Friday"
+                        d.startsWith("SAT", ignoreCase = true) -> "Saturday"
+                        d.startsWith("SUN", ignoreCase = true) -> "Sunday"
+                        else -> d
+                    }
+                    normalized == currentDayOfWeek
+                }
+                
+                if (hasClass && current.isBefore(today)) {
+                    scheduledPastDates.add(current)
+                }
+                current = current.plusDays(1)
+            }
+            
+            val markedDates = attendance.map { it.date }.toSet()
+            scheduledPastDates.count { !markedDates.contains(it.toString()) }
+        }
+    }
+
+    val totalClasses = presentCount + absentCount + unmarkedCount
+    val attendancePct = if (totalClasses > 0) {
+        ((presentCount.toFloat() / totalClasses.toFloat()) * 100).toInt()
     } else {
         100
     }
@@ -414,7 +466,7 @@ fun CourseDetailsScreen(
             }
 
             // ------------------ CARD 2: ATTENDANCE CARD ------------------
-            val activeLectures = presentCount + absentCount
+            val activeLectures = totalClasses
             val targetFraction = targetRequirement / 100f
 
             val skipCount = if (activeLectures > 0 && attendancePct >= targetRequirement) {
@@ -493,7 +545,7 @@ fun CourseDetailsScreen(
                                     )
                                 }
                                 Text(
-                                    text = "$presentCount/$totalMarked",
+                                    text = "$presentCount/$totalClasses",
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Medium
@@ -553,7 +605,7 @@ fun CourseDetailsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "$presentCount of $totalMarked classes",
+                                    text = "$presentCount of $totalClasses classes",
                                     color = TextSecondary,
                                     fontSize = 14.sp
                                 )
@@ -620,8 +672,8 @@ fun CourseDetailsScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 
-                                val nextBunkPct = if (totalMarked >= 0) {
-                                    (presentCount.toFloat() / (totalMarked + 1).toFloat() * 100).toInt()
+                                val nextBunkPct = if (totalClasses >= 0) {
+                                    (presentCount.toFloat() / (totalClasses + 1).toFloat() * 100).toInt()
                                 } else {
                                     0
                                 }
