@@ -744,7 +744,13 @@ fun WeekViewScreen(
             GlassButton(
                 onClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(5000)
+                        pagerState.animateScrollToPage(
+                            page = 5000,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
                     }
                 },
                 accentColor = NeonBlue,

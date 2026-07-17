@@ -144,13 +144,29 @@ fun HomeScreen(
         val weeksBetween = java.time.temporal.ChronoUnit.DAYS.between(baseSunday, selectedSunday) / 7
         val targetWeekPage = 5000 + weeksBetween.toInt()
         if (pagerState.currentPage != targetWeekPage) {
-            pagerState.scrollToPage(targetWeekPage)
+            launch {
+                pagerState.animateScrollToPage(
+                    page = targetWeekPage,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            }
         }
 
         val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(baseDate, selectedDate)
         val targetDayPage = 50000 + daysBetween.toInt()
         if (dayPagerState.currentPage != targetDayPage) {
-            dayPagerState.scrollToPage(targetDayPage)
+            launch {
+                dayPagerState.animateScrollToPage(
+                    page = targetDayPage,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            }
         }
     }
 
