@@ -15,7 +15,7 @@ import com.anish18.classflow.data.model.*
         CourseAttachment::class,
         Holiday::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class TimetableDatabase : RoomDatabase() {
