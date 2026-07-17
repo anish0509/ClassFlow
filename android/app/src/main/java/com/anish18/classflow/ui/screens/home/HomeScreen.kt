@@ -138,6 +138,9 @@ fun HomeScreen(
     val pagerState = rememberPagerState(initialPage = 5000) { 10000 }
     val dayPagerState = rememberPagerState(initialPage = 50000) { 100000 }
 
+    val isWeekPagerDragged by pagerState.interactionSource.collectIsDraggedAsState()
+    val isDayPagerDragged by dayPagerState.interactionSource.collectIsDraggedAsState()
+
     LaunchedEffect(selectedDate) {
         val selectedSunday = selectedDate.minusDays((selectedDate.dayOfWeek.value % 7).toLong())
         val baseSunday = baseDate.minusDays((baseDate.dayOfWeek.value % 7).toLong())
@@ -171,19 +174,23 @@ fun HomeScreen(
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        val targetSunday = baseDate.plusWeeks((pagerState.currentPage - 5000).toLong())
-            .let { d -> d.minusDays((d.dayOfWeek.value % 7).toLong()) }
-        val currentOffset = selectedDate.dayOfWeek.value % 7
-        val computedDate = targetSunday.plusDays(currentOffset.toLong())
-        if (!computedDate.isEqual(selectedDate)) {
-            viewModel.selectDate(computedDate)
+        if (isWeekPagerDragged) {
+            val targetSunday = baseDate.plusWeeks((pagerState.currentPage - 5000).toLong())
+                .let { d -> d.minusDays((d.dayOfWeek.value % 7).toLong()) }
+            val currentOffset = selectedDate.dayOfWeek.value % 7
+            val computedDate = targetSunday.plusDays(currentOffset.toLong())
+            if (!computedDate.isEqual(selectedDate)) {
+                viewModel.selectDate(computedDate)
+            }
         }
     }
 
     LaunchedEffect(dayPagerState.currentPage) {
-        val computedDate = baseDate.plusDays((dayPagerState.currentPage - 50000).toLong())
-        if (!computedDate.isEqual(selectedDate)) {
-            viewModel.selectDate(computedDate)
+        if (isDayPagerDragged) {
+            val computedDate = baseDate.plusDays((dayPagerState.currentPage - 50000).toLong())
+            if (!computedDate.isEqual(selectedDate)) {
+                viewModel.selectDate(computedDate)
+            }
         }
     }
 
