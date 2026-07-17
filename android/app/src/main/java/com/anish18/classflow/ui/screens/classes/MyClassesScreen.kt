@@ -177,7 +177,8 @@ fun MyClassesScreen(
                                     java.time.DayOfWeek.SUNDAY -> "Sunday"
                                 }
                                 
-                                val hasClass = courseClasses.any { session ->
+                                var hasClassAndPassed = false
+                                courseClasses.forEach { session ->
                                     val d = session.dayOfWeek
                                     val normalized = when {
                                         d.startsWith("MON", ignoreCase = true) -> "Monday"
@@ -189,10 +190,23 @@ fun MyClassesScreen(
                                         d.startsWith("SUN", ignoreCase = true) -> "Sunday"
                                         else -> d
                                     }
-                                    normalized == currentDayOfWeek
+                                    if (normalized == currentDayOfWeek) {
+                                        if (current.isBefore(today)) {
+                                            hasClassAndPassed = true
+                                        } else if (current.isEqual(today)) {
+                                            try {
+                                                val classStart = java.time.LocalTime.parse(session.startTime)
+                                                if (java.time.LocalTime.now().isAfter(classStart)) {
+                                                    hasClassAndPassed = true
+                                                }
+                                            } catch (e: Exception) {
+                                                hasClassAndPassed = true
+                                            }
+                                        }
+                                    }
                                 }
                                 
-                                if (hasClass && current.isBefore(today)) {
+                                if (hasClassAndPassed) {
                                     scheduledPastDates.add(current)
                                 }
                                 current = current.plusDays(1)

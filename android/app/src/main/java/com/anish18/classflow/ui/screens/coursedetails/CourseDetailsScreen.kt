@@ -94,7 +94,7 @@ fun CourseDetailsScreen(
     val course by viewModel.course.collectAsState()
     val classes by viewModel.classes.collectAsState()
     val attendance by viewModel.attendance.collectAsState()
-    val activeSemester by viewModel.activeSemester.collectAsState()
+    val courseSemester by viewModel.courseSemester.collectAsState()
 
     val context = LocalContext.current
     LaunchedEffect(viewModel) {
@@ -148,11 +148,11 @@ fun CourseDetailsScreen(
     val presentCount = attendance.count { it.status == "present" }
     val absentCount = attendance.count { it.status == "absent" }
 
-    val unmarkedCount = remember(classes, attendance, activeSemester) {
-        val semStart = activeSemester?.let {
+    val unmarkedCount = remember(classes, attendance, courseSemester) {
+        val semStart = courseSemester?.let {
             try { java.time.LocalDate.parse(it.startDate) } catch (e: Exception) { null }
         }
-        val semEnd = activeSemester?.let {
+        val semEnd = courseSemester?.let {
             try { java.time.LocalDate.parse(it.endDate) } catch (e: Exception) { null }
         }
         if (semStart == null || classes.isEmpty()) {
@@ -174,7 +174,8 @@ fun CourseDetailsScreen(
                     java.time.DayOfWeek.SUNDAY -> "Sunday"
                 }
                 
-                val hasClass = classes.any { session ->
+                var hasClassAndPassed = false
+                classes.forEach { session ->
                     val d = session.dayOfWeek
                     val normalized = when {
                         d.startsWith("MON", ignoreCase = true) -> "Monday"
@@ -186,10 +187,23 @@ fun CourseDetailsScreen(
                         d.startsWith("SUN", ignoreCase = true) -> "Sunday"
                         else -> d
                     }
-                    normalized == currentDayOfWeek
+                    if (normalized == currentDayOfWeek) {
+                        if (current.isBefore(today)) {
+                            hasClassAndPassed = true
+                        } else if (current.isEqual(today)) {
+                            try {
+                                val classStart = java.time.LocalTime.parse(session.startTime)
+                                if (java.time.LocalTime.now().isAfter(classStart)) {
+                                    hasClassAndPassed = true
+                                }
+                            } catch (e: Exception) {
+                                hasClassAndPassed = true
+                            }
+                        }
+                    }
                 }
                 
-                if (hasClass && current.isBefore(today)) {
+                if (hasClassAndPassed) {
                     scheduledPastDates.add(current)
                 }
                 current = current.plusDays(1)
@@ -811,13 +825,13 @@ fun CourseDetailsScreen(
             val yearMonth = java.time.YearMonth.of(displayedYear, displayedMonth)
             val daysInMonth = yearMonth.lengthOfMonth()
             // Precomputations for calendar performance optimization
-            val semStart = remember(activeSemester) {
-                activeSemester?.let {
+            val semStart = remember(courseSemester) {
+                courseSemester?.let {
                     try { java.time.LocalDate.parse(it.startDate) } catch (e: Exception) { null }
                 }
             }
-            val semEnd = remember(activeSemester) {
-                activeSemester?.let {
+            val semEnd = remember(courseSemester) {
+                courseSemester?.let {
                     try { java.time.LocalDate.parse(it.endDate) } catch (e: Exception) { null }
                 }
             }

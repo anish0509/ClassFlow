@@ -93,6 +93,10 @@ class TimetableRepository @Inject constructor(
         semesterDao.setActiveSemester(semesterId)
     }
 
+    suspend fun getSemesterById(id: String?): Semester? = withContext(ioDispatcher) {
+        if (id == null) null else semesterDao.getSemesterById(id)
+    }
+
     // Courses (dynamically filtered by active semester)
     @OptIn(ExperimentalCoroutinesApi::class)
     val activeCoursesFlow: Flow<List<Course>> = activeSemesterFlow.flatMapLatest { semester ->

@@ -31,6 +31,9 @@ class CourseDetailsViewModel @Inject constructor(
     private val _course = MutableStateFlow<Course?>(null)
     val course: StateFlow<Course?> = _course.asStateFlow()
 
+    private val _courseSemester = MutableStateFlow<Semester?>(null)
+    val courseSemester: StateFlow<Semester?> = _courseSemester.asStateFlow()
+
     val classes: StateFlow<List<ClassSession>> = repository.activeClassesFlow
         .map { list -> list.filter { it.courseId == courseId } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -50,7 +53,11 @@ class CourseDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _course.value = repository.getCourseById(courseId)
+            val c = repository.getCourseById(courseId)
+            _course.value = c
+            if (c != null) {
+                _courseSemester.value = repository.getSemesterById(c.semesterId)
+            }
         }
     }
 
