@@ -61,12 +61,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Checklist
 
 /**
@@ -80,7 +80,7 @@ class MainViewModel @Inject constructor(
 
 @Composable
 fun MainScreen(
-    backgroundStyle: String,
+    @Suppress("UNUSED_PARAMETER") backgroundStyle: String,
     initialRoute: String? = null,
     onRouteConsumed: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -133,7 +133,7 @@ fun MainScreen(
         LocalScreenHazeState provides hazeState,
         LocalTutorialController provides tutorialController
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = modifier.fillMaxSize()) {
             // Background mesh layer
             Box(
                 modifier = Modifier
@@ -395,7 +395,7 @@ fun MainScreen(
                                                 val iconVector = when (screen) {
                                                     Screen.Home -> if (selected) Icons.Filled.Home else Icons.Outlined.Home
                                                     Screen.WeekView -> if (selected) Icons.Filled.CalendarMonth else Icons.Outlined.CalendarMonth
-                                                    Screen.Classes -> if (selected) Icons.Filled.MenuBook else Icons.Outlined.MenuBook
+                                                    Screen.Classes -> if (selected) Icons.AutoMirrored.Filled.MenuBook else Icons.AutoMirrored.Outlined.MenuBook
                                                     Screen.Tasks -> if (selected) Icons.Filled.Checklist else Icons.Outlined.Checklist
                                                     Screen.Settings -> if (selected) Icons.Filled.Settings else Icons.Outlined.Settings
                                                     else -> screen.icon

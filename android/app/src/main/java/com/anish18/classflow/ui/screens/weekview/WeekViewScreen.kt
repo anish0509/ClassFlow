@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -587,7 +588,7 @@ fun WeekViewScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.MenuBook,
+                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
                                 contentDescription = null,
                                 tint = courseColor,
                                 modifier = Modifier.size(16.dp)
@@ -854,7 +855,10 @@ private fun captureAndShareScreenshot(context: Context, view: View, bounds: andr
         // Calculate bottom bar height + stable navigation bar inset to crop it out of the screenshot
         val density = context.resources.displayMetrics.density
         val bottomBarHeightPx = (82 * density).toInt()
-        val navBarInsets = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        val navBarInsets = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            view.rootWindowInsets?.getInsets(android.view.WindowInsets.Type.navigationBars())?.bottom ?: 0
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            @Suppress("DEPRECATION")
             view.rootWindowInsets?.stableInsetBottom ?: 0
         } else {
             0
@@ -917,7 +921,10 @@ private fun fallbackCaptureAndShare(context: Context, view: View, bounds: androi
 
         val density = context.resources.displayMetrics.density
         val bottomBarHeightPx = (82 * density).toInt()
-        val navBarInsets = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        val navBarInsets = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            view.rootWindowInsets?.getInsets(android.view.WindowInsets.Type.navigationBars())?.bottom ?: 0
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            @Suppress("DEPRECATION")
             view.rootWindowInsets?.stableInsetBottom ?: 0
         } else {
             0

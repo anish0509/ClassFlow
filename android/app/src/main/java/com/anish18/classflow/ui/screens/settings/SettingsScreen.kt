@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -468,7 +469,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(start = 70.dp)
                         )
                         SettingItem(
-                            icon = Icons.Default.Input,
+                            icon = Icons.AutoMirrored.Filled.Input,
                             iconTint = NeonBlue,
                             title = "Import Timetable",
                             subtitle = "Import from QR screenshot or JSON file",
@@ -533,7 +534,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(start = 70.dp)
                         )
                         SettingItem(
-                            icon = Icons.Default.Article,
+                            icon = Icons.AutoMirrored.Filled.Article,
                             iconTint = TextMuted,
                             title = "Open Source Licenses"
                         )
@@ -565,7 +566,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(start = 70.dp)
                         )
                         SettingItem(
-                            icon = Icons.Default.Help,
+                            icon = Icons.AutoMirrored.Filled.Help,
                             iconTint = WaterBlue,
                             title = "Help & Guide",
                             subtitle = "Full feature guide & FAQ",
@@ -1359,7 +1360,7 @@ fun SettingsScreen(
                                     }
                                 }
                             }
-                            .addOnFailureListener { e: Exception ->
+                            .addOnFailureListener { _ ->
                                 Toast.makeText(context, "Scanning failed or cancelled.", Toast.LENGTH_SHORT).show()
                             }
                     },
@@ -1787,7 +1788,7 @@ fun SettingItem(
         if (trailingContent != null) {
             trailingContent()
         } else {
-            Icon(Icons.Default.KeyboardArrowRight, null, tint = TextMuted)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TextMuted)
         }
     }
 }
