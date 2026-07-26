@@ -1180,210 +1180,6 @@ fun CourseDetailsScreen(
                 }
             }
 
-            // Custom Rescheduling Shift Modal
-            val classSession = selectedClassForShift
-            GlassDialog(
-                visible = showShiftModal && classSession != null,
-                onDismissRequest = { showShiftModal = false },
-                captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
-            ) {
-                if (classSession != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Text(
-                            text = "Shift Class",
-                            color = TextPrimary,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        
-                        Text(
-                            text = "Reschedule ${course?.name}:",
-                            color = TextSecondary,
-                            fontSize = 13.sp
-                        )
-                        
-                        // Date Selector
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("Shift to date:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                    .clickable { 
-                                        showDatePickerModal = !showDatePickerModal
-                                        showStartTimePickerModal = false
-                                        showEndTimePickerModal = false
-                                    }
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US)
-                                Text(shiftDate.format(dateFormatter), color = TextPrimary, fontSize = 15.sp)
-                                Icon(Icons.Default.CalendarMonth, null, tint = TextMuted, modifier = Modifier.size(20.dp))
-                            }
-                        }
-
-                        AnimatedVisibility(
-                            visible = showDatePickerModal,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                    .padding(vertical = 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                WheelDatePickerInline(
-                                    initialDate = shiftDate,
-                                    onDateChanged = { date ->
-                                        shiftDate = date
-                                    }
-                                )
-                            }
-                        }
-                        
-                        // Time Selectors
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Start Time", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
-                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                        .clickable { 
-                                            showStartTimePickerModal = !showStartTimePickerModal
-                                            showDatePickerModal = false
-                                            showEndTimePickerModal = false
-                                        }
-                                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(String.format(Locale.US, "%02d:%02d", shiftStartHour, shiftStartMinute), color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                            
-                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("End Time", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
-                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                        .clickable { 
-                                            showEndTimePickerModal = !showEndTimePickerModal
-                                            showDatePickerModal = false
-                                            showStartTimePickerModal = false
-                                        }
-                                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(String.format(Locale.US, "%02d:%02d", shiftEndHour, shiftEndMinute), color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-
-                        AnimatedVisibility(
-                            visible = showStartTimePickerModal,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                    .padding(vertical = 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                WheelTimePickerInline(
-                                    initialHour = shiftStartHour,
-                                    initialMinute = shiftStartMinute,
-                                    onTimeChanged = { h, m ->
-                                        shiftStartHour = h
-                                        shiftStartMinute = m
-                                    }
-                                )
-                            }
-                        }
-
-                        AnimatedVisibility(
-                            visible = showEndTimePickerModal,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                    .padding(vertical = 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                WheelTimePickerInline(
-                                    initialHour = shiftEndHour,
-                                    initialMinute = shiftEndMinute,
-                                    onTimeChanged = { h, m ->
-                                        shiftEndHour = h
-                                        shiftEndMinute = m
-                                    }
-                                )
-                            }
-                        }
-                        
-                        // Room Input
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("Room Location", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            AppTextField(
-                                value = shiftRoom,
-                                onValueChange = { shiftRoom = it },
-                                placeholder = { Text("e.g. Room A12") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            GlassDialogButton(
-                                onClick = { showShiftModal = false },
-                                modifier = Modifier
-                            ) {
-                                Text("Cancel", color = TextSecondary, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            GlassButton(
-                                onClick = {
-                                    val start = String.format(Locale.US, "%02d:%02d", shiftStartHour, shiftStartMinute)
-                                    val end = String.format(Locale.US, "%02d:%02d", shiftEndHour, shiftEndMinute)
-                                    viewModel.shiftClassSession(classSession, shiftOriginalDate, shiftDate, start, end, shiftRoom)
-                                    showShiftModal = false
-                                },
-                                accentColor = courseColor,
-                                cornerRadius = 12.dp
-                            ) {
-                                Text("Confirm Shift", color = Color.White, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-            }
-
             // ------------------ SECTION: ATTACHMENTS ------------------
             val attachments by viewModel.attachments.collectAsState()
 
@@ -1648,28 +1444,24 @@ fun CourseDetailsScreen(
         } else null
     }
 
-    AttendanceDialog(
-        currentStatus = attendanceDetails?.third,
-        isFuture = attendanceDetails?.first ?: false,
-        visible = dateStrForAttendance != null && attendanceDetails != null,
-        onDismissRequest = { 
-            selectedDateForAttendance = null 
-        },
-        onMarkAttendance = { status ->
-            if (dateStrForAttendance != null) {
+    if (dateStrForAttendance != null && attendanceDetails != null) {
+        AttendanceDialog(
+            currentStatus = attendanceDetails.third,
+            isFuture = attendanceDetails.first,
+            visible = true,
+            onDismissRequest = { 
+                selectedDateForAttendance = null 
+            },
+            onMarkAttendance = { status ->
                 viewModel.markAttendance(dateStrForAttendance, status)
                 selectedDateForAttendance = null
-            }
-        },
-        onClearAttendance = {
-            if (dateStrForAttendance != null) {
+            },
+            onClearAttendance = {
                 viewModel.markAttendance(dateStrForAttendance, null)
                 selectedDateForAttendance = null
-            }
-        },
-        onShiftClick = {
-            val session = attendanceDetails?.second
-            if (dateStrForAttendance != null && session != null) {
+            },
+            onShiftClick = {
+                val session = attendanceDetails.second
                 selectedClassForShift = session
                 val parsedDate = java.time.LocalDate.parse(dateStrForAttendance)
                 shiftDate = parsedDate
@@ -1691,14 +1483,15 @@ fun CourseDetailsScreen(
                 showShiftModal = true
                 selectedDateForAttendance = null
             }
-        }
-    )
+        )
+    }
 
-    GlassDialog(
-        visible = showAddScheduleDialog,
-        onDismissRequest = { showAddScheduleDialog = false },
-        captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
-    ) {
+    if (showAddScheduleDialog) {
+        GlassDialog(
+            visible = true,
+            onDismissRequest = { showAddScheduleDialog = false },
+            captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
+        ) {
         var dayOfWeek by remember { mutableStateOf("Monday") }
         var startTime by remember { mutableStateOf("09:00") }
         var endTime by remember { mutableStateOf("09:50") }
@@ -1927,12 +1720,14 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
+        }
     }
 
-    GlassDialog(
-        visible = showGoalSelectorDialog,
-        onDismissRequest = { showGoalSelectorDialog = false }
-    ) {
+    if (showGoalSelectorDialog) {
+        GlassDialog(
+            visible = true,
+            onDismissRequest = { showGoalSelectorDialog = false }
+        ) {
         var tempGoal by remember(targetRequirement) { mutableStateOf(targetRequirement) }
 
         // Dialog Form Content Column
@@ -1993,12 +1788,14 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
+        }
     }
 
-    GlassDialog(
-        visible = showProfInfoDialog,
-        onDismissRequest = { showProfInfoDialog = false }
-    ) {
+    if (showProfInfoDialog) {
+        GlassDialog(
+            visible = true,
+            onDismissRequest = { showProfInfoDialog = false }
+        ) {
         // Dialog Form Content Column
         Column(
             modifier = Modifier
@@ -2042,13 +1839,14 @@ fun CourseDetailsScreen(
                     ) {
                         Text("Close", color = Color.White, fontWeight = FontWeight.Bold)
                     }
-                }
+        }
     }
 
-    GlassDialog(
-        visible = showDeleteConfirmDialog,
-        onDismissRequest = { showDeleteConfirmDialog = false }
-    ) {
+    if (showDeleteConfirmDialog) {
+        GlassDialog(
+            visible = true,
+            onDismissRequest = { showDeleteConfirmDialog = false }
+        ) {
         // Dialog Form Content Column
         Column(
             modifier = Modifier
@@ -2103,9 +1901,9 @@ fun CourseDetailsScreen(
     }
 
         val currentCourse = course
-        if (currentCourse != null) {
+        if (currentCourse != null && showEditCourseDialog) {
             GlassDialog(
-                visible = showEditCourseDialog,
+                visible = true,
                 onDismissRequest = { showEditCourseDialog = false }
             ) {
                 var name by remember(currentCourse) { mutableStateOf(currentCourse.name) }
@@ -2403,6 +2201,212 @@ fun CourseDetailsScreen(
                     }
         }
     }
+
+        // Custom Rescheduling Shift Modal
+        val classSessionForShift = selectedClassForShift
+        if (showShiftModal && classSessionForShift != null) {
+            GlassDialog(
+                visible = true,
+                onDismissRequest = { showShiftModal = false },
+                captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = "Shift Class",
+                        color = TextPrimary,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = "Reschedule ${course?.name}:",
+                        color = TextSecondary,
+                        fontSize = 13.sp
+                    )
+                    
+                    // Date Selector
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Shift to date:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .clickable { 
+                                    showDatePickerModal = !showDatePickerModal
+                                    showStartTimePickerModal = false
+                                    showEndTimePickerModal = false
+                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US)
+                            Text(shiftDate.format(dateFormatter), color = TextPrimary, fontSize = 15.sp)
+                            Icon(Icons.Default.CalendarMonth, null, tint = TextMuted, modifier = Modifier.size(20.dp))
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = showDatePickerModal,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .padding(vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            WheelDatePickerInline(
+                                initialDate = shiftDate,
+                                onDateChanged = { date ->
+                                    shiftDate = date
+                                }
+                            )
+                        }
+                    }
+                    
+                    // Time Selectors
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Start Time", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
+                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                    .clickable { 
+                                        showStartTimePickerModal = !showStartTimePickerModal
+                                        showDatePickerModal = false
+                                        showEndTimePickerModal = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(String.format(Locale.US, "%02d:%02d", shiftStartHour, shiftStartMinute), color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("End Time", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
+                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                    .clickable { 
+                                        showEndTimePickerModal = !showEndTimePickerModal
+                                        showDatePickerModal = false
+                                        showStartTimePickerModal = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(String.format(Locale.US, "%02d:%02d", shiftEndHour, shiftEndMinute), color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = showStartTimePickerModal,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .padding(vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            WheelTimePickerInline(
+                                initialHour = shiftStartHour,
+                                initialMinute = shiftStartMinute,
+                                onTimeChanged = { h, m ->
+                                    shiftStartHour = h
+                                    shiftStartMinute = m
+                                }
+                            )
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = showEndTimePickerModal,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .padding(vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            WheelTimePickerInline(
+                                initialHour = shiftEndHour,
+                                initialMinute = shiftEndMinute,
+                                onTimeChanged = { h, m ->
+                                    shiftEndHour = h
+                                    shiftEndMinute = m
+                                }
+                            )
+                        }
+                    }
+                    
+                    // Room Input
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Room Location", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        AppTextField(
+                            value = shiftRoom,
+                            onValueChange = { shiftRoom = it },
+                            placeholder = { Text("e.g. Room A12") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        GlassDialogButton(
+                            onClick = { showShiftModal = false },
+                            modifier = Modifier
+                        ) {
+                            Text("Cancel", color = TextSecondary, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        GlassButton(
+                            onClick = {
+                                val start = String.format(Locale.US, "%02d:%02d", shiftStartHour, shiftStartMinute)
+                                val end = String.format(Locale.US, "%02d:%02d", shiftEndHour, shiftEndMinute)
+                                viewModel.shiftClassSession(classSessionForShift, shiftOriginalDate, shiftDate, start, end, shiftRoom)
+                                showShiftModal = false
+                            },
+                            accentColor = courseColor,
+                            cornerRadius = 12.dp
+                        ) {
+                            Text("Confirm Shift", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+        }
+        }
+    }
+}
 }
 }
 }
