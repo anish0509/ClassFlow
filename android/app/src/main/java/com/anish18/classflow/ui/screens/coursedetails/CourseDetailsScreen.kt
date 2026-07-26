@@ -1682,8 +1682,14 @@ fun CourseDetailsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val suggestedRooms = remember(classes, course) {
+                            val set = mutableSetOf<String>()
+                            course?.room?.takeIf { it.isNotBlank() }?.let { set.add(it) }
+                            classes.mapNotNull { it.room?.takeIf { r -> r.isNotBlank() } }.forEach { set.add(it) }
+                            if (set.isEmpty()) listOf("LH-101", "Lab 2", "Auditorium") else set.toList()
+                        }
                         Text("Recent:", color = TextSecondary, fontSize = 12.sp)
-                        listOf("A18", "A17", "A10").forEach { item ->
+                        suggestedRooms.take(3).forEach { item ->
                             Box(
                                 modifier = Modifier
                                     .background(CardBackground.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
@@ -1736,14 +1742,12 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
-        }
     }
 
-    if (showGoalSelectorDialog) {
-        GlassDialog(
-            visible = true,
-            onDismissRequest = { showGoalSelectorDialog = false }
-        ) {
+    GlassDialog(
+        visible = showGoalSelectorDialog,
+        onDismissRequest = { showGoalSelectorDialog = false }
+    ) {
         var tempGoal by remember(targetRequirement) { mutableStateOf(targetRequirement) }
 
         // Dialog Form Content Column
@@ -1807,11 +1811,10 @@ fun CourseDetailsScreen(
         }
     }
 
-    if (showProfInfoDialog) {
-        GlassDialog(
-            visible = true,
-            onDismissRequest = { showProfInfoDialog = false }
-        ) {
+    GlassDialog(
+        visible = showProfInfoDialog,
+        onDismissRequest = { showProfInfoDialog = false }
+    ) {
         // Dialog Form Content Column
         Column(
             modifier = Modifier
@@ -1858,11 +1861,10 @@ fun CourseDetailsScreen(
         }
     }
 
-    if (showDeleteConfirmDialog) {
-        GlassDialog(
-            visible = true,
-            onDismissRequest = { showDeleteConfirmDialog = false }
-        ) {
+    GlassDialog(
+        visible = showDeleteConfirmDialog,
+        onDismissRequest = { showDeleteConfirmDialog = false }
+    ) {
         // Dialog Form Content Column
         Column(
             modifier = Modifier
@@ -1916,316 +1918,315 @@ fun CourseDetailsScreen(
                 }
     }
 
-        val currentCourse = course
-        if (currentCourse != null && showEditCourseDialog) {
-            GlassDialog(
-                visible = true,
-                onDismissRequest = { showEditCourseDialog = false }
+    val currentCourse = course
+    if (currentCourse != null) {
+        GlassDialog(
+            visible = showEditCourseDialog,
+            onDismissRequest = { showEditCourseDialog = false }
+        ) {
+            var name by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.name) }
+            var shortName by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.shortName) }
+            var professor by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.professor) }
+            var credits by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.credits.toString()) }
+            var room by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.room) }
+            var colorHex by remember(showEditCourseDialog, currentCourse) { mutableStateOf(currentCourse.color) }
+
+            // Dialog Form Content Column
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                var name by remember(currentCourse) { mutableStateOf(currentCourse.name) }
-                var shortName by remember(currentCourse) { mutableStateOf(currentCourse.shortName) }
-                var professor by remember(currentCourse) { mutableStateOf(currentCourse.professor) }
-                var credits by remember(currentCourse) { mutableStateOf(currentCourse.credits.toString()) }
-                var room by remember(currentCourse) { mutableStateOf(currentCourse.room) }
-                var colorHex by remember(currentCourse) { mutableStateOf(currentCourse.color) }
+                        Text(
+                            text = "Edit Course",
+                            color = TextPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Serif
+                        )
 
-                // Dialog Form Content Column
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                            Text(
-                                text = "Edit Course",
-                                color = TextPrimary,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Serif
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Course Name
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Course Name *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            AppTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                placeholder = { Text("e.g., Introduction to Programming") },
+                                modifier = Modifier.fillMaxWidth()
                             )
+                        }
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                        // Short Code
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Short Name *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            AppTextField(
+                                value = shortName,
+                                onValueChange = { shortName = it },
+                                placeholder = { Text("e.g., Intro Prog") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
 
-                            // Course Name
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Course Name *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        // Professor
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Professor *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            AppTextField(
+                                value = professor,
+                                onValueChange = { professor = it },
+                                placeholder = { Text("e.g., Dr. Smith") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        // Credits and Room side-by-side
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("Credits", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 AppTextField(
-                                    value = name,
-                                    onValueChange = { name = it },
-                                    placeholder = { Text("e.g., Introduction to Programming") },
+                                    value = credits,
+                                    onValueChange = { credits = it },
+                                    placeholder = { Text("3") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
+                            }
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("Default Room *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                AppTextField(
+                                    value = room,
+                                    onValueChange = { room = it },
+                                    placeholder = { Text("e.g., LH-101") },
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
+                        }
 
-                            // Short Code
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Short Name *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                AppTextField(
-                                    value = shortName,
-                                    onValueChange = { shortName = it },
-                                    placeholder = { Text("e.g., Intro Prog") },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-                            // Professor
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Professor *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                AppTextField(
-                                    value = professor,
-                                    onValueChange = { professor = it },
-                                    placeholder = { Text("e.g., Dr. Smith") },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-                            // Credits and Room side-by-side
+                        // Accent Color Palette
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("Course Color", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            val colorOptions = listOf(
+                                "#8FD8EC" to NeonBlue,
+                                "#C3B1E1" to Color(0xFFC3B1E1),
+                                "#2DD4BF" to Color(0xFF2DD4BF),
+                                "#A78BFA" to Color(0xFFA78BFA),
+                                "#EC4899" to Color(0xFFEC4899),
+                                "#06B6D4" to Color(0xFF06B6D4),
+                                "#F97316" to Color(0xFFF97316),
+                                "#10B981" to Color(0xFF10B981),
+                                "#EF4444" to Color(0xFFEF4444),
+                                "#8B5CF6" to Color(0xFF8B5CF6)
+                            )
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Text("Credits", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                    AppTextField(
-                                        value = credits,
-                                        onValueChange = { credits = it },
-                                        placeholder = { Text("3") },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                                    )
-                                }
-                                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Text("Default Room *", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                    AppTextField(
-                                        value = room,
-                                        onValueChange = { room = it },
-                                        placeholder = { Text("e.g., LH-101") },
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
-
-                            // Accent Color Palette
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Course Color", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                val colorOptions = listOf(
-                                    "#8FD8EC" to NeonBlue,
-                                    "#C3B1E1" to Color(0xFFC3B1E1),
-                                    "#2DD4BF" to Color(0xFF2DD4BF),
-                                    "#A78BFA" to Color(0xFFA78BFA),
-                                    "#EC4899" to Color(0xFFEC4899),
-                                    "#06B6D4" to Color(0xFF06B6D4),
-                                    "#F97316" to Color(0xFFF97316),
-                                    "#10B981" to Color(0xFF10B981),
-                                    "#EF4444" to Color(0xFFEF4444),
-                                    "#8B5CF6" to Color(0xFF8B5CF6)
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    colorOptions.forEach { (hex, col) ->
-                                        val isSelected = colorHex.equals(hex, ignoreCase = true)
-                                        Box(
-                                            modifier = Modifier
-                                                .size(38.dp)
-                                                .background(col, RoundedCornerShape(19.dp))
-                                                .border(
-                                                    width = if (isSelected) 3.dp else 0.dp,
-                                                    color = if (isSelected) Color.White else Color.Transparent,
-                                                    shape = RoundedCornerShape(19.dp)
-                                                )
-                                                .clickable { colorHex = hex },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            if (isSelected) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = "Selected",
-                                                    tint = Color.Black,
-                                                    modifier = Modifier.size(16.dp)
-                                                )
-                                            }
+                                colorOptions.forEach { (hex, col) ->
+                                    val isSelected = colorHex.equals(hex, ignoreCase = true)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(38.dp)
+                                            .background(col, RoundedCornerShape(19.dp))
+                                            .border(
+                                                width = if (isSelected) 3.dp else 0.dp,
+                                                color = if (isSelected) Color.White else Color.Transparent,
+                                                shape = RoundedCornerShape(19.dp)
+                                            )
+                                            .clickable { colorHex = hex },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = "Selected",
+                                                tint = Color.Black,
+                                                modifier = Modifier.size(16.dp)
+                                            )
                                         }
                                     }
                                 }
                             }
+                        }
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            HorizontalDivider(color = CardBackground.copy(alpha = 0.2f))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HorizontalDivider(color = CardBackground.copy(alpha = 0.2f))
 
-                            // Action Buttons
-                             Row(
-                                 modifier = Modifier
-                                     .fillMaxWidth()
-                                     .padding(horizontal = 8.dp, vertical = 6.dp)
-                                     .height(46.dp),
-                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                 verticalAlignment = Alignment.CenterVertically
+                        // Action Buttons
+                         Row(
+                             modifier = Modifier
+                                 .fillMaxWidth()
+                                 .padding(horizontal = 8.dp, vertical = 6.dp)
+                                 .height(46.dp),
+                             horizontalArrangement = Arrangement.spacedBy(12.dp),
+                             verticalAlignment = Alignment.CenterVertically
+                         ) {
+                             GlassDialogButton(
+                                 onClick = { showEditCourseDialog = false },
+                                 modifier = Modifier.weight(1f).fillMaxHeight()
                              ) {
-                                 GlassDialogButton(
-                                     onClick = { showEditCourseDialog = false },
-                                     modifier = Modifier.weight(1f).fillMaxHeight()
-                                 ) {
-                                     Text("Cancel", color = TextSecondary, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                                 }
-                                 GlassDialogButton(
-                                     onClick = {
-                                         if (name.isNotEmpty() && shortName.isNotEmpty() && professor.isNotEmpty() && room.isNotEmpty()) {
-                                             val credsVal = credits.toIntOrNull() ?: 3
-                                             viewModel.updateCourseDetails(name, shortName, professor, credsVal, room, colorHex)
-                                             showEditCourseDialog = false
-                                         }
-                                     },
-                                    modifier = Modifier.weight(1f).fillMaxHeight()
-                                ) {
-                                    Text("Save", color = NeonBlue, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                                }
+                                 Text("Cancel", color = TextSecondary, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                             }
+                             GlassDialogButton(
+                                 onClick = {
+                                     if (name.isNotEmpty() && shortName.isNotEmpty() && professor.isNotEmpty() && room.isNotEmpty()) {
+                                         val credsVal = credits.toIntOrNull() ?: 3
+                                         viewModel.updateCourseDetails(name, shortName, professor, credsVal, room, colorHex)
+                                         showEditCourseDialog = false
+                                     }
+                                 },
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            ) {
+                                Text("Save", color = NeonBlue, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             }
-                        }
-            }
-        }
-
-        // Add Exam / Quiz Dialog
-        if (showAddExamDialog) {
-            var newExamTitle by remember { mutableStateOf("") }
-            var newExamType by remember { mutableStateOf("Midterm") }
-            var newExamDate by remember { mutableStateOf(java.time.LocalDate.now().plusDays(7).toString()) }
-            var newExamTime by remember { mutableStateOf("09:00 AM") }
-            var newExamLocation by remember { mutableStateOf("") }
-            var newExamNotes by remember { mutableStateOf("") }
-
-            GlassDialog(
-                visible = true,
-                onDismissRequest = { showAddExamDialog = false }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Schedule Exam / Quiz for ${course?.shortName ?: course?.name ?: "Course"}",
-                        color = TextPrimary,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    // Title
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Exam Title *", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                        AppTextField(
-                            value = newExamTitle,
-                            onValueChange = { newExamTitle = it },
-                            placeholder = { Text("e.g. Midterm 1") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    // Type
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Exam Type", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                        val types = listOf("Midterm", "Quiz", "Final", "Lab Exam")
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            types.forEach { t ->
-                                val isSelected = newExamType == t
-                                Box(
-                                    modifier = Modifier
-                                        .background(if (isSelected) WaterBlue.copy(alpha = 0.20f) else CardBackground.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
-                                        .border(1.dp, if (isSelected) WaterBlue else FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
-                                        .clickable { newExamType = t }
-                                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                                ) {
-                                    Text(t, color = if (isSelected) WaterBlue else TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-                    }
-
-                    // Date & Time
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("Date (YYYY-MM-DD)", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                            AppTextField(
-                                value = newExamDate,
-                                onValueChange = { newExamDate = it },
-                                placeholder = { Text("2026-10-15") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("Time", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                            AppTextField(
-                                value = newExamTime,
-                                onValueChange = { newExamTime = it },
-                                placeholder = { Text("09:00 AM") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    // Location
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Room / Hall Location", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                        AppTextField(
-                            value = newExamLocation,
-                            onValueChange = { newExamLocation = it },
-                            placeholder = { Text("e.g. Hall A17") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    // Notes
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Syllabus / Topics Covered", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                        AppTextField(
-                            value = newExamNotes,
-                            onValueChange = { newExamNotes = it },
-                            placeholder = { Text("e.g. Chapters 1-4") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        GlassTextButton(onClick = { showAddExamDialog = false }) {
-                            Text("Cancel", color = TextSecondary)
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        GlassButton(
-                            onClick = {
-                                if (newExamTitle.isNotBlank()) {
-                                    viewModel.addExam(newExamTitle, newExamType, newExamDate, newExamTime, newExamLocation, newExamNotes)
-                                    showAddExamDialog = false
-                                }
-                            },
-                            accentColor = WaterBlue
-                        ) {
-                            Text("Save Exam", color = TextPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
         }
     }
 
-        // Custom Rescheduling Shift Modal
-        val classSessionForShift = selectedClassForShift
-        if (showShiftModal && classSessionForShift != null) {
-            GlassDialog(
-                visible = true,
-                onDismissRequest = { showShiftModal = false },
-                captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
+    // Add Exam / Quiz Dialog
+    GlassDialog(
+        visible = showAddExamDialog,
+        onDismissRequest = { showAddExamDialog = false }
+    ) {
+        var newExamTitle by remember(showAddExamDialog) { mutableStateOf("") }
+        var newExamType by remember(showAddExamDialog) { mutableStateOf("Midterm") }
+        var newExamDate by remember(showAddExamDialog) { mutableStateOf(java.time.LocalDate.now().plusDays(7).toString()) }
+        var newExamTime by remember(showAddExamDialog) { mutableStateOf("09:00 AM") }
+        var newExamLocation by remember(showAddExamDialog) { mutableStateOf("") }
+        var newExamNotes by remember(showAddExamDialog) { mutableStateOf("") }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Schedule Exam / Quiz for ${course?.shortName ?: course?.name ?: "Course"}",
+                color = TextPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Title
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Exam Title *", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                AppTextField(
+                    value = newExamTitle,
+                    onValueChange = { newExamTitle = it },
+                    placeholder = { Text("e.g. Midterm 1") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            // Type
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Exam Type", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                val types = listOf("Midterm", "Quiz", "Final", "Lab Exam")
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    types.forEach { t ->
+                        val isSelected = newExamType == t
+                        Box(
+                            modifier = Modifier
+                                .background(if (isSelected) WaterBlue.copy(alpha = 0.20f) else CardBackground.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                .border(1.dp, if (isSelected) WaterBlue else FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                                .clickable { newExamType = t }
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                        ) {
+                            Text(t, color = if (isSelected) WaterBlue else TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            // Date & Time
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Date (YYYY-MM-DD)", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                    AppTextField(
+                        value = newExamDate,
+                        onValueChange = { newExamDate = it },
+                        placeholder = { Text("2026-10-15") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Time", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                    AppTextField(
+                        value = newExamTime,
+                        onValueChange = { newExamTime = it },
+                        placeholder = { Text("09:00 AM") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // Location
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Room / Hall Location", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                AppTextField(
+                    value = newExamLocation,
+                    onValueChange = { newExamLocation = it },
+                    placeholder = { Text("e.g. Hall A17") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            // Notes
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Syllabus / Topics Covered", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                AppTextField(
+                    value = newExamNotes,
+                    onValueChange = { newExamNotes = it },
+                    placeholder = { Text("e.g. Chapters 1-4") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                GlassTextButton(onClick = { showAddExamDialog = false }) {
+                    Text("Cancel", color = TextSecondary)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                GlassButton(
+                    onClick = {
+                        if (newExamTitle.isNotBlank()) {
+                            viewModel.addExam(newExamTitle, newExamType, newExamDate, newExamTime, newExamLocation, newExamNotes)
+                            showAddExamDialog = false
+                        }
+                    },
+                    accentColor = WaterBlue
+                ) {
+                    Text("Save Exam", color = TextPrimary, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+
+    // Custom Rescheduling Shift Modal
+    val classSessionForShift = selectedClassForShift
+    if (classSessionForShift != null) {
+        GlassDialog(
+            visible = showShiftModal,
+            onDismissRequest = { showShiftModal = false },
+            captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
+        ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -2422,7 +2423,4 @@ fun CourseDetailsScreen(
             }
         }
     }
-}
-}
-}
 }
