@@ -1178,6 +1178,8 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
+            }
+
             // Custom Rescheduling Shift Modal
             val classSession = selectedClassForShift
             GlassDialog(
@@ -2399,8 +2401,7 @@ fun CourseDetailsScreen(
                             Text("Save Exam", color = TextPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
-                }
-            }
+        }
     }
 }
 }
