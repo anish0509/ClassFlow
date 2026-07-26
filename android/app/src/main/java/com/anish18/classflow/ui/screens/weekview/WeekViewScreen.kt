@@ -417,27 +417,25 @@ fun WeekViewScreen(
                                                                 fontWeight = FontWeight.Bold,
                                                                 maxLines = 1
                                                             )
-                                                            if (columns.size == 1) {
-                                                                session.room?.let { roomVal ->
-                                                                    if (roomVal.isNotEmpty()) {
-                                                                        Text(
-                                                                            text = roomVal,
-                                                                            color = TextSecondary,
-                                                                            fontSize = 8.5.sp,
-                                                                            fontWeight = FontWeight.Medium,
-                                                                            maxLines = 1
-                                                                        )
-                                                                    }
-                                                                }
-                                                                if (durationMin >= 45) {
-                                                                    Text(
-                                                                        text = "${session.startTime} - ${session.endTime}",
-                                                                        color = TextSecondary,
-                                                                        fontSize = 8.sp,
-                                                                        fontWeight = FontWeight.Medium,
-                                                                        maxLines = 1
-                                                                    )
-                                                                }
+                                                            val locationStr = session.room?.takeIf { it.isNotBlank() } ?: associatedCourse?.room?.takeIf { it.isNotBlank() }
+
+                                                            if (!locationStr.isNullOrBlank()) {
+                                                                Text(
+                                                                    text = locationStr,
+                                                                    color = TextSecondary,
+                                                                    fontSize = if (numDays > 3 || columns.size > 1) 7.5.sp else 8.5.sp,
+                                                                    fontWeight = FontWeight.Medium,
+                                                                    maxLines = 1
+                                                                )
+                                                            }
+                                                            if (locationStr.isNullOrBlank() || durationMin >= 45 || numDays <= 3) {
+                                                                Text(
+                                                                    text = "${session.startTime} - ${session.endTime}",
+                                                                    color = TextSecondary,
+                                                                    fontSize = if (numDays > 3 || columns.size > 1) 7.sp else 8.sp,
+                                                                    fontWeight = FontWeight.Medium,
+                                                                    maxLines = 1
+                                                                )
                                                             }
                                                         }
                                                     }
