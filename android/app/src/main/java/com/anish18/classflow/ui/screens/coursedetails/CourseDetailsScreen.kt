@@ -227,48 +227,39 @@ fun CourseDetailsScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
                 .statusBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Back button and header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            GlassIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                onClick = onBack,
-                size = 40.dp,
-                iconSize = 20.dp,
-                tint = TextPrimary
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            // Back button and header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GlassIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    onClick = onBack,
+                    size = 40.dp,
+                    iconSize = 20.dp,
+                    tint = TextPrimary
+                )
+                Spacer(modifier = Modifier.width(14.dp))
                 Text(
                     text = "Subject Details",
                     color = courseColor,
                     fontSize = 18.sp,
-                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Single Unified Scrollable Content Column
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+            // Single Unified Scrollable Content Column
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
             // ------------------ CARD 1: COURSE INFO & SCHEDULE CARD ------------------
             GlassCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -355,9 +346,8 @@ fun CourseDetailsScreen(
                         Text(
                             text = course?.name ?: "Subject",
                             color = TextPrimary,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Serif
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "by ${course?.professor ?: "Unknown"}",
