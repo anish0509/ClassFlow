@@ -445,36 +445,106 @@ class SettingsViewModel @Inject constructor(
                 val icsText = withContext(defaultDispatcher) {
                     val classes = repository.allClassesFlow.first()
                     val courses = repository.allCoursesFlow.first()
-                    
+                    val semesters = repository.allSemestersFlow.first()
+                    val activeSem = repository.activeSemesterFlow.first()
+
+                    val dtfDate = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")
+                    val nowUtc = java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"))
+
                     val sb = java.lang.StringBuilder()
-                    sb.append("BEGIN:VCALENDAR\n")
-                    sb.append("VERSION:2.0\n")
-                    sb.append("PRODID:-//ClassFlow//Timetable//EN\n")
-                    
+                    sb.append("BEGIN:VCALENDAR\r\n")
+                    sb.append("VERSION:2.0\r\n")
+                    sb.append("PRODID:-//ClassFlow//UniTimetable//EN\r\n")
+                    sb.append("CALSCALE:GREGORIAN\r\n")
+                    sb.append("METHOD:PUBLISH\r\n")
+                    sb.append("X-WR-CALNAME:ClassFlow Timetable\r\n")
+
                     classes.forEach { session ->
                         val course = courses.find { it.id == session.courseId }
-                        sb.append("BEGIN:VEVENT\n")
-                        sb.append("SUMMARY:${course?.name ?: "Class"}\n")
-                        sb.append("LOCATION:${session.room ?: "N/A"}\n")
-                        val dayAbbr = when(session.dayOfWeek.lowercase()) {
-                            "monday" -> "MO"
-                            "tuesday" -> "TU"
-                            "wednesday" -> "WE"
-                            "thursday" -> "TH"
-                            "friday" -> "FR"
-                            "saturday" -> "SA"
-                            "sunday" -> "SU"
-                            else -> "MO"
+                        val semester = semesters.find { it.id == (session.semesterId ?: course?.semesterId) } ?: activeSem
+
+                        val semStart = try {
+                            if (!semester?.startDate.isNullOrEmpty()) java.time.LocalDate.parse(semester?.startDate) else java.time.LocalDate.now()
+                        } catch (e: Exception) {
+                            java.time.LocalDate.now()
                         }
-                        sb.append("RRULE:FREQ=WEEKLY;BYDAY=$dayAbbr\n")
-                        val startStr = session.startTime.replace(":", "") + "00"
-                        val endStr = session.endTime.replace(":", "") + "00"
-                        sb.append("DTSTART:20260706T$startStr\n")
-                        sb.append("DTEND:20260706T$endStr\n")
-                        sb.append("END:VEVENT\n")
+                        val semEnd = try {
+                            if (!semester?.endDate.isNullOrEmpty()) java.time.LocalDate.parse(semester?.endDate) else semStart.plusMonths(4)
+                        } catch (e: Exception) {
+                            semStart.plusMonths(4)
+                        }
+
+                        val targetDay = when (session.dayOfWeek.lowercase().trim()) {
+                            "monday" -> java.time.DayOfWeek.MONDAY
+                            "tuesday" -> java.time.DayOfWeek.TUESDAY
+                            "wednesday" -> java.time.DayOfWeek.WEDNESDAY
+                            "thursday" -> java.time.DayOfWeek.THURSDAY
+                            "friday" -> java.time.DayOfWeek.FRIDAY
+                            "saturday" -> java.time.DayOfWeek.SATURDAY
+                            "sunday" -> java.time.DayOfWeek.SUNDAY
+                            else -> java.time.DayOfWeek.MONDAY
+                        }
+
+                        val dayAbbr = when (targetDay) {
+                            java.time.DayOfWeek.MONDAY -> "MO"
+                            java.time.DayOfWeek.TUESDAY -> "TU"
+                            java.time.DayOfWeek.WEDNESDAY -> "WE"
+                            java.time.DayOfWeek.THURSDAY -> "TH"
+                            java.time.DayOfWeek.FRIDAY -> "FR"
+                            java.time.DayOfWeek.SATURDAY -> "SA"
+                            java.time.DayOfWeek.SUNDAY -> "SU"
+                        }
+
+                        // Calculate the FIRST occurrence of this day of the week on or after semStart
+                        var firstOccur = semStart
+                        while (firstOccur.dayOfWeek != targetDay) {
+                            firstOccur = firstOccur.plusDays(1)
+                        }
+
+                        fun formatTime(tStr: String): String {
+                            val parts = tStr.split(":")
+                            val h = parts.getOrNull(0)?.toIntOrNull() ?: 9
+                            val m = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                            return String.format(java.util.Locale.US, "%02d%02d00", h, m)
+                        }
+
+                        val startFormatted = formatTime(session.startTime)
+                        val endFormatted = formatTime(session.endTime)
+                        val startDateStr = firstOccur.format(dtfDate)
+                        val untilDateStr = semEnd.format(dtfDate)
+
+                        val summary = if (!course?.shortName.isNullOrEmpty()) {
+                            "${course?.name} (${course?.shortName})"
+                        } else {
+                            course?.name ?: "Class"
+                        }
+                        val location = session.room ?: course?.room ?: ""
+
+                        sb.append("BEGIN:VEVENT\r\n")
+                        sb.append("UID:classflow_${session.id}_${startDateStr}@classflow\r\n")
+                        sb.append("DTSTAMP:$nowUtc\r\n")
+                        sb.append("SUMMARY:$summary\r\n")
+                        if (location.isNotBlank()) {
+                            sb.append("LOCATION:$location\r\n")
+                        }
+                        val desc = "Course: ${course?.name ?: ""}\\nProf: ${course?.professor ?: "N/A"}\\nRoom: $location"
+                        sb.append("DESCRIPTION:$desc\r\n")
+                        sb.append("DTSTART:${startDateStr}T$startFormatted\r\n")
+                        sb.append("DTEND:${startDateStr}T$endFormatted\r\n")
+                        sb.append("RRULE:FREQ=WEEKLY;BYDAY=$dayAbbr;UNTIL=${untilDateStr}T235959Z\r\n")
+
+                        // 15-minute advance notification alarm for Google Calendar / Apple Calendar
+                        sb.append("BEGIN:VALARM\r\n")
+                        sb.append("TRIGGER:-PT15M\r\n")
+                        sb.append("ACTION:DISPLAY\r\n")
+                        sb.append("DESCRIPTION:Class Reminder: $summary\r\n")
+                        sb.append("END:VALARM\r\n")
+
+                        sb.append("END:VEVENT\r\n")
                     }
-                    
-                    sb.append("END:VCALENDAR\n")
+
+                    sb.append("END:VCALENDAR\r\n")
                     sb.toString()
                 }
                 onExportReady(icsText)
