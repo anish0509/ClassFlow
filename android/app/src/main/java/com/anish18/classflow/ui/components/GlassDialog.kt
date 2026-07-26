@@ -120,15 +120,9 @@ fun GlassDialog(
                                 onClick = { /* consume click — prevent backdrop dismiss */ }
                             ),
                         cornerRadius = 36.dp,
-                        thickness = 18.dp,
-                        ior = 1.55f,
-                        blurRadius = 8f,
                         displacementScale = if (isDark) 0.35f else 0.10f,
                         normalStrength = if (isDark) 1.15f else 0.65f,
                         brightness = if (isDark) 1.08f else 1.00f,
-                        chromaticAberration = 2.0f,
-                        rimStrength = 1.4f,
-                        glassColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.35f),
                         captureEnabled = captureEnabled,
                         updateKey = isDark
                     ) {
