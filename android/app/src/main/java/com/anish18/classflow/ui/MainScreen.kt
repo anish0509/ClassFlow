@@ -197,9 +197,6 @@ fun MainScreen(
                                 composable(Screen.Tasks.route) {
                                     TasksScreen()
                                 }
-                                composable(Screen.Exams.route) {
-                                    ExamsScreen()
-                                }
                                 composable(Screen.Settings.route) {
                                     SettingsScreen(
                                         onNavigateToHelp = {

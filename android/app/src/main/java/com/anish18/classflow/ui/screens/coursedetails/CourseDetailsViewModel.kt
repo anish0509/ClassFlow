@@ -6,20 +6,25 @@ import androidx.lifecycle.viewModelScope
 import com.anish18.classflow.data.model.Attendance
 import com.anish18.classflow.data.model.ClassSession
 import com.anish18.classflow.data.model.Course
+import com.anish18.classflow.data.model.Exam
 import com.anish18.classflow.data.model.Semester
+import com.anish18.classflow.data.repository.ExamRepository
 import com.anish18.classflow.data.repository.TimetableRepository
 import android.content.Context
 import android.widget.Toast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CourseDetailsViewModel @Inject constructor(
     private val repository: TimetableRepository,
+    private val examRepository: ExamRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -50,6 +55,11 @@ class CourseDetailsViewModel @Inject constructor(
 
     val activeSemester: StateFlow<Semester?> = repository.activeSemesterFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val courseExams: StateFlow<List<Exam>> = activeSemester.flatMapLatest { sem ->
+        if (sem == null) flowOf(emptyList())
+        else examRepository.getExamsForSemester(sem.id).map { list -> list.filter { it.courseId == courseId } }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -86,6 +96,29 @@ class CourseDetailsViewModel @Inject constructor(
     fun deleteClassSession(classSession: ClassSession) {
         viewModelScope.launch {
             repository.deleteClass(classSession)
+        }
+    }
+
+    fun addExam(title: String, type: String, examDate: String, examTime: String, location: String?, notes: String?) {
+        viewModelScope.launch {
+            val semId = courseSemester.value?.id ?: activeSemester.value?.id ?: return@launch
+            val exam = Exam(
+                title = title.trim(),
+                examType = type,
+                courseId = courseId,
+                examDate = examDate,
+                examTime = examTime,
+                location = location?.trim()?.ifEmpty { null },
+                notes = notes?.trim()?.ifEmpty { null },
+                semesterId = semId
+            )
+            examRepository.addExam(exam)
+        }
+    }
+
+    fun deleteExam(exam: Exam) {
+        viewModelScope.launch {
+            examRepository.deleteExam(exam)
         }
     }
 
@@ -186,13 +219,11 @@ class CourseDetailsViewModel @Inject constructor(
     fun markAttendance(date: String, status: String?, notes: String? = null) {
         viewModelScope.launch {
             try {
-                // Find which class session corresponds to this date's weekday
                 val localDate = java.time.LocalDate.parse(date)
-                val weekdayStr = localDate.dayOfWeek.name.lowercase() // e.g. "monday"
+                val weekdayStr = localDate.dayOfWeek.name.lowercase()
                 val session = classes.value.find { it.dayOfWeek.lowercase() == weekdayStr }
                 val classId = session?.id ?: "unknown"
 
-                // Check if there is already an attendance log for this class and date
                 val existing = repository.getAttendanceForClassAndDate(classId, date)
                 
                 if (status == null) {
@@ -226,7 +257,7 @@ class CourseDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val localDate = java.time.LocalDate.parse(date)
-                val weekdayStr = localDate.dayOfWeek.name.lowercase() // e.g. "monday"
+                val weekdayStr = localDate.dayOfWeek.name.lowercase()
                 val session = classes.value.find { it.dayOfWeek.lowercase() == weekdayStr }
                 val classId = session?.id ?: "unknown"
 
@@ -241,7 +272,7 @@ class CourseDetailsViewModel @Inject constructor(
                             classId = classId,
                             courseId = courseId,
                             date = date,
-                            status = "absent", // default to absent if unmarked and they write a note
+                            status = "absent",
                             notes = note.ifEmpty { null },
                             markedAt = java.time.Instant.now().toString()
                         )
@@ -270,19 +301,15 @@ class CourseDetailsViewModel @Inject constructor(
                     return@launch
                 }
                 
-                // Check if originalDate was itself a shifted-to date for this class
                 val allAttendance = repository.getAttendanceForCourse(classSession.courseId)
                 val parentRecord = allAttendance.find { 
                     it.classId == classSession.id && it.shiftedToDate == originalDate.toString() && it.status == "shifted" 
                 }
                 
                 if (parentRecord != null) {
-                    // The class was previously shifted from parentRecord.date to originalDate.
                     if (newDate.toString() == parentRecord.date) {
-                        // Shifting back to original date -> delete the shift record
                         repository.deleteAttendance(parentRecord)
                     } else {
-                        // Shifting to a new date -> update the original shift record
                         val updatedParent = parentRecord.copy(
                             shiftedToDate = newDate.toString(),
                             shiftedStartTime = startTime,
@@ -293,8 +320,6 @@ class CourseDetailsViewModel @Inject constructor(
                         repository.insertAttendance(updatedParent)
                     }
                     
-                    // Since it is no longer shifted to originalDate, delete any attendance record 
-                    // the user might have marked on originalDate
                     val originalDateRecord = allAttendance.find {
                         it.classId == classSession.id && it.date == originalDate.toString() && it.status != "shifted"
                     }
@@ -302,7 +327,6 @@ class CourseDetailsViewModel @Inject constructor(
                         repository.deleteAttendance(originalDateRecord)
                     }
                 } else {
-                    // originalDate is the original day of the class session
                     val existing = repository.getAttendanceForClassAndDate(classSession.id, originalDate.toString())
                     val attendanceRecord = existing?.copy(
                         status = "shifted",
