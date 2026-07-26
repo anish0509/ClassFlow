@@ -82,6 +82,10 @@ fun AttendanceDialog(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        val isDark = ThemeState.isDark
+                        val defaultPillBg = if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.35f)
+                        val defaultPillBorder = if (isDark) Color.White.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.50f)
+
                         // Row 1: Present & Absent
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -92,12 +96,12 @@ fun AttendanceDialog(
                                 .weight(1f)
                                 .height(48.dp)
                                 .background(
-                                    color = if (isFuture) CardBackground.copy(alpha = 0.15f) else if (currentStatus == "present") NeonGreen.copy(alpha = 0.15f) else CardBackground.copy(alpha = 0.5f), 
+                                    color = if (isFuture) defaultPillBg.copy(alpha = 0.05f) else if (currentStatus == "present") NeonGreen.copy(alpha = 0.20f) else defaultPillBg, 
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = if (isFuture) TextMuted.copy(alpha = 0.2f) else if (currentStatus == "present") NeonGreen else FrostedGlassBorder.copy(alpha = 0.15f),
+                                    color = if (isFuture) TextMuted.copy(alpha = 0.2f) else if (currentStatus == "present") NeonGreen else defaultPillBorder,
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .clip(RoundedCornerShape(24.dp))
@@ -133,12 +137,12 @@ fun AttendanceDialog(
                                 .weight(1f)
                                 .height(48.dp)
                                 .background(
-                                    color = if (isFuture) CardBackground.copy(alpha = 0.15f) else if (currentStatus == "absent") NeonRed.copy(alpha = 0.15f) else CardBackground.copy(alpha = 0.5f), 
+                                    color = if (isFuture) defaultPillBg.copy(alpha = 0.05f) else if (currentStatus == "absent") NeonRed.copy(alpha = 0.20f) else defaultPillBg, 
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = if (isFuture) TextMuted.copy(alpha = 0.2f) else if (currentStatus == "absent") NeonRed else FrostedGlassBorder.copy(alpha = 0.15f),
+                                    color = if (isFuture) TextMuted.copy(alpha = 0.2f) else if (currentStatus == "absent") NeonRed else defaultPillBorder,
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .clip(RoundedCornerShape(24.dp))
@@ -181,12 +185,12 @@ fun AttendanceDialog(
                                     .weight(1f)
                                     .height(48.dp)
                                     .background(
-                                        color = if (currentStatus == "canceled") NeonYellow.copy(alpha = 0.15f) else CardBackground.copy(alpha = 0.5f), 
+                                        color = if (currentStatus == "canceled") NeonYellow.copy(alpha = 0.20f) else defaultPillBg, 
                                         shape = RoundedCornerShape(24.dp)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (currentStatus == "canceled") NeonYellow else FrostedGlassBorder.copy(alpha = 0.15f),
+                                        color = if (currentStatus == "canceled") NeonYellow else defaultPillBorder,
                                         shape = RoundedCornerShape(24.dp)
                                     )
                                     .clip(RoundedCornerShape(24.dp))
@@ -221,12 +225,12 @@ fun AttendanceDialog(
                                     .weight(1f)
                                     .height(48.dp)
                                     .background(
-                                        color = CardBackground.copy(alpha = 0.5f), 
+                                        color = defaultPillBg, 
                                         shape = RoundedCornerShape(24.dp)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = FrostedGlassBorder.copy(alpha = 0.15f),
+                                        color = defaultPillBorder,
                                         shape = RoundedCornerShape(24.dp)
                                     )
                                     .clip(RoundedCornerShape(24.dp))

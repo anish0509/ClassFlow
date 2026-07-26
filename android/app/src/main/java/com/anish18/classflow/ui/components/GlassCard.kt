@@ -256,14 +256,14 @@ fun GlassCard(
 
         val isDark = ThemeState.isDark
         val cardBgColor = if (isDark) {
-            CardBackground.copy(alpha = 0.22f)
+            Color.White.copy(alpha = 0.08f)
         } else {
-            Color.White.copy(alpha = 0.78f)
+            Color.White.copy(alpha = 0.35f)
         }
         val cardBorderColor = if (isDark) {
-            FrostedGlassBorder.copy(alpha = 0.45f)
+            Color.White.copy(alpha = 0.30f)
         } else {
-            Color.Black.copy(alpha = 0.08f)
+            Color.White.copy(alpha = 0.65f)
         }
 
         Box(

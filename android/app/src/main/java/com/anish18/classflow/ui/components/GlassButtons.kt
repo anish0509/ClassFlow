@@ -201,8 +201,8 @@ fun GlassDialogButton(
         label = "dialog_btn_scale"
     )
 
-    val fillColor = if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.03f)
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.08f)
+    val fillColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.25f)
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.50f)
 
     Box(
         modifier = modifier
@@ -211,10 +211,10 @@ fun GlassDialogButton(
             .background(
                 brush = Brush.verticalGradient(
                     colors = if (isDark) listOf(
-                        Color.White.copy(alpha = 0.10f),
+                        Color.White.copy(alpha = 0.18f),
                         fillColor
                     ) else listOf(
-                        Color.White.copy(alpha = 0.40f),
+                        Color.White.copy(alpha = 0.50f),
                         fillColor
                     )
                 )

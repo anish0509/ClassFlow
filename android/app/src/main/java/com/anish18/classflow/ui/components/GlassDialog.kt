@@ -51,8 +51,8 @@ fun GlassDialog(
     content: @Composable () -> Unit
 ) {
     val isDark = ThemeState.isDark
-    val glassColor = if (isDark) Color(0xFF161822).copy(alpha = 0.45f) else Color.White.copy(alpha = 0.45f)
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.65f)
+    val glassColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.35f)
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.65f)
 
     DisposableEffect(visible) {
         if (visible) {
