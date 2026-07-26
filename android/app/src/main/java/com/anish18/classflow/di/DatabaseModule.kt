@@ -46,4 +46,7 @@ object DatabaseModule {
 
     @Provides
     fun provideHolidayDao(db: TimetableDatabase): HolidayDao = db.holidayDao()
+
+    @Provides
+    fun provideExamDao(db: TimetableDatabase): ExamDao = db.examDao()
 }

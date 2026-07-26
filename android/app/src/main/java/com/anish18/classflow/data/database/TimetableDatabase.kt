@@ -13,9 +13,10 @@ import com.anish18.classflow.data.model.*
         Attendance::class,
         Task::class,
         CourseAttachment::class,
-        Holiday::class
+        Holiday::class,
+        Exam::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class TimetableDatabase : RoomDatabase() {
@@ -25,4 +26,5 @@ abstract class TimetableDatabase : RoomDatabase() {
     abstract fun attendanceDao(): AttendanceDao
     abstract fun taskDao(): TaskDao
     abstract fun holidayDao(): HolidayDao
+    abstract fun examDao(): ExamDao
 }

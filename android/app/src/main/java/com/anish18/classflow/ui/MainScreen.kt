@@ -46,6 +46,7 @@ import com.anish18.classflow.ui.navigation.Screen
 import com.anish18.classflow.ui.glass.compose.GlassBox
 import com.anish18.classflow.ui.screens.classes.MyClassesScreen
 import com.anish18.classflow.ui.screens.coursedetails.CourseDetailsScreen
+import com.anish18.classflow.ui.screens.exams.ExamsScreen
 import com.anish18.classflow.ui.screens.help.HelpScreen
 import com.anish18.classflow.ui.screens.home.HomeScreen
 import com.anish18.classflow.ui.screens.about.AboutScreen
@@ -195,6 +196,9 @@ fun MainScreen(
                                 }
                                 composable(Screen.Tasks.route) {
                                     TasksScreen()
+                                }
+                                composable(Screen.Exams.route) {
+                                    ExamsScreen()
                                 }
                                 composable(Screen.Settings.route) {
                                     SettingsScreen(
