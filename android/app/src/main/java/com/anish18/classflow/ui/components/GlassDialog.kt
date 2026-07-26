@@ -17,9 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
+import android.view.WindowManager
 import com.anish18.classflow.ui.glass.compose.GlassBox
 import com.anish18.classflow.ui.theme.*
 
@@ -58,10 +61,19 @@ fun GlassDialog(
                 dismissOnClickOutside = true
             )
         ) {
+            val dialogWindowProvider = LocalView.current.parent as? DialogWindowProvider
+            DisposableEffect(dialogWindowProvider) {
+                dialogWindowProvider?.window?.run {
+                    clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                    setDimAmount(0f)
+                }
+                onDispose {}
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.45f))
+                    .background(Color.Transparent)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
