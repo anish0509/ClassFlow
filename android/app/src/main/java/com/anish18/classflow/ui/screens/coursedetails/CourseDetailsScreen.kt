@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.zIndex
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import dev.chrisbanes.haze.HazeState
@@ -1435,8 +1436,8 @@ fun CourseDetailsScreen(
 
         // Top Frosted Glass Header matching other screens
         GlassHeader(
-            title = "Subject Details",
-            subtitle = course?.shortName ?: course?.name ?: "Course",
+            title = course?.name ?: "Subject Details",
+            subtitle = course?.shortName ?: course?.professor?.ifEmpty { null } ?: "Course",
             navigationIcon = {
                 GlassIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -1447,7 +1448,18 @@ fun CourseDetailsScreen(
                     tint = TextPrimary
                 )
             },
-            hazeState = localHazeState
+            actions = {
+                GlassIconButton(
+                    icon = Icons.Default.Edit,
+                    contentDescription = "Edit Course",
+                    onClick = { showEditCourseDialog = true },
+                    size = 38.dp,
+                    iconSize = 18.dp,
+                    tint = TextPrimary
+                )
+            },
+            hazeState = localHazeState,
+            modifier = Modifier.fillMaxWidth().zIndex(100f)
         )
 
     val dateStrForAttendance = selectedDateForAttendance
