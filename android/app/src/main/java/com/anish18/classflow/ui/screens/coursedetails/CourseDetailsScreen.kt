@@ -226,6 +226,7 @@ fun CourseDetailsScreen(
     }
 
     val localHazeState = remember { HazeState() }
+    val mainScrollState = rememberScrollState()
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -235,7 +236,7 @@ fun CourseDetailsScreen(
             modifier = modifier
                 .fillMaxSize()
                 .haze(localHazeState)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(mainScrollState)
                 .padding(
                     top = statusBarHeight + 70.dp + 10.dp,
                     bottom = 40.dp,
@@ -1528,6 +1529,7 @@ fun CourseDetailsScreen(
         GlassDialog(
             visible = true,
             onDismissRequest = { showAddScheduleDialog = false },
+            scrollState = mainScrollState,
             captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
         ) {
         var dayOfWeek by remember { mutableStateOf("Monday") }
@@ -1764,7 +1766,8 @@ fun CourseDetailsScreen(
     if (showGoalSelectorDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showGoalSelectorDialog = false }
+            onDismissRequest = { showGoalSelectorDialog = false },
+            scrollState = mainScrollState
         ) {
         var tempGoal by remember(targetRequirement) { mutableStateOf(targetRequirement) }
 
@@ -1832,7 +1835,8 @@ fun CourseDetailsScreen(
     if (showProfInfoDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showProfInfoDialog = false }
+            onDismissRequest = { showProfInfoDialog = false },
+            scrollState = mainScrollState
         ) {
         // Dialog Form Content Column
         Column(
@@ -1883,7 +1887,8 @@ fun CourseDetailsScreen(
     if (showDeleteConfirmDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showDeleteConfirmDialog = false }
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            scrollState = mainScrollState
         ) {
         // Dialog Form Content Column
         Column(
@@ -1942,7 +1947,8 @@ fun CourseDetailsScreen(
         if (currentCourse != null && showEditCourseDialog) {
             GlassDialog(
                 visible = true,
-                onDismissRequest = { showEditCourseDialog = false }
+                onDismissRequest = { showEditCourseDialog = false },
+                scrollState = mainScrollState
             ) {
                 var name by remember(currentCourse) { mutableStateOf(currentCourse.name) }
                 var shortName by remember(currentCourse) { mutableStateOf(currentCourse.shortName) }
@@ -2123,7 +2129,8 @@ fun CourseDetailsScreen(
 
             GlassDialog(
                 visible = true,
-                onDismissRequest = { showAddExamDialog = false }
+                onDismissRequest = { showAddExamDialog = false },
+                scrollState = mainScrollState
             ) {
                 Column(
                     modifier = Modifier
@@ -2246,6 +2253,7 @@ fun CourseDetailsScreen(
             GlassDialog(
                 visible = true,
                 onDismissRequest = { showShiftModal = false },
+                scrollState = mainScrollState,
                 captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
             ) {
                 Column(

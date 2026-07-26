@@ -37,6 +37,7 @@ fun GlassDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    scrollState: androidx.compose.foundation.ScrollState? = null,
     captureEnabled: Boolean = true,
     avoidNavBar: Boolean = false,
     content: @Composable () -> Unit
@@ -62,6 +63,12 @@ fun GlassDialog(
 
     val density = LocalDensity.current
     val slideOffsetPx = with(density) { 120.dp.roundToPx() }
+    val config = LocalConfiguration.current
+    val screenWidth = config.screenWidthDp.dp
+    val screenHeight = config.screenHeightDp.dp
+    val scrollOffsetY = if (scrollState != null) {
+        with(density) { scrollState.value.toDp() }
+    } else 0.dp
 
     val cardEnter: EnterTransition = fadeIn(animationSpec = tween(350)) +
         slideInVertically(
@@ -86,7 +93,9 @@ fun GlassDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .width(screenWidth)
+                .height(screenHeight)
+                .offset(y = scrollOffsetY)
                 .background(Color.Transparent)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -103,7 +112,6 @@ fun GlassDialog(
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                val config = LocalConfiguration.current
                 val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                 val maxDialogHeight = if (avoidNavBar) {
                     val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
