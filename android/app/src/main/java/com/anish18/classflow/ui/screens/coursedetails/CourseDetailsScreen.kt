@@ -846,12 +846,13 @@ fun CourseDetailsScreen(
                     } else {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             courseExams.forEach { exam ->
-                                val daysLeft = try {
+                                val daysLeft: Long? = try {
                                     val examLocalDate = java.time.LocalDate.parse(exam.examDate)
                                     java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), examLocalDate)
-                                } catch (e: Exception) { 0L }
+                                } catch (e: Exception) { null }
 
                                 val countdownText = when {
+                                    daysLeft == null -> "SCHEDULED"
                                     daysLeft < 0 -> "OVERDUE"
                                     daysLeft == 0L -> "TODAY"
                                     daysLeft == 1L -> "TOMORROW"
@@ -859,6 +860,7 @@ fun CourseDetailsScreen(
                                 }
 
                                 val statusColor = when {
+                                    daysLeft == null -> WaterBlue
                                     daysLeft <= 1L -> NeonRed
                                     daysLeft <= 3L -> NeonOrange
                                     else -> WaterBlue
