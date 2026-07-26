@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavType
@@ -261,6 +262,7 @@ fun MainScreen(
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
+                                    .zIndex(100f)
                                     .navigationBarsPadding()
                                     .padding(start = 20.dp, end = 20.dp, bottom = 14.dp)
                                     .height(68.dp)

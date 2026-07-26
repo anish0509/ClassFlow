@@ -1,16 +1,20 @@
 package com.anish18.classflow.ui.components
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import com.anish18.classflow.ui.theme.ThemeState
 
 @Composable
@@ -98,21 +102,51 @@ fun BackgroundMesh(
             }
 
             "custom_image" -> {
-                if (!imageUri.isNullOrEmpty()) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = "Custom Wallpaper",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    // Scrim overlay to maintain high text contrast on custom photos
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                if (isDark) Color.Black.copy(alpha = 0.40f) else Color.White.copy(alpha = 0.25f)
-                            )
-                    )
+                val context = LocalContext.current
+                val bitmap = remember(imageUri) {
+                    if (imageUri.isNullOrEmpty()) null else {
+                        try {
+                            val uri = android.net.Uri.parse(imageUri)
+                            val inputStream = context.contentResolver.openInputStream(uri)
+                            val opts = BitmapFactory.Options().apply {
+                                inPreferredConfig = Bitmap.Config.ARGB_8888
+                                inMutable = false
+                            }
+                            val b = BitmapFactory.decodeStream(inputStream, null, opts)
+                            inputStream?.close()
+                            b
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
+                    }
+                }
+
+                if (bitmap != null) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val imageWidth = bitmap.width.toFloat()
+                        val imageHeight = bitmap.height.toFloat()
+                        val canvasWidth = size.width
+                        val canvasHeight = size.height
+
+                        // Calculate Center-Crop bounds
+                        val scale = maxOf(canvasWidth / imageWidth, canvasHeight / imageHeight)
+                        val scaledWidth = imageWidth * scale
+                        val scaledHeight = imageHeight * scale
+                        val left = (canvasWidth - scaledWidth) / 2f
+                        val top = (canvasHeight - scaledHeight) / 2f
+
+                        drawImage(
+                            image = bitmap.asImageBitmap(),
+                            dstOffset = IntOffset(left.toInt(), top.toInt()),
+                            dstSize = IntSize(scaledWidth.toInt(), scaledHeight.toInt())
+                        )
+
+                        // Contrast scrim overlay to keep all glass cards & navbar crisp
+                        drawRect(
+                            color = if (isDark) Color.Black.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.20f)
+                        )
+                    }
                 } else {
                     DefaultMesh(isDark = isDark)
                 }
