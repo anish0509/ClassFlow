@@ -125,6 +125,8 @@ fun WeekViewScreen(
         }
     }
 
+    var viewDaysMode by remember { mutableIntStateOf(6) } // 6, 3, or 1 days per view page
+
     val hourHeight = 62.dp
     val startHour = 0
     val totalHours = 24
@@ -171,7 +173,7 @@ fun WeekViewScreen(
                         baseDate.plusWeeks((page - 5000).toLong())
                             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
                     }
-                    val targetWeekDays = remember(targetMonday) {
+                    val allWeekDays = remember(targetMonday) {
                         listOf(
                             "Monday" to targetMonday,
                             "Tuesday" to targetMonday.plusDays(1),
@@ -181,10 +183,14 @@ fun WeekViewScreen(
                             "Saturday" to targetMonday.plusDays(5)
                         )
                     }
-                    // NOTE: columnWidth must NOT be wrapped in remember() — it derives from
-                    // totalWidth (BoxWithConstraints.maxWidth outside pager), which may be 0.dp
-                    // for off-screen pages during pre-composition. Always recalculate fresh.
-                    val numDays = 6 // Mon–Sat, always fixed
+                    val targetWeekDays = remember(allWeekDays, viewDaysMode) {
+                        when (viewDaysMode) {
+                            1 -> listOf(allWeekDays[0])
+                            3 -> allWeekDays.take(3)
+                            else -> allWeekDays
+                        }
+                    }
+                    val numDays = targetWeekDays.size
                     val columnWidth = if (totalWidth > timelineWidth) (totalWidth - timelineWidth) / numDays else (totalWidth / numDays)
 
                     Column(
@@ -544,6 +550,21 @@ fun WeekViewScreen(
             subtitle = "$weekNumber  •  $rangeStr  •  ${activeSemester?.name ?: "Sem 5"}",
             hazeState = localHazeState,
             actions = {
+                GlassIconButton(
+                    icon = if (viewDaysMode == 6) Icons.Default.ViewColumn else if (viewDaysMode == 3) Icons.Default.ViewWeek else Icons.Default.CalendarViewDay,
+                    contentDescription = "Toggle View Days",
+                    onClick = {
+                        viewDaysMode = when (viewDaysMode) {
+                            6 -> 3
+                            3 -> 1
+                            else -> 6
+                        }
+                    },
+                    size = 40.dp,
+                    iconSize = 18.dp,
+                    tint = TextPrimary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 GlassIconButton(
                     icon = Icons.Default.Share,
                     contentDescription = "Share",

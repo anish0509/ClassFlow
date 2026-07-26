@@ -1276,12 +1276,16 @@ fun SettingsScreen(
                 GlassButton(
                     onClick = {
                         viewModel.generateQRSharingPayload { payload ->
-                            qrBitmap = generateQrCodeBitmapHelper(payload)
-                            if (qrBitmap != null) {
+                            val qrBmp = generateQrCodeBitmapHelper(payload)
+                            if (qrBmp != null) {
+                                qrBitmap = qrBmp
                                 showShareDialog = false
                                 showQrCodeDisplay = true
                             } else {
-                                Toast.makeText(context, "Failed to generate QR Code", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Timetable too large for QR Code. Exporting as file...", Toast.LENGTH_LONG).show()
+                                viewModel.exportBackup { backupJson ->
+                                    shareFileHelper(context, "classflow_timetable.json", backupJson, "application/json")
+                                }
                             }
                         }
                     },

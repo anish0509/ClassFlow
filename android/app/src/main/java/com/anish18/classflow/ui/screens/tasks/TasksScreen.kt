@@ -73,8 +73,21 @@ fun TasksScreen(
     var completedExpanded by remember { mutableStateOf(false) }
 
 
-    val pendingTasks = tasks.filter { it.status == "pending" }
-    val completedTasks = tasks.filter { it.status == "completed" }
+    val pendingTasks = remember(tasks) {
+        tasks.filter { it.status == "pending" }
+            .sortedWith(
+                compareBy { task ->
+                    val dateStr = task.dueDate
+                    if (dateStr.isNullOrEmpty()) {
+                        "9999-12-31"
+                    } else {
+                        val timeStr = task.dueTime ?: "23:59"
+                        "$dateStr $timeStr"
+                    }
+                }
+            )
+    }
+    val completedTasks = remember(tasks) { tasks.filter { it.status == "completed" } }
 
     val localHazeState = remember { HazeState() }
 
