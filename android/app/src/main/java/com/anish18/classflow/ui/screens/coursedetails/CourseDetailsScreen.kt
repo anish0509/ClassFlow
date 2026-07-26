@@ -229,6 +229,7 @@ fun CourseDetailsScreen(
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Box(modifier = Modifier.fillMaxSize()) {
+        val currentBoxScope = this
         // Single Main Scrollable Column
         Column(
             modifier = modifier
@@ -1459,7 +1460,7 @@ fun CourseDetailsScreen(
                 )
             },
             hazeState = localHazeState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = currentBoxScope.run { Modifier.fillMaxWidth().align(Alignment.TopCenter).zIndex(100f) }
         )
 
     val dateStrForAttendance = selectedDateForAttendance
