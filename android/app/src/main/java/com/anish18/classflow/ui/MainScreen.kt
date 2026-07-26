@@ -317,10 +317,10 @@ fun MainScreen(
                                                         brush = Brush.verticalGradient(
                                                             colors = if (isDark) listOf(
                                                                 Color.White.copy(alpha = 0.22f),
-                                                                Color.White.copy(alpha = 0.06f)
+                                                                WaterBlue.copy(alpha = 0.12f)
                                                             ) else listOf(
-                                                                Color.White.copy(alpha = 0.82f),
-                                                                Color.White.copy(alpha = 0.52f)
+                                                                Color.White.copy(alpha = 0.55f),
+                                                                WaterBlue.copy(alpha = 0.20f)
                                                             )
                                                         ),
                                                         shape = RoundedCornerShape(25.dp)
@@ -329,11 +329,11 @@ fun MainScreen(
                                                         width = 1.dp,
                                                         brush = Brush.verticalGradient(
                                                             colors = if (isDark) listOf(
-                                                                Color.White.copy(alpha = 0.80f),
+                                                                Color.White.copy(alpha = 0.65f),
                                                                 Color.White.copy(alpha = 0.18f)
                                                             ) else listOf(
-                                                                Color.Black.copy(alpha = 0.20f),
-                                                                Color.Black.copy(alpha = 0.06f)
+                                                                Color.White.copy(alpha = 0.85f),
+                                                                Color.White.copy(alpha = 0.40f)
                                                             )
                                                         ),
                                                         shape = RoundedCornerShape(25.dp)

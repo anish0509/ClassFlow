@@ -260,20 +260,28 @@ fun HomeScreen(
                             dayNum
                         }
 
-                        val itemBgColor = remember(isSelected, isToday, isDark) {
+                        val itemBgBrush = remember(isSelected, isToday, isDark) {
                             when {
-                                isSelected && isToday -> NeonBlue
-                                isSelected -> if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.08f)
-                                else -> Color.Transparent
+                                isSelected && isToday -> Brush.verticalGradient(listOf(NeonBlue, NeonBlue.copy(alpha = 0.80f)))
+                                isSelected -> if (isDark) {
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), WaterBlue.copy(alpha = 0.12f)))
+                                } else {
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.55f), WaterBlue.copy(alpha = 0.20f)))
+                                }
+                                else -> Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
                             }
                         }
 
-                        val itemBorderColor = remember(isSelected, isToday, isDark) {
+                        val itemBorderBrush = remember(isSelected, isToday, isDark) {
                             when {
-                                isSelected && isToday -> Color.Transparent
-                                isSelected -> if (isDark) Color.White.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.12f)
-                                isToday -> NeonBlue
-                                else -> Color.Transparent
+                                isSelected && isToday -> Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.40f), Color.Transparent))
+                                isSelected -> if (isDark) {
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.15f)))
+                                } else {
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.85f), Color.White.copy(alpha = 0.40f)))
+                                }
+                                isToday -> Brush.verticalGradient(listOf(NeonBlue, NeonBlue.copy(alpha = 0.6f)))
+                                else -> Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
                             }
                         }
 
@@ -289,10 +297,10 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .width(42.dp)
                                     .height(58.dp)
-                                    .background(itemBgColor, RoundedCornerShape(21.dp))
+                                    .background(itemBgBrush, RoundedCornerShape(21.dp))
                                     .border(
-                                        width = if (itemBorderColor != Color.Transparent) 1.5.dp else 0.dp,
-                                        color = itemBorderColor,
+                                        width = 1.dp,
+                                        brush = itemBorderBrush,
                                         shape = RoundedCornerShape(21.dp)
                                     ),
                                 contentAlignment = Alignment.Center
