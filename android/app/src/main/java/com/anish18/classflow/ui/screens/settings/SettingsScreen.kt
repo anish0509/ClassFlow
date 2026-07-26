@@ -123,15 +123,22 @@ fun SettingsScreen(
     val wallpaperImagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
+        uri?.let { inputUri ->
             try {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (_: Exception) {}
-            viewModel.setWallpaperImageUri(it.toString())
-            viewModel.setWallpaperType("custom_image")
+                val inputStream = context.contentResolver.openInputStream(inputUri)
+                if (inputStream != null) {
+                    val destFile = java.io.File(context.filesDir, "custom_wallpaper.jpg")
+                    destFile.outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                    inputStream.close()
+                    viewModel.setWallpaperImageUri(destFile.toURI().toString())
+                    viewModel.setWallpaperType("custom_image")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "Failed to load image wallpaper", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
