@@ -227,8 +227,10 @@ fun CourseDetailsScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 16.dp)
-                .statusBarsPadding()
+                .statusBarsPadding(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -815,6 +817,154 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
+            // Exams & Quizzes Card Section
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                glowColor = courseColor,
+                hazeEnabled = false
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.Default.Event, null, tint = courseColor, modifier = Modifier.size(20.dp))
+                            Text(
+                                text = "Exams & Quizzes",
+                                color = TextPrimary,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        GlassTextButton(onClick = { showAddExamDialog = true }) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Icon(Icons.Default.Add, null, tint = WaterBlue, modifier = Modifier.size(16.dp))
+                                Text("+ Add Exam", color = WaterBlue, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    if (courseExams.isEmpty()) {
+                        Text(
+                            text = "No exams scheduled for this course yet.\nTap + Add Exam to set midterm or quiz dates.",
+                            color = TextMuted,
+                            fontSize = 13.sp,
+                            lineHeight = 18.sp
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            courseExams.forEach { exam ->
+                                val daysLeft = try {
+                                    val examLocalDate = java.time.LocalDate.parse(exam.examDate)
+                                    java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), examLocalDate)
+                                } catch (e: Exception) { 0L }
+
+                                val countdownText = when {
+                                    daysLeft < 0 -> "OVERDUE"
+                                    daysLeft == 0L -> "TODAY"
+                                    daysLeft == 1L -> "TOMORROW"
+                                    else -> "$daysLeft DAYS LEFT"
+                                }
+
+                                val statusColor = when {
+                                    daysLeft <= 1L -> NeonRed
+                                    daysLeft <= 3L -> NeonOrange
+                                    else -> WaterBlue
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = exam.title,
+                                            color = TextPrimary,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.weight(1f)
+                                        )
+
+                                        Box(
+                                            modifier = Modifier
+                                                .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                                .border(1.dp, statusColor.copy(alpha = 0.30f), RoundedCornerShape(8.dp))
+                                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = countdownText,
+                                                color = statusColor,
+                                                fontSize = 9.5.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(exam.examType.uppercase(Locale.ROOT), color = courseColor, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                        }
+
+                                        Text(
+                                            text = "${exam.examDate} • ${exam.examTime}",
+                                            color = TextSecondary,
+                                            fontSize = 11.5.sp
+                                        )
+
+                                        exam.location?.let { room ->
+                                            Text(
+                                                text = "• $room",
+                                                color = TextSecondary,
+                                                fontSize = 11.5.sp
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        IconButton(
+                                            onClick = { viewModel.deleteExam(exam) },
+                                            modifier = Modifier.size(20.dp)
+                                        ) {
+                                            Icon(Icons.Default.Delete, null, tint = TextMuted, modifier = Modifier.size(14.dp))
+                                        }
+                                    }
+
+                                    if (!exam.notes.isNullOrBlank()) {
+                                        Text(
+                                            text = "Syllabus: ${exam.notes}",
+                                            color = TextMuted,
+                                            fontSize = 11.5.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -1056,156 +1206,6 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
-            // Exams & Quizzes Card Section
-            GlassCard(
-                modifier = Modifier.fillMaxWidth(),
-                glowColor = courseColor,
-                hazeEnabled = false
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(Icons.Default.Event, null, tint = courseColor, modifier = Modifier.size(20.dp))
-                            Text(
-                                text = "Exams & Quizzes",
-                                color = TextPrimary,
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        GlassTextButton(onClick = { showAddExamDialog = true }) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Icon(Icons.Default.Add, null, tint = WaterBlue, modifier = Modifier.size(16.dp))
-                                Text("+ Add Exam", color = WaterBlue, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-
-                    if (courseExams.isEmpty()) {
-                        Text(
-                            text = "No exams scheduled for this course yet.\nTap + Add Exam to set midterm or quiz dates.",
-                            color = TextMuted,
-                            fontSize = 13.sp,
-                            lineHeight = 18.sp
-                        )
-                    } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            courseExams.forEach { exam ->
-                                val daysLeft = try {
-                                    val examLocalDate = java.time.LocalDate.parse(exam.examDate)
-                                    java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), examLocalDate)
-                                } catch (e: Exception) { 0L }
-
-                                val countdownText = when {
-                                    daysLeft < 0 -> "OVERDUE"
-                                    daysLeft == 0L -> "TODAY"
-                                    daysLeft == 1L -> "TOMORROW"
-                                    else -> "$daysLeft DAYS LEFT"
-                                }
-
-                                val statusColor = when {
-                                    daysLeft <= 1L -> NeonRed
-                                    daysLeft <= 3L -> NeonOrange
-                                    else -> WaterBlue
-                                }
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
-                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
-                                        .padding(12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = exam.title,
-                                            color = TextPrimary,
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.weight(1f)
-                                        )
-
-                                        Box(
-                                            modifier = Modifier
-                                                .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                                                .border(1.dp, statusColor.copy(alpha = 0.30f), RoundedCornerShape(8.dp))
-                                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                                        ) {
-                                            Text(
-                                                text = countdownText,
-                                                color = statusColor,
-                                                fontSize = 9.5.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
-                                    }
-
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
-                                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                                        ) {
-                                            Text(exam.examType.uppercase(Locale.ROOT), color = courseColor, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                                        }
-
-                                        Text(
-                                            text = "${exam.examDate} • ${exam.examTime}",
-                                            color = TextSecondary,
-                                            fontSize = 11.5.sp
-                                        )
-
-                                        exam.location?.let { room ->
-                                            Text(
-                                                text = "• $room",
-                                                color = TextSecondary,
-                                                fontSize = 11.5.sp
-                                            )
-                                        }
-
-                                        Spacer(modifier = Modifier.weight(1f))
-
-                                        IconButton(
-                                            onClick = { viewModel.deleteExam(exam) },
-                                            modifier = Modifier.size(20.dp)
-                                        ) {
-                                            Icon(Icons.Default.Delete, null, tint = TextMuted, modifier = Modifier.size(14.dp))
-                                        }
-                                    }
-
-                                    if (!exam.notes.isNullOrBlank()) {
-                                        Text(
-                                            text = "Syllabus: ${exam.notes}",
-                                            color = TextMuted,
-                                            fontSize = 11.5.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             // Custom Rescheduling Shift Modal
             val classSession = selectedClassForShift
             GlassDialog(
@@ -2413,7 +2413,8 @@ fun CourseDetailsScreen(
                     }
                 }
             }
-        }
     }
+}
+}
 }
 }
