@@ -144,10 +144,6 @@ fun HomeScreen(
     val isDayDragged by dayPagerState.interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(selectedDate) {
-        if (isWeekDragged || isDayDragged || pagerState.isScrollInProgress || dayPagerState.isScrollInProgress) {
-            return@LaunchedEffect
-        }
-
         val selectedSunday = selectedDate.minusDays((selectedDate.dayOfWeek.value % 7).toLong())
         val baseSunday = baseDate.minusDays((baseDate.dayOfWeek.value % 7).toLong())
         val weeksBetween = java.time.temporal.ChronoUnit.DAYS.between(baseSunday, selectedSunday) / 7
@@ -156,36 +152,45 @@ fun HomeScreen(
         val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(baseDate, selectedDate)
         val targetDayPage = 50000 + daysBetween.toInt()
 
-        val isAnimatingWeek = pagerState.currentPage != targetWeekPage
-        val isAnimatingDay = dayPagerState.currentPage != targetDayPage
+        val needWeekSync = pagerState.currentPage != targetWeekPage
+        val needDaySync = dayPagerState.currentPage != targetDayPage
 
-        if (isAnimatingWeek || isAnimatingDay) {
+        if (needWeekSync || needDaySync) {
             isProgrammaticScroll = true
-            val weekJob = launch {
-                if (isAnimatingWeek) {
-                    pagerState.animateScrollToPage(
-                        page = targetWeekPage,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    )
+            try {
+                if (needWeekSync) {
+                    if (isWeekDragged) {
+                        pagerState.scrollToPage(targetWeekPage)
+                    } else {
+                        launch {
+                            pagerState.animateScrollToPage(
+                                page = targetWeekPage,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium
+                                )
+                            )
+                        }
+                    }
                 }
-            }
-            val dayJob = launch {
-                if (isAnimatingDay) {
-                    dayPagerState.animateScrollToPage(
-                        page = targetDayPage,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    )
+                if (needDaySync) {
+                    if (isDayDragged) {
+                        dayPagerState.scrollToPage(targetDayPage)
+                    } else {
+                        launch {
+                            dayPagerState.animateScrollToPage(
+                                page = targetDayPage,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium
+                                )
+                            )
+                        }
+                    }
                 }
+            } finally {
+                isProgrammaticScroll = false
             }
-            weekJob.join()
-            dayJob.join()
-            isProgrammaticScroll = false
         }
     }
 
@@ -243,6 +248,7 @@ fun HomeScreen(
                     weekDays.forEach { date ->
                         val isSelected = date.isEqual(selectedDate)
                         val isToday = date.isEqual(LocalDate.now())
+                        val isDark = ThemeState.isDark
                         val dayName = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.US).uppercase()
                         val dayNum = date.dayOfMonth.toString()
                         val dateText = if (date.dayOfMonth == 1) {
@@ -251,18 +257,18 @@ fun HomeScreen(
                             dayNum
                         }
 
-                        val itemBgColor = remember(isSelected, isToday) {
+                        val itemBgColor = remember(isSelected, isToday, isDark) {
                             when {
                                 isSelected && isToday -> NeonBlue
-                                isSelected -> if (ThemeState.isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.08f)
+                                isSelected -> if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.08f)
                                 else -> Color.Transparent
                             }
                         }
 
-                        val itemBorderColor = remember(isSelected, isToday) {
+                        val itemBorderColor = remember(isSelected, isToday, isDark) {
                             when {
                                 isSelected && isToday -> Color.Transparent
-                                isSelected -> if (ThemeState.isDark) Color.White.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.12f)
+                                isSelected -> if (isDark) Color.White.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.12f)
                                 isToday -> NeonBlue
                                 else -> Color.Transparent
                             }
