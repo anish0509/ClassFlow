@@ -439,13 +439,17 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun exportIcsCalendar(onExportReady: (String) -> Unit) {
+    fun exportIcsCalendar(
+        selectedCourseIds: Set<String>? = null,
+        onExportReady: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val icsText = withContext(defaultDispatcher) {
                     val classes = repository.allClassesFlow.first()
                     val courses = repository.allCoursesFlow.first()
                     val semesters = repository.allSemestersFlow.first()
+                    val holidays = repository.allHolidaysFlow.first()
                     val activeSem = repository.activeSemesterFlow.first()
 
                     val dtfDate = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")
@@ -460,7 +464,13 @@ class SettingsViewModel @Inject constructor(
                     sb.append("METHOD:PUBLISH\r\n")
                     sb.append("X-WR-CALNAME:ClassFlow Timetable\r\n")
 
-                    classes.forEach { session ->
+                    val filteredClasses = if (!selectedCourseIds.isNullOrEmpty()) {
+                        classes.filter { it.courseId in selectedCourseIds }
+                    } else {
+                        classes
+                    }
+
+                    filteredClasses.forEach { session ->
                         val course = courses.find { it.id == session.courseId }
                         val semester = semesters.find { it.id == (session.semesterId ?: course?.semesterId) } ?: activeSem
 
@@ -528,11 +538,46 @@ class SettingsViewModel @Inject constructor(
                         if (location.isNotBlank()) {
                             sb.append("LOCATION:$location\r\n")
                         }
-                        val desc = "Course: ${course?.name ?: ""}\\nProf: ${course?.professor ?: "N/A"}\\nRoom: $location"
-                        sb.append("DESCRIPTION:$desc\r\n")
+
+                        // Map Course Hex Color for Google & Apple Calendar
+                        val courseColor = course?.color ?: "#0083B3"
+                        sb.append("COLOR:$courseColor\r\n")
+                        sb.append("X-APPLE-CALENDAR-COLOR:$courseColor\r\n")
+
+                        // Build rich event description
+                        val descLines = mutableListOf<String>()
+                        descLines.add("Course: ${course?.name ?: "Class"}")
+                        if (!course?.professor.isNullOrEmpty()) descLines.add("Professor: ${course?.professor}")
+                        if (!course?.professorEmail.isNullOrEmpty()) descLines.add("Email: ${course?.professorEmail}")
+                        if (!course?.professorPhone.isNullOrEmpty()) descLines.add("Phone: ${course?.professorPhone}")
+                        if (location.isNotBlank()) descLines.add("Room: $location")
+                        if (course?.credits != null) descLines.add("Credits: ${course.credits}")
+                        if (course?.minAttendanceRequirement != null) descLines.add("Min Attendance Requirement: ${course.minAttendanceRequirement}%")
+                        if (!course?.syllabusUrl.isNullOrEmpty()) descLines.add("Syllabus: ${course?.syllabusUrl}")
+                        if (!course?.notes.isNullOrEmpty()) descLines.add("Notes: ${course?.notes}")
+
+                        val descStr = descLines.joinToString("\\n")
+                        sb.append("DESCRIPTION:$descStr\r\n")
+
                         sb.append("DTSTART:${startDateStr}T$startFormatted\r\n")
                         sb.append("DTEND:${startDateStr}T$endFormatted\r\n")
                         sb.append("RRULE:FREQ=WEEKLY;BYDAY=$dayAbbr;UNTIL=${untilDateStr}T235959Z\r\n")
+
+                        // Add EXDATE exclusions for University Holidays
+                        val sessionHolidays = holidays.filter { h ->
+                            try {
+                                val hDate = java.time.LocalDate.parse(h.date)
+                                !hDate.isBefore(semStart) && !hDate.isAfter(semEnd) && hDate.dayOfWeek == targetDay
+                            } catch (e: Exception) {
+                                false
+                            }
+                        }
+                        sessionHolidays.forEach { h ->
+                            try {
+                                val hDateStr = java.time.LocalDate.parse(h.date).format(dtfDate)
+                                sb.append("EXDATE:${hDateStr}T$startFormatted\r\n")
+                            } catch (_: Exception) {}
+                        }
 
                         // 15-minute advance notification alarm for Google Calendar / Apple Calendar
                         sb.append("BEGIN:VALARM\r\n")
