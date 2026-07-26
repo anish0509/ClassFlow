@@ -230,7 +230,7 @@ fun MyClassesScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            // Top Row: Course Name
+                            // Top Row: Course Name & Attendance Percentage Badge
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -239,32 +239,66 @@ fun MyClassesScreen(
                                 Text(
                                     text = course.name,
                                     color = TextPrimary,
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = FontFamily.Serif,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.weight(1f)
                                 )
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                val badgeColor = if (attendanceRate < 75) WarnSalmon else WaterBlue
+                                val badgeBgColor = badgeColor.copy(alpha = 0.15f)
+                                Box(
+                                    modifier = Modifier
+                                        .background(badgeBgColor, RoundedCornerShape(8.dp))
+                                        .border(
+                                            1.dp,
+                                            badgeColor.copy(alpha = 0.30f),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        text = "$attendanceRate% PRESENT",
+                                        color = badgeColor,
+                                        fontSize = 9.5.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
 
-                            // Bottom Row: Details and Attendance Status
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            // Bottom Row: Professor & Course Code Badges
+                            if (course.professor.isNotEmpty() || course.shortName.isNotEmpty()) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    // 1. Professor Icon/Pill
+                                    if (course.shortName.isNotEmpty()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = courseColorVal.copy(alpha = 0.15f),
+                                                    shape = RoundedCornerShape(8.dp)
+                                                )
+                                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = course.shortName.uppercase(Locale.ROOT),
+                                                color = courseColorVal,
+                                                fontSize = 9.5.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+
                                     if (course.professor.isNotEmpty()) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                                             modifier = Modifier
-                                                .background(PillBackground, RoundedCornerShape(100.dp))
-                                                .border(1.dp, PillBorder, RoundedCornerShape(100.dp))
-                                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                                                .background(PillBackground, RoundedCornerShape(8.dp))
+                                                .border(1.dp, PillBorder, RoundedCornerShape(8.dp))
+                                                .padding(horizontal = 8.dp, vertical = 2.dp)
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Person,
@@ -278,61 +312,10 @@ fun MyClassesScreen(
                                                 fontSize = 9.5.sp,
                                                 fontWeight = FontWeight.Medium,
                                                 maxLines = 1,
-                                                softWrap = false,
                                                 overflow = TextOverflow.Ellipsis
                                             )
                                         }
                                     }
-
-                                    // 2. Course Short Name (Code) Pill
-                                    if (course.shortName.isNotEmpty()) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                            modifier = Modifier
-                                                .background(PillBackground, RoundedCornerShape(100.dp))
-                                                .border(1.dp, PillBorder, RoundedCornerShape(100.dp))
-                                                .padding(horizontal = 8.dp, vertical = 3.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Book,
-                                                contentDescription = null,
-                                                tint = TextSecondary,
-                                                modifier = Modifier.size(10.dp)
-                                            )
-                                            Text(
-                                                text = course.shortName,
-                                                color = TextSecondary,
-                                                fontSize = 9.5.sp,
-                                                fontWeight = FontWeight.Medium,
-                                                maxLines = 1,
-                                                softWrap = false
-                                            )
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.width(12.dp))
-
-                                // Right side: Attendance Percentage Badge
-                                val badgeColor = if (attendanceRate < 75) WarnSalmon else WaterBlue
-                                val badgeBgColor = badgeColor.copy(alpha = 0.12f)
-                                Box(
-                                    modifier = Modifier
-                                        .background(badgeBgColor, RoundedCornerShape(100.dp))
-                                        .border(
-                                            1.dp,
-                                            badgeColor.copy(alpha = 0.25f),
-                                            RoundedCornerShape(100.dp)
-                                        )
-                                        .padding(horizontal = 10.dp, vertical = 4.5.dp)
-                                ) {
-                                    Text(
-                                        text = "$attendanceRate% PRESENT",
-                                        color = badgeColor,
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
                                 }
                             }
                         }
