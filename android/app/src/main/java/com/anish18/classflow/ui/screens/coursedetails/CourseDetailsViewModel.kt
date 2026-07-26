@@ -129,6 +129,7 @@ class CourseDetailsViewModel @Inject constructor(
                 val updated = current.copy(notes = notes)
                 repository.updateCourse(updated)
                 _course.value = updated
+                _toastMessage.emit("Course notes saved successfully!")
             }
         }
     }

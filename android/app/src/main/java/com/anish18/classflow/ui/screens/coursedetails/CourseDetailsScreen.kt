@@ -362,13 +362,17 @@ fun CourseDetailsScreen(
                                         .background(
                                             brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                                                 colors = if (ThemeState.isDark)
-                                                    listOf(Color.White.copy(alpha = 0.06f), CardBackground.copy(alpha = 0.12f))
+                                                    listOf(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.03f))
                                                 else
-                                                    listOf(Color.White.copy(alpha = 0.55f), CardBackground.copy(alpha = 0.25f))
+                                                    listOf(Color.White.copy(alpha = 0.70f), Color.White.copy(alpha = 0.40f))
                                             ),
                                             shape = RoundedCornerShape(16.dp)
                                         )
-                                        .border(0.8.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 1.dp,
+                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.60f),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .padding(horizontal = 12.dp, vertical = 10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -631,12 +635,12 @@ fun CourseDetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                color = if (isCritical) NeonRed.copy(alpha = 0.08f) else NeonGreen.copy(alpha = 0.08f), 
+                                color = if (isCritical) NeonRed.copy(alpha = if (ThemeState.isDark) 0.15f else 0.10f) else NeonGreen.copy(alpha = if (ThemeState.isDark) 0.15f else 0.10f), 
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .border(
                                 width = 1.dp, 
-                                color = if (isCritical) NeonRed.copy(alpha = 0.25f) else NeonGreen.copy(alpha = 0.25f), 
+                                color = if (isCritical) NeonRed.copy(alpha = if (ThemeState.isDark) 0.35f else 0.45f) else NeonGreen.copy(alpha = if (ThemeState.isDark) 0.35f else 0.45f), 
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .padding(16.dp)
@@ -751,8 +755,15 @@ fun CourseDetailsScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                                    .background(
+                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
                                     .padding(horizontal = 16.dp, vertical = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
@@ -856,8 +867,15 @@ fun CourseDetailsScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
-                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
+                                        .background(
+                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
+                                            shape = RoundedCornerShape(14.dp)
+                                        )
+                                        .border(
+                                            width = 1.dp,
+                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
+                                            shape = RoundedCornerShape(14.dp)
+                                        )
                                         .padding(12.dp),
                                     verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
@@ -1046,8 +1064,7 @@ fun CourseDetailsScreen(
 
                     // Weekdays labels Row
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         val daysOfWeekLabels = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
                         daysOfWeekLabels.forEach { label ->
@@ -1056,7 +1073,7 @@ fun CourseDetailsScreen(
                                 color = TextMuted,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.width(36.dp),
+                                modifier = Modifier.weight(1f),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
@@ -1072,13 +1089,12 @@ fun CourseDetailsScreen(
                     ) {
                         for (r in 0 until rowsCount) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 for (c in 0 until 7) {
                                     val cellIndex = r * 7 + c
                                     if (cellIndex < firstDayOfWeek || cellIndex >= totalGridCells) {
-                                        Spacer(modifier = Modifier.width(36.dp))
+                                        Spacer(modifier = Modifier.weight(1f))
                                     } else {
                                         val day = cellIndex - firstDayOfWeek + 1
                                         val date = java.time.LocalDate.of(displayedYear, displayedMonth, day)
@@ -1128,7 +1144,7 @@ fun CourseDetailsScreen(
 
                                         Box(
                                             modifier = Modifier
-                                                .width(36.dp)
+                                                .weight(1f)
                                                 .height(44.dp)
                                                 .clickable(enabled = showIndicator) {
                                                     selectedDateForAttendance = dateStr
@@ -1290,8 +1306,15 @@ fun CourseDetailsScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                                    .background(
+                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
                                     .clickable {
                                         val file = java.io.File(attachment.localPath)
                                         if (file.exists()) {
