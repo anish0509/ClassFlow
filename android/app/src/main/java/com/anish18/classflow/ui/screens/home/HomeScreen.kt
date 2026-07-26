@@ -266,7 +266,7 @@ fun HomeScreen(
                                 isSelected -> if (isDark) {
                                     Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.08f)))
                                 } else {
-                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.70f), Color.White.copy(alpha = 0.35f)))
+                                    Brush.verticalGradient(listOf(Color(0xFF0F172A).copy(alpha = 0.09f), Color(0xFF0F172A).copy(alpha = 0.04f)))
                                 }
                                 else -> Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
                             }
@@ -278,7 +278,7 @@ fun HomeScreen(
                                 isSelected -> if (isDark) {
                                     Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.15f)))
                                 } else {
-                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.85f), Color.White.copy(alpha = 0.40f)))
+                                    Brush.verticalGradient(listOf(Color(0xFF0F172A).copy(alpha = 0.20f), Color(0xFF0F172A).copy(alpha = 0.08f)))
                                 }
                                 isToday -> Brush.verticalGradient(listOf(NeonBlue, NeonBlue.copy(alpha = 0.6f)))
                                 else -> Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))

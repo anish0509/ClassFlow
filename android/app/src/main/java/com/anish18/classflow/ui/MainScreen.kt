@@ -316,11 +316,11 @@ fun MainScreen(
                                                     .background(
                                                         brush = Brush.verticalGradient(
                                                             colors = if (isDark) listOf(
-                                                                Color.White.copy(alpha = 0.22f),
+                                                                Color.White.copy(alpha = 0.25f),
                                                                 Color.White.copy(alpha = 0.08f)
                                                             ) else listOf(
-                                                                Color.White.copy(alpha = 0.70f),
-                                                                Color.White.copy(alpha = 0.35f)
+                                                                Color(0xFF0F172A).copy(alpha = 0.09f),
+                                                                Color(0xFF0F172A).copy(alpha = 0.04f)
                                                             )
                                                         ),
                                                         shape = RoundedCornerShape(25.dp)
@@ -332,8 +332,8 @@ fun MainScreen(
                                                                 Color.White.copy(alpha = 0.65f),
                                                                 Color.White.copy(alpha = 0.18f)
                                                             ) else listOf(
-                                                                Color.White.copy(alpha = 0.85f),
-                                                                Color.White.copy(alpha = 0.40f)
+                                                                Color(0xFF0F172A).copy(alpha = 0.20f),
+                                                                Color(0xFF0F172A).copy(alpha = 0.08f)
                                                             )
                                                         ),
                                                         shape = RoundedCornerShape(25.dp)
