@@ -114,8 +114,6 @@ class TimetableRepository @Inject constructor(
         courseDao.getCoursesBySemester(semesterId)
 
     suspend fun getCourseById(id: String): Course? = courseDao.getCourseById(id)
-
-    fun getCourseByIdFlow(id: String): Flow<Course?> = courseDao.getCourseByIdFlow(id)
     
     suspend fun insertCourse(course: Course) = withContext(ioDispatcher) {
         courseDao.insertCourse(course)

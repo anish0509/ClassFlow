@@ -2127,51 +2127,39 @@ fun <T> SegmentedControl(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val isDark = ThemeState.isDark
-    val trackBg = if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.05f)
-    val trackBorder = if (isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.10f)
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(36.dp)
-            .background(trackBg, RoundedCornerShape(12.dp))
-            .border(1.dp, trackBorder, RoundedCornerShape(12.dp))
-            .padding(3.dp)
+            .height(34.dp)
+            .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+            .border(1.dp, FrostedGlassBorder.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+            .padding(2.dp)
             .graphicsLayer(alpha = if (enabled) 1f else 0.5f),
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         items.forEach { (value, label) ->
             val isSelected = value == selectedItem
-            val pillBg = if (isSelected) {
-                if (isDark) Color.White.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.85f)
-            } else Color.Transparent
-
-            val pillBorderColor = if (isSelected) {
-                if (isDark) Color.White.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.65f)
-            } else Color.Transparent
-
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = pillBg,
-                        shape = RoundedCornerShape(9.dp)
+                        color = if (isSelected) Color.White.copy(alpha = 0.08f) else Color.Transparent,
+                        shape = RoundedCornerShape(8.dp)
                     )
                     .border(
                         width = if (isSelected) 1.dp else 0.dp,
-                        color = pillBorderColor,
-                        shape = RoundedCornerShape(9.dp)
+                        color = if (isSelected) FrostedGlassBorder.copy(alpha = 0.3f) else Color.Transparent,
+                        shape = RoundedCornerShape(8.dp)
                     )
                     .clickable(enabled = enabled) { onItemSelected(value) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = label,
-                    color = if (isSelected) (if (isDark) WaterBlue else NeonBlue) else TextSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                    color = if (isSelected) WaterBlue else TextSecondary,
+                    fontSize = 11.sp,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             }
         }

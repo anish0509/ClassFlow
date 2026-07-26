@@ -33,15 +33,11 @@ class CourseDetailsViewModel @Inject constructor(
 
     val courseId: String = savedStateHandle.get<String>("courseId") ?: ""
 
-    val course: StateFlow<Course?> = repository.getCourseByIdFlow(courseId)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    private val _course = MutableStateFlow<Course?>(null)
+    val course: StateFlow<Course?> = _course.asStateFlow()
 
-    val courseSemester: StateFlow<Semester?> = course.flatMapLatest { c ->
-        if (c == null) flowOf(null)
-        else repository.activeSemesterFlow.map { sem ->
-            if (sem?.id == c.semesterId) sem else repository.getSemesterById(c.semesterId)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    private val _courseSemester = MutableStateFlow<Semester?>(null)
+    val courseSemester: StateFlow<Semester?> = _courseSemester.asStateFlow()
 
     val classes: StateFlow<List<ClassSession>> = repository.activeClassesFlow
         .map { list -> list.filter { it.courseId == courseId } }
@@ -65,25 +61,20 @@ class CourseDetailsViewModel @Inject constructor(
         else examRepository.getExamsForSemester(sem.id).map { list -> list.filter { it.courseId == courseId } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private fun normalizeDayOfWeek(day: String): String {
-        val d = day.trim()
-        return when {
-            d.startsWith("MON", ignoreCase = true) -> "Monday"
-            d.startsWith("TUE", ignoreCase = true) -> "Tuesday"
-            d.startsWith("WED", ignoreCase = true) -> "Wednesday"
-            d.startsWith("THU", ignoreCase = true) -> "Thursday"
-            d.startsWith("FRI", ignoreCase = true) -> "Friday"
-            d.startsWith("SAT", ignoreCase = true) -> "Saturday"
-            d.startsWith("SUN", ignoreCase = true) -> "Sunday"
-            else -> d.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.US) else it.toString() }
+    init {
+        viewModelScope.launch {
+            val c = repository.getCourseById(courseId)
+            _course.value = c
+            if (c != null) {
+                _courseSemester.value = repository.getSemesterById(c.semesterId)
+            }
         }
     }
 
     fun addClassSession(dayOfWeek: String, startTime: String, endTime: String, room: String?) {
         viewModelScope.launch {
-            val normalizedDay = normalizeDayOfWeek(dayOfWeek)
             val activeSem = repository.getActiveSemester()
-            val clash = repository.checkClash(normalizedDay, startTime, endTime, activeSem?.id)
+            val clash = repository.checkClash(dayOfWeek, startTime, endTime, activeSem?.id)
             if (clash != null) {
                 _toastMessage.emit("Class Slot Clash: Overlaps with an existing class session!")
                 return@launch
@@ -92,7 +83,7 @@ class CourseDetailsViewModel @Inject constructor(
                 ClassSession(
                     id = UUID.randomUUID().toString(),
                     courseId = courseId,
-                    dayOfWeek = normalizedDay,
+                    dayOfWeek = dayOfWeek,
                     startTime = startTime,
                     endTime = endTime,
                     room = room,
@@ -133,28 +124,29 @@ class CourseDetailsViewModel @Inject constructor(
 
     fun saveCourseNotes(notes: String) {
         viewModelScope.launch {
-            val current = course.value
+            val current = _course.value
             if (current != null) {
                 val updated = current.copy(notes = notes)
                 repository.updateCourse(updated)
-                _toastMessage.emit("Course notes saved successfully!")
+                _course.value = updated
             }
         }
     }
 
     fun saveMinAttendanceRequirement(requirement: Int) {
         viewModelScope.launch {
-            val current = course.value
+            val current = _course.value
             if (current != null) {
                 val updated = current.copy(minAttendanceRequirement = requirement)
                 repository.updateCourse(updated)
+                _course.value = updated
             }
         }
     }
 
     fun deleteCourse() {
         viewModelScope.launch {
-            val current = course.value
+            val current = _course.value
             if (current != null) {
                 repository.deleteCourse(current)
             }
@@ -163,7 +155,7 @@ class CourseDetailsViewModel @Inject constructor(
 
     fun updateCourseDetails(name: String, shortName: String, professor: String, credits: Int, room: String, colorHex: String) {
         viewModelScope.launch {
-            val current = course.value
+            val current = _course.value
             if (current != null) {
                 val updated = current.copy(
                     name = name,
@@ -174,12 +166,13 @@ class CourseDetailsViewModel @Inject constructor(
                     color = colorHex
                 )
                 repository.updateCourse(updated)
+                _course.value = updated
             }
         }
     }
 
     fun addAttachment(fileName: String, fileUri: android.net.Uri, context: android.content.Context) {
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val attachmentsDir = java.io.File(context.filesDir, "attachments/$courseId")
                 if (!attachmentsDir.exists()) {
@@ -210,7 +203,7 @@ class CourseDetailsViewModel @Inject constructor(
     }
 
     fun deleteAttachment(attachment: com.anish18.classflow.data.model.CourseAttachment) {
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val file = java.io.File(attachment.localPath)
                 if (file.exists()) {

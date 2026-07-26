@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
@@ -36,7 +37,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.zIndex
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import dev.chrisbanes.haze.HazeState
@@ -226,17 +226,15 @@ fun CourseDetailsScreen(
     }
 
     val localHazeState = remember { HazeState() }
-    val mainScrollState = rememberScrollState()
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val currentBoxScope = this
         // Single Main Scrollable Column
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .haze(localHazeState)
-                .verticalScroll(mainScrollState)
+                .verticalScroll(rememberScrollState())
                 .padding(
                     top = statusBarHeight + 70.dp + 10.dp,
                     bottom = 40.dp,
@@ -365,17 +363,13 @@ fun CourseDetailsScreen(
                                         .background(
                                             brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                                                 colors = if (ThemeState.isDark)
-                                                    listOf(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.03f))
+                                                    listOf(Color.White.copy(alpha = 0.06f), CardBackground.copy(alpha = 0.12f))
                                                 else
-                                                    listOf(Color.White.copy(alpha = 0.70f), Color.White.copy(alpha = 0.40f))
+                                                    listOf(Color.White.copy(alpha = 0.55f), CardBackground.copy(alpha = 0.25f))
                                             ),
                                             shape = RoundedCornerShape(16.dp)
                                         )
-                                        .border(
-                                            width = 1.dp,
-                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.60f),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .border(0.8.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                                         .padding(horizontal = 12.dp, vertical = 10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -638,12 +632,12 @@ fun CourseDetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                color = if (isCritical) NeonRed.copy(alpha = if (ThemeState.isDark) 0.15f else 0.10f) else NeonGreen.copy(alpha = if (ThemeState.isDark) 0.15f else 0.10f), 
+                                color = if (isCritical) NeonRed.copy(alpha = 0.08f) else NeonGreen.copy(alpha = 0.08f), 
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .border(
                                 width = 1.dp, 
-                                color = if (isCritical) NeonRed.copy(alpha = if (ThemeState.isDark) 0.35f else 0.45f) else NeonGreen.copy(alpha = if (ThemeState.isDark) 0.35f else 0.45f), 
+                                color = if (isCritical) NeonRed.copy(alpha = 0.25f) else NeonGreen.copy(alpha = 0.25f), 
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .padding(16.dp)
@@ -668,13 +662,10 @@ fun CourseDetailsScreen(
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                
-                                val nextBunkPct = if (totalClasses >= 0) {
-                                    (presentCount.toFloat() / (totalClasses + 1).toFloat() * 100).toInt()
-                                } else {
-                                    0
-                                }
-                                val targetText = if (attendancePct >= targetRequirement) {
+                                                         val targetText = if (totalClasses == 0) {
+                                    "No class sessions held yet for this course. Your attendance will be tracked once classes commence."
+                                } else if (attendancePct >= targetRequirement) {
+                                    val nextBunkPct = (presentCount.toFloat() / (totalClasses + 1).toFloat() * 100).toInt()
                                     val nextBunkStatus = if (nextBunkPct < targetRequirement) "drops you to $nextBunkPct% (CRITICAL)" else "keeps you at $nextBunkPct%"
                                     if (skipCount > 0) {
                                         "You can safely skip the next **$skipCount classes**. Bunking the next class $nextBunkStatus."
@@ -682,6 +673,7 @@ fun CourseDetailsScreen(
                                         "You cannot afford to skip any classes right now. Bunking the next class $nextBunkStatus."
                                     }
                                 } else {
+                                    val nextBunkPct = (presentCount.toFloat() / (totalClasses + 1).toFloat() * 100).toInt()
                                     "You must attend the next **$attendNeeded classes** consecutively to recover your attendance to $targetRequirement%. Bunking the next class drops you to $nextBunkPct%."
                                 }
                                 
@@ -710,100 +702,110 @@ fun CourseDetailsScreen(
                 }
             }
 
-
-
+            // ------------------ CARD 3: DEADLINES CARD ------------------
             val tasks by viewModel.tasks.collectAsState()
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(
-                    text = "Deadlines",
-                    color = TextPrimary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                if (tasks.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-                            .border(1.dp, FrostedGlassBorder.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                            .padding(vertical = 20.dp, horizontal = 16.dp),
-                        contentAlignment = Alignment.Center
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                glowColor = courseColor,
+                hazeEnabled = false
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AutoAwesome,
-                                contentDescription = null,
-                                tint = courseColor,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = "All caught up! No pending deadlines.",
-                                color = TextSecondary,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Assignment,
+                            contentDescription = null,
+                            tint = courseColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "Deadlines & Tasks",
+                            color = TextPrimary,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        tasks.forEach { task ->
+
+                    if (tasks.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(CardBackground.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
+                                .padding(vertical = 16.dp, horizontal = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    Text(
-                                        text = task.title,
-                                        color = TextPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-                                    if (!task.dueDate.isNullOrEmpty()) {
+                                Icon(
+                                    imageVector = Icons.Default.AutoAwesome,
+                                    contentDescription = null,
+                                    tint = courseColor,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    text = "All caught up! No pending deadlines.",
+                                    color = TextSecondary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            tasks.forEach { task ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Text(
-                                            text = "Due: ${task.dueDate} ${task.dueTime ?: ""}",
-                                            color = NeonRed.copy(alpha = 0.8f),
-                                            fontSize = 11.sp,
+                                            text = task.title,
+                                            color = TextPrimary,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                        if (!task.dueDate.isNullOrEmpty()) {
+                                            Text(
+                                                text = "Due: ${task.dueDate} ${task.dueTime ?: ""}",
+                                                color = NeonRed.copy(alpha = 0.85f),
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                            .border(1.dp, courseColor.copy(alpha = 0.30f), RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "PENDING",
+                                            color = courseColor,
+                                            fontSize = 9.5.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = "PENDING",
-                                        color = courseColor,
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
                                 }
                             }
                         }
                     }
                 }
-            // Exams & Quizzes Card Section
+            }        // Exams & Quizzes Card Section
             GlassCard(
                 modifier = Modifier.fillMaxWidth(),
                 glowColor = courseColor,
@@ -849,13 +851,12 @@ fun CourseDetailsScreen(
                     } else {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             courseExams.forEach { exam ->
-                                val daysLeft: Long? = try {
+                                val daysLeft = try {
                                     val examLocalDate = java.time.LocalDate.parse(exam.examDate)
                                     java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), examLocalDate)
-                                } catch (e: Exception) { null }
+                                } catch (e: Exception) { 0L }
 
                                 val countdownText = when {
-                                    daysLeft == null -> "SCHEDULED"
                                     daysLeft < 0 -> "OVERDUE"
                                     daysLeft == 0L -> "TODAY"
                                     daysLeft == 1L -> "TOMORROW"
@@ -863,7 +864,6 @@ fun CourseDetailsScreen(
                                 }
 
                                 val statusColor = when {
-                                    daysLeft == null -> WaterBlue
                                     daysLeft <= 1L -> NeonRed
                                     daysLeft <= 3L -> NeonOrange
                                     else -> WaterBlue
@@ -872,15 +872,8 @@ fun CourseDetailsScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(
-                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
-                                            shape = RoundedCornerShape(14.dp)
-                                        )
-                                        .border(
-                                            width = 1.dp,
-                                            color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
-                                            shape = RoundedCornerShape(14.dp)
-                                        )
+                                        .background(CardBackground.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(14.dp))
                                         .padding(12.dp),
                                     verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
@@ -1069,7 +1062,8 @@ fun CourseDetailsScreen(
 
                     // Weekdays labels Row
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         val daysOfWeekLabels = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
                         daysOfWeekLabels.forEach { label ->
@@ -1078,7 +1072,7 @@ fun CourseDetailsScreen(
                                 color = TextMuted,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.width(36.dp),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
@@ -1094,12 +1088,13 @@ fun CourseDetailsScreen(
                     ) {
                         for (r in 0 until rowsCount) {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 for (c in 0 until 7) {
                                     val cellIndex = r * 7 + c
                                     if (cellIndex < firstDayOfWeek || cellIndex >= totalGridCells) {
-                                        Spacer(modifier = Modifier.weight(1f))
+                                        Spacer(modifier = Modifier.width(36.dp))
                                     } else {
                                         val day = cellIndex - firstDayOfWeek + 1
                                         val date = java.time.LocalDate.of(displayedYear, displayedMonth, day)
@@ -1149,7 +1144,7 @@ fun CourseDetailsScreen(
 
                                         Box(
                                             modifier = Modifier
-                                                .weight(1f)
+                                                .width(36.dp)
                                                 .height(44.dp)
                                                 .clickable(enabled = showIndicator) {
                                                     selectedDateForAttendance = dateStr
@@ -1311,15 +1306,8 @@ fun CourseDetailsScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(
-                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.45f),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (ThemeState.isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.55f),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
+                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                                    .border(1.dp, FrostedGlassBorder.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
                                     .clickable {
                                         val file = java.io.File(attachment.localPath)
                                         if (file.exists()) {
@@ -1438,8 +1426,8 @@ fun CourseDetailsScreen(
 
         // Top Frosted Glass Header matching other screens
         GlassHeader(
-            title = course?.name ?: "Subject Details",
-            subtitle = course?.shortName ?: course?.professor?.ifEmpty { null } ?: "Course",
+            title = "Subject Details",
+            subtitle = course?.shortName ?: course?.name ?: "Course",
             navigationIcon = {
                 GlassIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -1450,18 +1438,7 @@ fun CourseDetailsScreen(
                     tint = TextPrimary
                 )
             },
-            actions = {
-                GlassIconButton(
-                    icon = Icons.Default.Edit,
-                    contentDescription = "Edit Course",
-                    onClick = { showEditCourseDialog = true },
-                    size = 38.dp,
-                    iconSize = 18.dp,
-                    tint = TextPrimary
-                )
-            },
-            hazeState = localHazeState,
-            modifier = currentBoxScope.run { Modifier.fillMaxWidth().align(Alignment.TopCenter).zIndex(100f) }
+            hazeState = localHazeState
         )
 
     val dateStrForAttendance = selectedDateForAttendance
@@ -1529,7 +1506,6 @@ fun CourseDetailsScreen(
         GlassDialog(
             visible = true,
             onDismissRequest = { showAddScheduleDialog = false },
-            scrollState = mainScrollState,
             captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
         ) {
         var dayOfWeek by remember { mutableStateOf("Monday") }
@@ -1766,8 +1742,7 @@ fun CourseDetailsScreen(
     if (showGoalSelectorDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showGoalSelectorDialog = false },
-            scrollState = mainScrollState
+            onDismissRequest = { showGoalSelectorDialog = false }
         ) {
         var tempGoal by remember(targetRequirement) { mutableStateOf(targetRequirement) }
 
@@ -1835,8 +1810,7 @@ fun CourseDetailsScreen(
     if (showProfInfoDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showProfInfoDialog = false },
-            scrollState = mainScrollState
+            onDismissRequest = { showProfInfoDialog = false }
         ) {
         // Dialog Form Content Column
         Column(
@@ -1887,8 +1861,7 @@ fun CourseDetailsScreen(
     if (showDeleteConfirmDialog) {
         GlassDialog(
             visible = true,
-            onDismissRequest = { showDeleteConfirmDialog = false },
-            scrollState = mainScrollState
+            onDismissRequest = { showDeleteConfirmDialog = false }
         ) {
         // Dialog Form Content Column
         Column(
@@ -1947,8 +1920,7 @@ fun CourseDetailsScreen(
         if (currentCourse != null && showEditCourseDialog) {
             GlassDialog(
                 visible = true,
-                onDismissRequest = { showEditCourseDialog = false },
-                scrollState = mainScrollState
+                onDismissRequest = { showEditCourseDialog = false }
             ) {
                 var name by remember(currentCourse) { mutableStateOf(currentCourse.name) }
                 var shortName by remember(currentCourse) { mutableStateOf(currentCourse.shortName) }
@@ -2129,8 +2101,7 @@ fun CourseDetailsScreen(
 
             GlassDialog(
                 visible = true,
-                onDismissRequest = { showAddExamDialog = false },
-                scrollState = mainScrollState
+                onDismissRequest = { showAddExamDialog = false }
             ) {
                 Column(
                     modifier = Modifier
@@ -2253,7 +2224,6 @@ fun CourseDetailsScreen(
             GlassDialog(
                 visible = true,
                 onDismissRequest = { showShiftModal = false },
-                scrollState = mainScrollState,
                 captureEnabled = !showDatePickerModal && !showStartTimePickerModal && !showEndTimePickerModal
             ) {
                 Column(
@@ -2449,10 +2419,9 @@ fun CourseDetailsScreen(
                         }
                     }
                 }
-        }
+            }
         }
     }
-}
 }
 }
 }
