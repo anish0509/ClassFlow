@@ -74,6 +74,7 @@ import java.time.LocalTime
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -158,33 +159,35 @@ fun HomeScreen(
         if (needWeekSync || needDaySync) {
             isProgrammaticScroll = true
             try {
-                if (needWeekSync) {
-                    if (isWeekDragged) {
-                        pagerState.scrollToPage(targetWeekPage)
-                    } else {
+                coroutineScope {
+                    if (needWeekSync) {
                         launch {
-                            pagerState.animateScrollToPage(
-                                page = targetWeekPage,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium
+                            if (isWeekDragged) {
+                                pagerState.scrollToPage(targetWeekPage)
+                            } else {
+                                pagerState.animateScrollToPage(
+                                    page = targetWeekPage,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
-                }
-                if (needDaySync) {
-                    if (isDayDragged) {
-                        dayPagerState.scrollToPage(targetDayPage)
-                    } else {
+                    if (needDaySync) {
                         launch {
-                            dayPagerState.animateScrollToPage(
-                                page = targetDayPage,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium
+                            if (isDayDragged) {
+                                dayPagerState.scrollToPage(targetDayPage)
+                            } else {
+                                dayPagerState.animateScrollToPage(
+                                    page = targetDayPage,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
