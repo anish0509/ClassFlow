@@ -49,6 +49,7 @@ import androidx.compose.foundation.rememberScrollState
 import com.anish18.classflow.ui.components.AttendanceDialog
 import com.anish18.classflow.ui.components.GlassButton
 import com.anish18.classflow.ui.components.GlassDialogButton
+import com.anish18.classflow.ui.components.GlassHeader
 import com.anish18.classflow.ui.components.GlassIconButton
 import com.anish18.classflow.ui.components.GlassTextButton
 import com.anish18.classflow.ui.components.GlassSlider
@@ -223,43 +224,24 @@ fun CourseDetailsScreen(
         100
     }
 
+    val localHazeState = remember { HazeState() }
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     Box(modifier = Modifier.fillMaxSize()) {
+        // Single Main Scrollable Column
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .statusBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .haze(localHazeState)
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    top = statusBarHeight + 70.dp + 10.dp,
+                    bottom = 40.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Back button and header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                GlassIconButton(
-                    icon = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    onClick = onBack,
-                    size = 40.dp,
-                    iconSize = 20.dp,
-                    tint = TextPrimary
-                )
-                Spacer(modifier = Modifier.width(14.dp))
-                Text(
-                    text = "Subject Details",
-                    color = courseColor,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Single Unified Scrollable Content Column
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
             // ------------------ CARD 1: COURSE INFO & SCHEDULE CARD ------------------
             GlassCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -837,8 +819,8 @@ fun CourseDetailsScreen(
 
                         GlassTextButton(onClick = { showAddExamDialog = true }) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Icon(Icons.Default.Add, null, tint = WaterBlue, modifier = Modifier.size(16.dp))
-                                Text("+ Add Exam", color = WaterBlue, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
+                                Icon(Icons.Default.Add, null, tint = WaterBlue, modifier = Modifier.size(15.dp))
+                                Text("Add Exam", color = WaterBlue, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -1627,7 +1609,23 @@ fun CourseDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
         }
-    }
+
+        // Top Frosted Glass Header matching other screens
+        GlassHeader(
+            title = "Subject Details",
+            subtitle = course?.shortName ?: course?.name ?: "Course",
+            navigationIcon = {
+                GlassIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    onClick = onBack,
+                    size = 38.dp,
+                    iconSize = 18.dp,
+                    tint = TextPrimary
+                )
+            },
+            hazeState = localHazeState
+        )
 
     val dateStrForAttendance = selectedDateForAttendance
     val attendanceDetails = remember(dateStrForAttendance, classes, attendance) {
