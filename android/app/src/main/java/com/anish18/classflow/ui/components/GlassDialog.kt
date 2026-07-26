@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.animation.ExperimentalAnimationApi
 import com.anish18.classflow.ui.glass.compose.GlassBox
-import com.anish18.classflow.ui.theme.ThemeState
+import com.anish18.classflow.ui.theme.*
 import dev.chrisbanes.haze.hazeChild
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,7 +43,7 @@ fun GlassDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    captureEnabled: Boolean = true,
+    @Suppress("UNUSED_PARAMETER") captureEnabled: Boolean = true,
     // When true: the outer Box is clamped to stop at the navbar top (padding bottom).
     // This prevents GlassBox from overlapping the navbar GlassBox → no black flash.
     // The card layout stays CENTERED — this is NOT a bottom-sheet layout change.
@@ -53,8 +53,6 @@ fun GlassDialog(
     content: @Composable () -> Unit
 ) {
     val isDark = ThemeState.isDark
-    val glassColor = if (isDark) Color(0xFF0F0F11).copy(alpha = 0.35f) else Color.White.copy(alpha = 0.25f)
-    val borderColor = if (isDark) Color.Black else Color.Black.copy(alpha = 0.20f)
 
     androidx.compose.runtime.DisposableEffect(visible) {
         if (visible) {
@@ -127,34 +125,42 @@ fun GlassDialog(
                 } else {
                     config.screenHeightDp.dp - statusBarTop - 32.dp
                 }
-                val isTransitioning = transition.currentState != transition.targetState
-                val finalCaptureEnabled = captureEnabled && !isTransitioning
+                val screenHazeState = LocalScreenHazeState.current ?: LocalHazeState.current
+                val finalShape = RoundedCornerShape(32.dp)
+                val dialogBgColor = if (isDark) {
+                    CardBackground.copy(alpha = 0.45f)
+                } else {
+                    Color.White.copy(alpha = 0.78f)
+                }
+                val dialogBorderColor = if (isDark) {
+                    FrostedGlassBorder.copy(alpha = 0.45f)
+                } else {
+                    Color.Black.copy(alpha = 0.08f)
+                }
 
-                GlassBox(
+                val hazeModifier = if (screenHazeState != null) {
+                    Modifier.hazeChild(state = screenHazeState, shape = finalShape)
+                } else {
+                    Modifier
+                }
+
+                Box(
                     modifier = modifier
                         .fillMaxWidth()
                         .heightIn(max = maxDialogHeight)
-                        .clip(RoundedCornerShape(32.dp))
+                        .clip(finalShape)
+                        .then(hazeModifier)
+                        .background(color = dialogBgColor, shape = finalShape)
+                        .border(
+                            width = 1.dp,
+                            color = dialogBorderColor,
+                            shape = finalShape
+                        )
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { /* consume — prevent dismiss on card tap */ }
                         )
-                        .border(
-                            width = 1.dp,
-                            color = borderColor,
-                            shape = RoundedCornerShape(32.dp)
-                        ),
-                    cornerRadius = 32.dp,
-                    thickness = 18.dp,
-                    ior = 1.55f,
-                    blurRadius = 6f,
-                    displacementScale = 0.35f,
-                    chromaticAberration = 1.8f,
-                    brightness = if (isDark) 1.14f else 1.10f,
-                    glassColor = glassColor,
-                    captureEnabled = finalCaptureEnabled,
-                    updateKey = isDark
                 ) {
                     content()
                 }
