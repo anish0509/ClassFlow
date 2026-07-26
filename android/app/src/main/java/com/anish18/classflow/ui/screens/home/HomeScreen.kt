@@ -140,7 +140,14 @@ fun HomeScreen(
 
     var isProgrammaticScroll by remember { mutableStateOf(false) }
 
+    val isWeekDragged by pagerState.interactionSource.collectIsDraggedAsState()
+    val isDayDragged by dayPagerState.interactionSource.collectIsDraggedAsState()
+
     LaunchedEffect(selectedDate) {
+        if (isWeekDragged || isDayDragged || pagerState.isScrollInProgress || dayPagerState.isScrollInProgress) {
+            return@LaunchedEffect
+        }
+
         val selectedSunday = selectedDate.minusDays((selectedDate.dayOfWeek.value % 7).toLong())
         val baseSunday = baseDate.minusDays((baseDate.dayOfWeek.value % 7).toLong())
         val weeksBetween = java.time.temporal.ChronoUnit.DAYS.between(baseSunday, selectedSunday) / 7
@@ -159,8 +166,8 @@ fun HomeScreen(
                     pagerState.animateScrollToPage(
                         page = targetWeekPage,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessMediumLow
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
                         )
                     )
                 }
@@ -170,8 +177,8 @@ fun HomeScreen(
                     dayPagerState.animateScrollToPage(
                         page = targetDayPage,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessMediumLow
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
                         )
                     )
                 }

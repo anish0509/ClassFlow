@@ -464,25 +464,26 @@ open class GlassFrameLayout @JvmOverloads constructor(
         post { onBackdropCaptured?.invoke() }
     }
 
+    private val captureRunnable = Runnable {
+        captureScheduled = false
+        if (isAttachedToWindow && visibility == VISIBLE) {
+            captureAndSetBackground()
+            lastCaptureTime = System.currentTimeMillis()
+        }
+    }
+
     private fun scheduleCaptureBackground() {
-        if (backdropHandledByChild) return
+        if (backdropHandledByChild || !isAttachedToWindow || visibility != VISIBLE) return
         if (!captureScheduled) {
             val now = System.currentTimeMillis()
             val elapsed = now - lastCaptureTime
 
             if (elapsed < minCaptureInterval) {
-                postDelayed({
-                    captureScheduled = false
-                    scheduleCaptureBackground()
-                }, minCaptureInterval - elapsed)
                 captureScheduled = true
+                postDelayed(captureRunnable, minCaptureInterval - elapsed)
             } else {
                 captureScheduled = true
-                post {
-                    captureScheduled = false
-                    captureAndSetBackground()
-                    lastCaptureTime = System.currentTimeMillis()
-                }
+                post(captureRunnable)
             }
         }
     }
