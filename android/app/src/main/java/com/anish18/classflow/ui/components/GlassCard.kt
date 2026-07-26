@@ -147,9 +147,9 @@ private val noiseBitmap: ImageBitmap by lazy {
     val random = java.util.Random()
     for (i in 0 until size * size) {
         val noiseVal = random.nextInt(256)
-        // High density random noise pixels with premium frosting opacity
+        // Subtle micro-grain noise opacity matching class/task cards
         colors[i] = android.graphics.Color.argb(
-            random.nextInt(30), // Max alpha = 29 (high density premium grain)
+            random.nextInt(6),
             noiseVal,
             noiseVal,
             noiseVal
