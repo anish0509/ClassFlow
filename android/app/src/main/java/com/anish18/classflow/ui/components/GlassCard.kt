@@ -275,10 +275,6 @@ fun GlassCard(
                     color = cardBgColor,
                     shape = finalShape
                 )
-                .background(
-                    brush = noiseBrush,
-                    shape = finalShape
-                )
                 .then(colorTagModifier)
                 .border(
                     width = 1.dp,
