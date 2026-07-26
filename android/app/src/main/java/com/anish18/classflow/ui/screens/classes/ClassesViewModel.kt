@@ -32,6 +32,9 @@ class ClassesViewModel @Inject constructor(
     val activeSemester: StateFlow<Semester?> = repository.activeSemesterFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val semesters: StateFlow<List<Semester>> = repository.allSemestersFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val courses: StateFlow<List<Course>> = repository.activeCoursesFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

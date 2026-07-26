@@ -145,7 +145,7 @@ fun CourseDetailsScreen(
     val targetRequirement = course?.minAttendanceRequirement ?: 75
 
     // Attendance stats
-    val presentCount = attendance.count { it.status == "present" }
+    val presentCount = attendance.count { it.status == "present" || it.status == "attended" }
     val absentCount = attendance.count { it.status == "absent" }
 
     val unmarkedCount = remember(classes, attendance, courseSemester) {
@@ -159,9 +159,10 @@ fun CourseDetailsScreen(
             0
         } else {
             val today = java.time.LocalDate.now()
+            val nowTime = java.time.LocalTime.now()
             val endLimit = if (semEnd != null && semEnd.isBefore(today)) semEnd else today
             
-            val scheduledPastDates = mutableListOf<java.time.LocalDate>()
+            val scheduledPastSessions = mutableListOf<Pair<String, java.time.LocalDate>>()
             var current: java.time.LocalDate = semStart
             while (!current.isAfter(endLimit)) {
                 val currentDayOfWeek = when (current.dayOfWeek) {
@@ -174,7 +175,6 @@ fun CourseDetailsScreen(
                     java.time.DayOfWeek.SUNDAY -> "Sunday"
                 }
                 
-                var hasClassAndPassed = false
                 classes.forEach { session ->
                     val d = session.dayOfWeek
                     val normalized = when {
@@ -188,29 +188,29 @@ fun CourseDetailsScreen(
                         else -> d
                     }
                     if (normalized == currentDayOfWeek) {
+                        var hasPassed = false
                         if (current.isBefore(today)) {
-                            hasClassAndPassed = true
+                            hasPassed = true
                         } else if (current.isEqual(today)) {
                             try {
                                 val classStart = java.time.LocalTime.parse(session.startTime)
-                                if (java.time.LocalTime.now().isAfter(classStart)) {
-                                    hasClassAndPassed = true
+                                if (nowTime.isAfter(classStart)) {
+                                    hasPassed = true
                                 }
                             } catch (e: Exception) {
-                                hasClassAndPassed = true
+                                hasPassed = true
                             }
                         }
+                        if (hasPassed) {
+                            scheduledPastSessions.add(Pair(session.id, current))
+                        }
                     }
-                }
-                
-                if (hasClassAndPassed) {
-                    scheduledPastDates.add(current)
                 }
                 current = current.plusDays(1)
             }
             
-            val markedDates = attendance.map { it.date }.toSet()
-            scheduledPastDates.count { !markedDates.contains(it.toString()) }
+            val markedSessionKeys = attendance.map { Pair(it.classId, it.date) }.toSet()
+            scheduledPastSessions.count { (classId, date) -> !markedSessionKeys.contains(Pair(classId, date.toString())) }
         }
     }
 
