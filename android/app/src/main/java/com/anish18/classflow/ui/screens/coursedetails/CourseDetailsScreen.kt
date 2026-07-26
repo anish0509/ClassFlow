@@ -1459,7 +1459,7 @@ fun CourseDetailsScreen(
                 )
             },
             hazeState = localHazeState,
-            modifier = Modifier.fillMaxWidth().zIndex(100f)
+            modifier = Modifier.fillMaxWidth()
         )
 
     val dateStrForAttendance = selectedDateForAttendance

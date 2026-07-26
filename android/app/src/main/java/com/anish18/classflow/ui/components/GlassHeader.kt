@@ -41,9 +41,9 @@ fun GlassHeader(
     val isDark = ThemeState.isDark
 
     val headerBgColor = if (isDark) {
-        Color.White.copy(alpha = 0.08f)
+        Color(0xFF1E1E22).copy(alpha = 0.85f)
     } else {
-        Color.White.copy(alpha = 0.35f)
+        Color.White.copy(alpha = 0.80f)
     }
 
     val headerBorderColor = if (isDark) {
