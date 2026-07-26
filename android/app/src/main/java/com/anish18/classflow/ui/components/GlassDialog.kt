@@ -38,6 +38,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun GlassDialog(
@@ -45,109 +48,111 @@ fun GlassDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     captureEnabled: Boolean = true,
-    // When true: the outer Box is clamped to stop at the navbar top (padding bottom).
-    // This prevents GlassBox from overlapping the navbar GlassBox → no black flash.
     avoidNavBar: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    if (!visible) return
+
     val isDark = ThemeState.isDark
     val glassColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.35f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.65f)
 
-    DisposableEffect(visible) {
-        if (visible) {
-            ThemeState.isDialogOpen = true
-        }
+    DisposableEffect(Unit) {
+        ThemeState.isDialogOpen = true
         onDispose {
-            if (visible) {
-                ThemeState.isDialogOpen = false
-            }
+            ThemeState.isDialogOpen = false
         }
     }
 
-    // Clamp bottom so the glass card never enters the navbar glass area
-    val navBarInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val navBarSafeBottom = if (avoidNavBar) navBarInset + 72.dp + 12.dp else 0.dp
-
-    val density = LocalDensity.current
-    val slideOffsetPx = with(density) { 120.dp.roundToPx() }
-
-    val cardEnter: EnterTransition = fadeIn(animationSpec = tween(350)) +
-        slideInVertically(
-            initialOffsetY = { slideOffsetPx },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMediumLow
-            )
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
         )
-
-    val cardExit: ExitTransition = fadeOut(animationSpec = tween(250)) +
-        slideOutVertically(
-            targetOffsetY = { slideOffsetPx },
-            animationSpec = tween(250)
-        )
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = cardEnter,
-        exit = cardExit
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismissRequest
-                ),
-            contentAlignment = Alignment.Center
+        val navBarInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val navBarSafeBottom = if (avoidNavBar) navBarInset + 72.dp + 12.dp else 0.dp
+
+        val density = LocalDensity.current
+        val slideOffsetPx = with(density) { 120.dp.roundToPx() }
+
+        val cardEnter: EnterTransition = fadeIn(animationSpec = tween(350)) +
+            slideInVertically(
+                initialOffsetY = { slideOffsetPx },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+
+        val cardExit: ExitTransition = fadeOut(animationSpec = tween(250)) +
+            slideOutVertically(
+                targetOffsetY = { slideOffsetPx },
+                animationSpec = tween(250)
+            )
+
+        AnimatedVisibility(
+            visible = true,
+            enter = cardEnter,
+            exit = cardExit
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(bottom = navBarSafeBottom)
-                    .padding(16.dp),
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.55f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onDismissRequest
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                val config = LocalConfiguration.current
-                val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                val maxDialogHeight = if (avoidNavBar) {
-                    val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                    config.screenHeightDp.dp - navBarBottom - statusBarTop - 72.dp - 12.dp - 32.dp
-                } else {
-                    config.screenHeightDp.dp - statusBarTop - 32.dp
-                }
-
-                GlassBox(
-                    modifier = modifier
+                Box(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = maxDialogHeight)
-                        .clip(RoundedCornerShape(32.dp))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { /* consume — prevent dismiss on card tap */ }
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = borderColor,
-                            shape = RoundedCornerShape(32.dp)
-                        ),
-                    cornerRadius = 32.dp,
-                    thickness = 18.dp,
-                    ior = 1.55f,
-                    blurRadius = 8f,
-                    displacementScale = 0.35f,
-                    chromaticAberration = 2.0f,
-                    rimStrength = 1.4f,
-                    brightness = if (isDark) 1.15f else 1.08f,
-                    glassColor = glassColor,
-                    captureEnabled = captureEnabled,
-                    updateKey = isDark
+                        .wrapContentHeight()
+                        .padding(bottom = navBarSafeBottom)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    content()
+                    val config = LocalConfiguration.current
+                    val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                    val maxDialogHeight = if (avoidNavBar) {
+                        val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                        config.screenHeightDp.dp - navBarBottom - statusBarTop - 72.dp - 12.dp - 32.dp
+                    } else {
+                        config.screenHeightDp.dp - statusBarTop - 32.dp
+                    }
+
+                    GlassBox(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .heightIn(max = maxDialogHeight)
+                            .clip(RoundedCornerShape(32.dp))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { /* consume click */ }
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = borderColor,
+                                shape = RoundedCornerShape(32.dp)
+                            ),
+                        cornerRadius = 32.dp,
+                        thickness = 18.dp,
+                        ior = 1.55f,
+                        blurRadius = 8f,
+                        displacementScale = 0.35f,
+                        chromaticAberration = 2.0f,
+                        rimStrength = 1.4f,
+                        brightness = if (isDark) 1.15f else 1.08f,
+                        glassColor = glassColor,
+                        captureEnabled = captureEnabled,
+                        updateKey = isDark
+                    ) {
+                        content()
+                    }
                 }
             }
         }
