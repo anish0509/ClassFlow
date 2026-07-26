@@ -148,21 +148,34 @@ fun GlassDialog(
                     modifier = modifier
                         .fillMaxWidth()
                         .heightIn(max = maxDialogHeight)
-                        .clip(finalShape)
-                        .then(hazeModifier)
-                        .background(color = dialogBgColor, shape = finalShape)
-                        .border(
-                            width = 1.dp,
-                            color = dialogBorderColor,
-                            shape = finalShape
-                        )
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { /* consume — prevent dismiss on card tap */ }
                         )
                 ) {
-                    content()
+                    // Layer 1: Blurred background surface
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(finalShape)
+                            .then(hazeModifier)
+                            .background(color = dialogBgColor, shape = finalShape)
+                            .border(
+                                width = 1.dp,
+                                color = dialogBorderColor,
+                                shape = finalShape
+                            )
+                    )
+
+                    // Layer 2: Sharp foreground content
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                    ) {
+                        content()
+                    }
                 }
             }
         }
