@@ -22,6 +22,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
@@ -112,6 +113,28 @@ fun SettingsScreen(
     var selectedSemesterToDelete by remember { mutableStateOf<Semester?>(null) }
     var showDeleteSemesterWarning by remember { mutableStateOf(false) }
     
+    // Wallpaper dialog state
+    var showWallpaperDialog by remember { mutableStateOf(false) }
+    val wallpaperType by viewModel.wallpaperType.collectAsState()
+    val wallpaperColorHex by viewModel.wallpaperColorHex.collectAsState()
+    val wallpaperGradientId by viewModel.wallpaperGradientId.collectAsState()
+    val wallpaperImageUri by viewModel.wallpaperImageUri.collectAsState()
+
+    val wallpaperImagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            viewModel.setWallpaperImageUri(it.toString())
+            viewModel.setWallpaperType("custom_image")
+        }
+    }
+
     // Unified Share/Import dialog states
     var showShareDialog by remember { mutableStateOf(false) }
     var showImportDialog by remember { mutableStateOf(false) }
@@ -307,7 +330,7 @@ fun SettingsScreen(
                             iconTint = NeonPurple,
                             title = "Dark Mode",
                             subtitle = "Switch between light and dark themes",
-                            shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+                            shape = RoundedCornerShape(0.dp),
                             trailingContent = {
                                 GlassSwitch(
                                     checked = ThemeState.isDark,
@@ -317,6 +340,19 @@ fun SettingsScreen(
                                     }
                                 )
                             }
+                        )
+                        HorizontalDivider(
+                            color = FrostedGlassBorder.copy(alpha = 0.10f),
+                            thickness = 0.8.dp,
+                            modifier = Modifier.padding(start = 70.dp)
+                        )
+                        SettingItem(
+                            icon = Icons.Default.Wallpaper,
+                            iconTint = NeonBlue,
+                            title = "Custom Wallpaper",
+                            subtitle = "Select solid colors, gradients, or local photo",
+                            onClick = { showWallpaperDialog = true },
+                            shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
                         )
                     }
                 }
@@ -1255,6 +1291,207 @@ fun SettingsScreen(
                 }
             }
         }
+
+    // Custom Wallpaper & Background Dialog
+    if (showWallpaperDialog) {
+        var selectedTab by remember { mutableIntStateOf(if (wallpaperType == "solid") 1 else if (wallpaperType == "gradient") 2 else if (wallpaperType == "custom_image") 3 else 0) }
+
+        GlassDialog(
+            visible = showWallpaperDialog,
+            onDismissRequest = { showWallpaperDialog = false }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text("Wallpaper & Background", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Customize app background with colors, gradients, or custom photo.", color = TextSecondary, fontSize = 13.sp)
+
+                // Tab Selector
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                        .padding(2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    val tabs = listOf("Default", "Colors", "Gradients", "Custom")
+                    tabs.forEachIndexed { index, label ->
+                        val isSelected = selectedTab == index
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .background(if (isSelected) WaterBlue.copy(alpha = 0.20f) else Color.Transparent, RoundedCornerShape(8.dp))
+                                .clickable { selectedTab = index },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                color = if (isSelected) WaterBlue else TextSecondary,
+                                fontSize = 11.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+
+                // Tab Content
+                when (selectedTab) {
+                    0 -> { // Default Mesh
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Standard Dynamic Mesh Background", color = TextSecondary, fontSize = 12.sp)
+                            GlassButton(
+                                onClick = {
+                                    viewModel.setWallpaperType("default")
+                                    showWallpaperDialog = false
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                accentColor = WaterBlue
+                            ) {
+                                Text("Use Default Dynamic Mesh", color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    1 -> { // Solid Colors
+                        val colors = listOf(
+                            "#0D1117" to "Midnight",
+                            "#0F172A" to "Slate",
+                            "#1E1B4B" to "Indigo",
+                            "#2D122D" to "Purple",
+                            "#062016" to "Emerald",
+                            "#2D0B1E" to "Rose",
+                            "#0A192F" to "Navy",
+                            "#000000" to "AMOLED"
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Select Solid Color:", color = TextSecondary, fontSize = 12.sp)
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                items(colors) { (hex, name) ->
+                                    val colorObj = try { Color(android.graphics.Color.parseColor(hex)) } catch (e: Exception) { Color.Black }
+                                    val isSelected = wallpaperType == "solid" && wallpaperColorHex.equals(hex, ignoreCase = true)
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.clickable {
+                                            viewModel.setWallpaperColorHex(hex)
+                                            viewModel.setWallpaperType("solid")
+                                        }
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(44.dp)
+                                                .background(colorObj, CircleShape)
+                                                .border(
+                                                    width = if (isSelected) 2.5.dp else 1.dp,
+                                                    color = if (isSelected) WaterBlue else Color.White.copy(alpha = 0.3f),
+                                                    shape = CircleShape
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (isSelected) {
+                                                Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(name, color = TextSecondary, fontSize = 10.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    2 -> { // Gradients
+                        val gradients = listOf(
+                            "aurora" to "Aurora Teal",
+                            "cyberpunk" to "Cyberpunk",
+                            "sunset" to "Sunset Flare",
+                            "deep_space" to "Deep Space",
+                            "ocean" to "Ocean Sapphire",
+                            "emerald" to "Emerald Prism"
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Select Preset Gradient:", color = TextSecondary, fontSize = 12.sp)
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                items(gradients) { (gradId, gradName) ->
+                                    val isSelected = wallpaperType == "gradient" && wallpaperGradientId == gradId
+                                    val gradBrush = when (gradId) {
+                                        "cyberpunk" -> Brush.linearGradient(listOf(Color(0xFF0F0C20), Color(0xFF591A73)))
+                                        "sunset" -> Brush.linearGradient(listOf(Color(0xFF2D0B1E), Color(0xFFD97736)))
+                                        "deep_space" -> Brush.linearGradient(listOf(Color(0xFF05050A), Color(0xFF1E1B4B)))
+                                        "ocean" -> Brush.linearGradient(listOf(Color(0xFF021B2B), Color(0xFF25A18E)))
+                                        "emerald" -> Brush.linearGradient(listOf(Color(0xFF062016), Color(0xFF137547)))
+                                        else -> Brush.linearGradient(listOf(Color(0xFF0B132B), Color(0xFF5BC0BE)))
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .width(95.dp)
+                                            .height(55.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(gradBrush)
+                                            .border(
+                                                width = if (isSelected) 2.5.dp else 1.dp,
+                                                color = if (isSelected) WaterBlue else Color.White.copy(alpha = 0.3f),
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .clickable {
+                                                viewModel.setWallpaperGradientId(gradId)
+                                                viewModel.setWallpaperType("gradient")
+                                            }
+                                            .padding(6.dp),
+                                        contentAlignment = Alignment.BottomStart
+                                    ) {
+                                        Text(gradName, color = Color.White, fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    3 -> { // Custom Image
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Choose Custom Photo / Wallpaper from Storage:", color = TextSecondary, fontSize = 12.sp)
+                            GlassButton(
+                                onClick = { wallpaperImagePicker.launch("image/*") },
+                                modifier = Modifier.fillMaxWidth(),
+                                accentColor = WaterBlue
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.PhotoLibrary, null, tint = TextPrimary)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Choose Photo from Storage", color = TextPrimary, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            if (!wallpaperImageUri.isNullOrEmpty() && wallpaperType == "custom_image") {
+                                GlassTextButton(
+                                    onClick = {
+                                        viewModel.setWallpaperImageUri(null)
+                                        viewModel.setWallpaperType("default")
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("Reset to Default Background", color = NeonRed, fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    GlassTextButton(onClick = { showWallpaperDialog = false }) {
+                        Text("Done", color = WaterBlue, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
 
     // Unified Share Timetable Dialog
     GlassDialog(

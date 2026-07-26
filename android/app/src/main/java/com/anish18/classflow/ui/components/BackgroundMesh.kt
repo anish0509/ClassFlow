@@ -1,11 +1,16 @@
 package com.anish18.classflow.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.anish18.classflow.ui.theme.ThemeState
 
 @Composable
@@ -13,15 +18,123 @@ fun BackgroundMesh(
     modifier: Modifier = Modifier
 ) {
     val isDark = ThemeState.isDark
+    val wallpaperType = ThemeState.wallpaperType
+    val colorHex = ThemeState.wallpaperColorHex
+    val gradientId = ThemeState.wallpaperGradientId
+    val imageUri = ThemeState.wallpaperImageUri
 
+    Box(modifier = modifier.fillMaxSize()) {
+        when (wallpaperType) {
+            "solid" -> {
+                val parsedColor = try {
+                    Color(android.graphics.Color.parseColor(colorHex))
+                } catch (e: Exception) {
+                    if (isDark) Color(0xFF0D1117) else Color(0xFFF2F4F7)
+                }
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawRect(color = parsedColor)
+                }
+            }
+
+            "gradient" -> {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    when (gradientId) {
+                        "cyberpunk" -> {
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF0F0C20), Color(0xFF2B1055), Color(0xFF591A73)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                        "sunset" -> {
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF2D0B1E), Color(0xFF6B1D38), Color(0xFFA83248), Color(0xFFD97736)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                        "deep_space" -> {
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF05050A), Color(0xFF0F172A), Color(0xFF1E1B4B)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                        "ocean" -> {
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF021B2B), Color(0xFF004E64), Color(0xFF25A18E)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                        "emerald" -> {
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF062016), Color(0xFF0B4F37), Color(0xFF137547)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                        else -> { // "aurora"
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF0B132B), Color(0xFF1C2541), Color(0xFF3A506B), Color(0xFF5BC0BE)),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, size.height)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            "custom_image" -> {
+                if (!imageUri.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Custom Wallpaper",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    // Scrim overlay to maintain high text contrast on custom photos
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                if (isDark) Color.Black.copy(alpha = 0.40f) else Color.White.copy(alpha = 0.25f)
+                            )
+                    )
+                } else {
+                    DefaultMesh(isDark = isDark)
+                }
+            }
+
+            else -> { // "default"
+                DefaultMesh(isDark = isDark)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DefaultMesh(isDark: Boolean) {
     if (isDark) {
-        // ── Premium Dark Mode iOS AMOLED Black ─────────────────────────────
-        Canvas(modifier = modifier.fillMaxSize()) {
+        // Premium Dark Mode iOS AMOLED Black
+        Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(color = Color(0xFF000000))
         }
     } else {
-        // ── Clean Light Mode Pastel Static Mesh ─────────────────────────────────
-        Canvas(modifier = modifier.fillMaxSize()) {
+        // Clean Light Mode Pastel Static Mesh
+        Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(color = Color(0xFFF2F2F7))
 
             // Soft Pastel Blue orb
@@ -30,10 +143,10 @@ fun BackgroundMesh(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(Color(0xFFCBE0FF).copy(alpha = 0.35f), Color.Transparent),
-                    center = androidx.compose.ui.geometry.Offset(x1, y1),
+                    center = Offset(x1, y1),
                     radius = size.width * 0.95f
                 ),
-                center = androidx.compose.ui.geometry.Offset(x1, y1),
+                center = Offset(x1, y1),
                 radius = size.width * 0.95f
             )
 
@@ -43,10 +156,10 @@ fun BackgroundMesh(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(Color(0xFFEADFFF).copy(alpha = 0.38f), Color.Transparent),
-                    center = androidx.compose.ui.geometry.Offset(x2, y2),
+                    center = Offset(x2, y2),
                     radius = size.width * 1.1f
                 ),
-                center = androidx.compose.ui.geometry.Offset(x2, y2),
+                center = Offset(x2, y2),
                 radius = size.width * 1.1f
             )
 
@@ -56,10 +169,10 @@ fun BackgroundMesh(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(Color(0xFFFFD5F0).copy(alpha = 0.32f), Color.Transparent),
-                    center = androidx.compose.ui.geometry.Offset(x3, y3),
+                    center = Offset(x3, y3),
                     radius = size.width * 0.85f
                 ),
-                center = androidx.compose.ui.geometry.Offset(x3, y3),
+                center = Offset(x3, y3),
                 radius = size.width * 0.85f
             )
         }

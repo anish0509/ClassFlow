@@ -56,12 +56,32 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val backgroundStyle: StateFlow<String> = appSettings.backgroundStyle
+    val wallpaperType: StateFlow<String> = appSettings.wallpaperType
+    val wallpaperColorHex: StateFlow<String> = appSettings.wallpaperColorHex
+    val wallpaperGradientId: StateFlow<String> = appSettings.wallpaperGradientId
+    val wallpaperImageUri: StateFlow<String?> = appSettings.wallpaperImageUri
     val showTasksOnTimetable: StateFlow<Boolean> = appSettings.showTasksOnTimetable
 
     val notificationsEnabled: StateFlow<Boolean> = appSettings.notificationsEnabled
     val classReminderBuffer: StateFlow<Int> = appSettings.classReminderBuffer
     val taskReminderEnabled: StateFlow<Boolean> = appSettings.taskReminderEnabled
     val taskReminderBuffer: StateFlow<Int> = appSettings.taskReminderBuffer
+
+    fun setWallpaperType(type: String) {
+        appSettings.setWallpaperType(type)
+    }
+
+    fun setWallpaperColorHex(hex: String) {
+        appSettings.setWallpaperColorHex(hex)
+    }
+
+    fun setWallpaperGradientId(id: String) {
+        appSettings.setWallpaperGradientId(id)
+    }
+
+    fun setWallpaperImageUri(uriStr: String?) {
+        appSettings.setWallpaperImageUri(uriStr)
+    }
 
     val studyModeEnabled: StateFlow<Boolean> = appSettings.studyModeEnabled
 

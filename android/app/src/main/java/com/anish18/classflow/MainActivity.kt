@@ -68,10 +68,18 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val backgroundStyle by appSettings.backgroundStyle.collectAsState()
+            val wallpaperType by appSettings.wallpaperType.collectAsState()
+            val wallpaperColorHex by appSettings.wallpaperColorHex.collectAsState()
+            val wallpaperGradientId by appSettings.wallpaperGradientId.collectAsState()
+            val wallpaperImageUri by appSettings.wallpaperImageUri.collectAsState()
             val destination by destinationFlow.collectAsState()
             
-            androidx.compose.runtime.LaunchedEffect(backgroundStyle) {
+            androidx.compose.runtime.LaunchedEffect(backgroundStyle, wallpaperType, wallpaperColorHex, wallpaperGradientId, wallpaperImageUri) {
                 com.anish18.classflow.ui.theme.ThemeState.isDark = (backgroundStyle == "Dark")
+                com.anish18.classflow.ui.theme.ThemeState.wallpaperType = wallpaperType
+                com.anish18.classflow.ui.theme.ThemeState.wallpaperColorHex = wallpaperColorHex
+                com.anish18.classflow.ui.theme.ThemeState.wallpaperGradientId = wallpaperGradientId
+                com.anish18.classflow.ui.theme.ThemeState.wallpaperImageUri = wallpaperImageUri
             }
             
             UniTimetableTheme {

@@ -17,6 +17,18 @@ class AppSettings @Inject constructor(
     private val _backgroundStyle = MutableStateFlow(prefs.getString("background_style", "Dark") ?: "Dark")
     val backgroundStyle: StateFlow<String> = _backgroundStyle.asStateFlow()
 
+    private val _wallpaperType = MutableStateFlow(prefs.getString("wallpaper_type", "default") ?: "default")
+    val wallpaperType: StateFlow<String> = _wallpaperType.asStateFlow()
+
+    private val _wallpaperColorHex = MutableStateFlow(prefs.getString("wallpaper_color_hex", "#0D1117") ?: "#0D1117")
+    val wallpaperColorHex: StateFlow<String> = _wallpaperColorHex.asStateFlow()
+
+    private val _wallpaperGradientId = MutableStateFlow(prefs.getString("wallpaper_gradient_id", "aurora") ?: "aurora")
+    val wallpaperGradientId: StateFlow<String> = _wallpaperGradientId.asStateFlow()
+
+    private val _wallpaperImageUri = MutableStateFlow(prefs.getString("wallpaper_image_uri", null))
+    val wallpaperImageUri: StateFlow<String?> = _wallpaperImageUri.asStateFlow()
+
     private val _showTasksOnTimetable = MutableStateFlow(prefs.getBoolean("show_tasks_on_timetable", true))
     val showTasksOnTimetable: StateFlow<Boolean> = _showTasksOnTimetable.asStateFlow()
 
@@ -36,6 +48,30 @@ class AppSettings @Inject constructor(
     fun setBackgroundStyle(style: String) {
         prefs.edit().putString("background_style", style).apply()
         _backgroundStyle.value = style
+    }
+
+    fun setWallpaperType(type: String) {
+        prefs.edit().putString("wallpaper_type", type).apply()
+        _wallpaperType.value = type
+    }
+
+    fun setWallpaperColorHex(hex: String) {
+        prefs.edit().putString("wallpaper_color_hex", hex).apply()
+        _wallpaperColorHex.value = hex
+    }
+
+    fun setWallpaperGradientId(id: String) {
+        prefs.edit().putString("wallpaper_gradient_id", id).apply()
+        _wallpaperGradientId.value = id
+    }
+
+    fun setWallpaperImageUri(uriStr: String?) {
+        if (uriStr == null) {
+            prefs.edit().remove("wallpaper_image_uri").apply()
+        } else {
+            prefs.edit().putString("wallpaper_image_uri", uriStr).apply()
+        }
+        _wallpaperImageUri.value = uriStr
     }
 
     fun setShowTasksOnTimetable(show: Boolean) {

@@ -8,6 +8,10 @@ import androidx.compose.ui.graphics.Color
 object ThemeState {
     var isDark by mutableStateOf(false)
     var isDialogOpen by mutableStateOf(false)
+    var wallpaperType by mutableStateOf("default") // "default", "solid", "gradient", "custom_image"
+    var wallpaperColorHex by mutableStateOf("#0D1117")
+    var wallpaperGradientId by mutableStateOf("aurora")
+    var wallpaperImageUri by mutableStateOf<String?>(null)
 }
 
 
