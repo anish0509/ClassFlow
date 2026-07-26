@@ -25,7 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
 import com.anish18.classflow.ui.theme.PremiumSpec
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -135,34 +136,72 @@ fun GlassDialog(
                         config.screenHeightDp.dp - statusBarTop - 32.dp
                     }
 
-                    GlassBox(
+                    Box(
                         modifier = modifier
                             .fillMaxWidth()
                             .heightIn(max = maxDialogHeight)
+                            .shadow(
+                                elevation = 24.dp,
+                                shape = RoundedCornerShape(32.dp),
+                                spotColor = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f)
+                            )
                             .clip(RoundedCornerShape(32.dp))
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = if (isDark) {
+                                        listOf(
+                                            androidx.compose.ui.graphics.Color(0xFF232330).copy(alpha = 0.88f),
+                                            androidx.compose.ui.graphics.Color(0xFF181822).copy(alpha = 0.82f)
+                                        )
+                                    } else {
+                                        listOf(
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.92f),
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.80f)
+                                        )
+                                    }
+                                ),
+                                shape = RoundedCornerShape(32.dp)
+                            )
+                            .border(
+                                width = 1.2.dp,
+                                brush = Brush.verticalGradient(
+                                    colors = if (isDark) {
+                                        listOf(
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.55f),
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f)
+                                        )
+                                    } else {
+                                        listOf(
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                                            androidx.compose.ui.graphics.Color.White.copy(alpha = 0.40f)
+                                        )
+                                    }
+                                ),
+                                shape = RoundedCornerShape(32.dp)
+                            )
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 onClick = { /* consume click */ }
                             )
-                            .border(
-                                width = 1.dp,
-                                color = borderColor,
-                                shape = RoundedCornerShape(32.dp)
-                            ),
-                        cornerRadius = 32.dp,
-                        thickness = 18.dp,
-                        ior = 1.55f,
-                        blurRadius = 8f,
-                        displacementScale = 0.35f,
-                        chromaticAberration = 2.0f,
-                        rimStrength = 1.4f,
-                        brightness = if (isDark) 1.15f else 1.08f,
-                        glassColor = glassColor,
-                        captureEnabled = captureEnabled,
-                        updateKey = isDark
                     ) {
-                        content()
+                        GlassBox(
+                            modifier = Modifier.fillMaxWidth(),
+                            cornerRadius = 32.dp,
+                            thickness = 18.dp,
+                            ior = 1.55f,
+                            blurRadius = 8f,
+                            displacementScale = if (isDark) 0.35f else 0.10f,
+                            normalStrength = if (isDark) 1.15f else 0.65f,
+                            brightness = if (isDark) 1.08f else 1.00f,
+                            chromaticAberration = 2.0f,
+                            rimStrength = 1.4f,
+                            glassColor = glassColor,
+                            captureEnabled = captureEnabled,
+                            updateKey = isDark
+                        ) {
+                            content()
+                        }
                     }
                 }
             }
