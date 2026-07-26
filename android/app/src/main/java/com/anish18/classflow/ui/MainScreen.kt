@@ -267,19 +267,7 @@ fun MainScreen(
                             ) {
                                 // Pure canonical Glass glass — all defaults from GlassLiquidGlass.applyBase()
                                 GlassBox(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .border(
-                                            width = 1.dp,
-                                            brush = Brush.linearGradient(
-                                                colors = listOf(
-                                                    Color.White.copy(alpha = if (isDark) 0.55f else 0.70f),
-                                                    WaterBlue.copy(alpha = if (isDark) 0.30f else 0.25f),
-                                                    Color.White.copy(alpha = if (isDark) 0.10f else 0.15f)
-                                                )
-                                            ),
-                                            shape = RoundedCornerShape(36.dp)
-                                        ),
+                                    modifier = Modifier.fillMaxSize(),
                                     cornerRadius = 36.dp,
                                     // In light mode: reduce displacement/normal so bright background text isn't warped/compressed
                                     displacementScale = if (isDark) 0.35f else 0.10f,

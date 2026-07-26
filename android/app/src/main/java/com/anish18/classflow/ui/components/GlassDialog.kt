@@ -51,7 +51,8 @@ fun GlassDialog(
     content: @Composable () -> Unit
 ) {
     val isDark = ThemeState.isDark
-    val glassColor = if (isDark) Color(0xFF0F0F11).copy(alpha = 0.35f) else Color.White.copy(alpha = 0.25f)
+    val scrimColor = if (isDark) Color.Black.copy(alpha = 0.55f) else Color.Black.copy(alpha = 0.30f)
+    val glassColor = if (isDark) Color(0xFF16181D).copy(alpha = 0.85f) else Color(0xFFF6F8FC).copy(alpha = 0.90f)
     val borderColor = if (isDark) Color.Black else Color.Black.copy(alpha = 0.20f)
 
     DisposableEffect(visible) {
@@ -95,7 +96,7 @@ fun GlassDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Transparent)
+                .background(scrimColor)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
