@@ -312,6 +312,7 @@ fun SettingsScreen(
                                 GlassSwitch(
                                     checked = ThemeState.isDark,
                                     onCheckedChange = { isDarkChecked ->
+                                        ThemeState.isDark = isDarkChecked
                                         viewModel.setBackgroundStyle(if (isDarkChecked) "Dark" else "Light")
                                     }
                                 )
