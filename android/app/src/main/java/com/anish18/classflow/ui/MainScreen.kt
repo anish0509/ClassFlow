@@ -317,10 +317,10 @@ fun MainScreen(
                                                         brush = Brush.verticalGradient(
                                                             colors = if (isDark) listOf(
                                                                 Color.White.copy(alpha = 0.22f),
-                                                                WaterBlue.copy(alpha = 0.12f)
+                                                                Color.White.copy(alpha = 0.08f)
                                                             ) else listOf(
-                                                                Color.White.copy(alpha = 0.55f),
-                                                                WaterBlue.copy(alpha = 0.20f)
+                                                                Color.White.copy(alpha = 0.70f),
+                                                                Color.White.copy(alpha = 0.35f)
                                                             )
                                                         ),
                                                         shape = RoundedCornerShape(25.dp)

@@ -264,9 +264,9 @@ fun HomeScreen(
                             when {
                                 isSelected && isToday -> Brush.verticalGradient(listOf(NeonBlue, NeonBlue.copy(alpha = 0.80f)))
                                 isSelected -> if (isDark) {
-                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), WaterBlue.copy(alpha = 0.12f)))
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.08f)))
                                 } else {
-                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.55f), WaterBlue.copy(alpha = 0.20f)))
+                                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.70f), Color.White.copy(alpha = 0.35f)))
                                 }
                                 else -> Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
                             }
