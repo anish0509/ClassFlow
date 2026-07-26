@@ -41,6 +41,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogWindowProvider
+import android.view.WindowManager
+import androidx.compose.runtime.SideEffect
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun GlassDialog(
@@ -70,6 +75,12 @@ fun GlassDialog(
             usePlatformDefaultWidth = false
         )
     ) {
+        val windowProvider = LocalView.current.parent as? DialogWindowProvider
+        SideEffect {
+            windowProvider?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            windowProvider?.window?.setDimAmount(0f)
+        }
+
         val navBarInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         val navBarSafeBottom = if (avoidNavBar) navBarInset + 72.dp + 12.dp else 0.dp
 
@@ -99,7 +110,7 @@ fun GlassDialog(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.55f))
+                    .background(Color.Transparent)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
