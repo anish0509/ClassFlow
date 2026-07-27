@@ -545,7 +545,7 @@ fun WeekViewScreen(
         // Frosted Glass Header overlay
         GlassHeader(
             title = "Week Schedule",
-            subtitle = "$weekNumber  •  $rangeStr  •  ${activeSemester?.name ?: "Sem 5"}",
+            subtitle = null,
             hazeState = localHazeState,
             actions = {
                 GlassIconButton(
