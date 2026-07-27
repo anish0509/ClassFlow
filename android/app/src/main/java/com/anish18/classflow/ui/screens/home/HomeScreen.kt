@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -607,16 +609,19 @@ fun HomeScreen(
                                 label = "pulse"
                             )
 
+                            val haptics = LocalHapticFeedback.current
                             val dismissState = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { dismissValue ->
                                     val canMark = !targetDate.isAfter(LocalDate.now()) && !isHolidayTargetDay && status != "shifted"
                                     if (canMark) {
                                         when (dismissValue) {
                                             SwipeToDismissBoxValue.StartToEnd -> {
+                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 viewModel.markAttendance(classSession.id, classSession.courseId, dateStr, "present")
                                                 false
                                             }
                                             SwipeToDismissBoxValue.EndToStart -> {
+                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 viewModel.markAttendance(classSession.id, classSession.courseId, dateStr, "absent")
                                                 false
                                             }

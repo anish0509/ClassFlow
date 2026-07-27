@@ -25,7 +25,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
@@ -211,10 +213,26 @@ fun MyClassesScreen(
                         if (totalEligible > 0) (presents * 100) / totalEligible else 100
                     }
 
-                    GlassCard(
-                        glowColor = courseColorVal,
-                        onClick = { onCourseClick(course.id) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .drawBehind {
+                                drawCircle(
+                                    brush = Brush.radialGradient(
+                                        colors = listOf(
+                                            courseColorVal.copy(alpha = if (ThemeState.isDark) 0.18f else 0.12f),
+                                            Color.Transparent
+                                        ),
+                                        center = Offset(size.width * 0.15f, size.height * 0.5f),
+                                        radius = size.width * 0.55f
+                                    )
+                                )
+                            }
                     ) {
+                        GlassCard(
+                            glowColor = courseColorVal,
+                            onClick = { onCourseClick(course.id) }
+                        ) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -335,6 +353,7 @@ fun MyClassesScreen(
                     }
                 }
             }
+        }
 
             // Frosted Glass Header overlay
             GlassHeader(

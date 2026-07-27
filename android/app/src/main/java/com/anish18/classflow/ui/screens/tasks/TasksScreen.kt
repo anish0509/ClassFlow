@@ -31,6 +31,8 @@ import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
 import com.anish18.classflow.ui.components.GlassHeader
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -88,6 +90,10 @@ fun TasksScreen(
             )
     }
     val completedTasks = remember(tasks) { tasks.filter { it.status == "completed" } }
+    val overdueTasks = remember(pendingTasks) {
+        val today = java.time.LocalDate.now().toString()
+        pendingTasks.filter { !it.dueDate.isNullOrEmpty() && it.dueDate < today }
+    }
 
     val localHazeState = remember { HazeState() }
 
@@ -131,6 +137,74 @@ fun TasksScreen(
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
+                            }
+                        }
+                    }
+                }
+
+                if (overdueTasks.isNotEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(WarnSalmon.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .border(1.dp, WarnSalmon.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .background(WarnSalmon.copy(alpha = 0.2f), RoundedCornerShape(16.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = WarnSalmon,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    Column {
+                                        Text(
+                                            text = "${overdueTasks.size} Overdue Task${if (overdueTasks.size > 1) "s" else ""}",
+                                            color = TextPrimary,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Needs attention or rescheduling",
+                                            color = WarnSalmon,
+                                            fontSize = 11.5.sp
+                                        )
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .background(WarnSalmon.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                                        .border(1.dp, WarnSalmon.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .clickable { showAddTaskDialog = true }
+                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(Icons.Default.Bolt, null, tint = WarnSalmon, modifier = Modifier.size(12.dp))
+                                        Text("Reschedule", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
                             }
                         }
                     }
@@ -462,14 +536,17 @@ fun TaskCard(
 
     val isCompleted = task.status == "completed"
 
+    val haptics = LocalHapticFeedback.current
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
                 SwipeToDismissBoxValue.StartToEnd -> {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     onToggle()
                     false
                 }
                 SwipeToDismissBoxValue.EndToStart -> {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     onDelete()
                     false
                 }
