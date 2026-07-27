@@ -99,18 +99,7 @@ fun MyClassesScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Inner Label: COURSES · SEMESTER
-                item {
-                    Text(
-                        text = "${courses.size} COURSES  ·  ${activeSemester?.name?.uppercase() ?: "NO ACTIVE SEMESTER"}",
-                        color = TextMuted,
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
+
                 if (courses.isEmpty() && activeSemester != null) {
                     item {
                         Box(
