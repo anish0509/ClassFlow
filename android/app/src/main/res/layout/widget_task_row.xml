@@ -40,10 +40,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#F5FFFFFF"
-                android:textSize="13sp"
+                android:textSize="13.5sp"
                 android:textStyle="bold"
                 android:ellipsize="end"
-                android:maxLines="1" />
+                android:maxLines="2" />
 
             <TextView
                 android:id="@+id/task_meta"
@@ -55,6 +55,16 @@
                 android:ellipsize="end"
                 android:maxLines="1" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/task_priority_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFA855F7"
+            android:textSize="9.5sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:layout_marginLeft="8dp" />
     </LinearLayout>
 
 </FrameLayout>

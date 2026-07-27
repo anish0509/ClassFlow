@@ -107,6 +107,22 @@ class TasksRemoteViewsFactory(
             views.setInt(R.id.task_checkbox, "setColorFilter", Color.parseColor("#FFC084FC"))
         }
 
+        // Format priority tag badge
+        val priorityText = when (task.priority.lowercase()) {
+            "high" -> "🔴 HIGH"
+            "medium", "med" -> "🟡 MED"
+            "low" -> "🟢 LOW"
+            else -> ""
+        }
+        val priorityColor = when (task.priority.lowercase()) {
+            "high" -> "#FF453A"
+            "medium", "med" -> "#FFD60A"
+            "low" -> "#30D158"
+            else -> "#A855F7"
+        }
+        views.setTextViewText(R.id.task_priority_label, priorityText)
+        views.setTextColor(R.id.task_priority_label, Color.parseColor(priorityColor))
+
         // Fill-in intent so the provider can handle the tap
         val fillInIntent = Intent().apply {
             putExtra(TasksWidgetProvider.EXTRA_TASK_ID, task.id)

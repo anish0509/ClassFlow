@@ -65,7 +65,7 @@ class ClassesRemoteViewsFactory(
         views.setTextViewText(R.id.class_time, "${session.startTime} – ${session.endTime}")
 
         val roomText = session.room ?: course?.room ?: ""
-        views.setTextViewText(R.id.class_meta, if (roomText.isNotEmpty()) " • $roomText" else "")
+        views.setTextViewText(R.id.class_meta, if (roomText.isNotEmpty()) " • 📍 $roomText" else "")
 
         // Dynamic row background based on wallpaper brightness
         views.setInt(
@@ -97,15 +97,15 @@ class ClassesRemoteViewsFactory(
 
         if (now.isAfter(end)) {
             statusText = "DONE"
-            labelColor = if (isWallpaperLight) "#80000000" else "#80FFFFFF"
+            labelColor = if (isWallpaperLight) "#64748B" else "#94A3B8"
             dotColor = adjustAlpha(baseColor, 0.4f)
         } else if (!now.isBefore(start) && !now.isAfter(end)) {
-            statusText = "LIVE"
-            labelColor = baseColor
-            dotColor = baseColor
+            statusText = "⚡ LIVE"
+            labelColor = if (isWallpaperLight) "#0284C7" else "#38BDF8"
+            dotColor = "#0284C7"
         } else {
             statusText = "UPCOMING"
-            labelColor = if (isWallpaperLight) "#9E000000" else "#B3FFFFFF"
+            labelColor = if (isWallpaperLight) "#475569" else "#CBD5E1"
             dotColor = baseColor
         }
 

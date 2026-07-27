@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Locale
 import android.app.WallpaperManager
 import android.app.WallpaperColors
@@ -131,13 +132,33 @@ class ClassesWidgetProvider : AppWidgetProvider() {
                 if (isLight) R.drawable.widget_glass_background_light else R.drawable.widget_glass_background_dark
             )
 
+            // Date and progress formatting
+            val todayDate = LocalDate.now()
+            val formattedDate = todayDate.format(java.time.format.DateTimeFormatter.ofPattern("EEE, MMM d", Locale.US))
+            views.setTextViewText(R.id.widget_date_label, formattedDate)
+
+            val nowTime = LocalTime.now()
+            val doneCount = todayClasses.count { session ->
+                try {
+                    val parts = session.endTime.split(":")
+                    LocalTime.of(parts[0].trim().toInt(), parts[1].trim().toInt()).isBefore(nowTime)
+                } catch (e: Exception) {
+                    false
+                }
+            }
+            val totalCount = todayClasses.size
+            val progressText = if (totalCount > 0) "$doneCount/$totalCount Done" else ""
+            views.setTextViewText(R.id.widget_progress_badge, progressText)
+
             if (isLight) {
                 views.setTextColor(R.id.widget_title, Color.parseColor("#E6000000"))
+                views.setTextColor(R.id.widget_progress_badge, Color.parseColor("#0284C7"))
                 views.setTextColor(R.id.widget_date_label, Color.parseColor("#80000000"))
                 views.setTextColor(R.id.empty_state, Color.parseColor("#90000000"))
                 views.setInt(R.id.widget_divider, "setBackgroundColor", Color.parseColor("#20000000"))
             } else {
                 views.setTextColor(R.id.widget_title, Color.parseColor("#E02DD4BF"))
+                views.setTextColor(R.id.widget_progress_badge, Color.parseColor("#FF2DD4BF"))
                 views.setTextColor(R.id.widget_date_label, Color.parseColor("#99FFFFFF"))
                 views.setTextColor(R.id.empty_state, Color.parseColor("#99FFFFFF"))
                 views.setInt(R.id.widget_divider, "setBackgroundColor", Color.parseColor("#40FFFFFF"))

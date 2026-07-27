@@ -169,12 +169,18 @@ class TasksWidgetProvider : AppWidgetProvider() {
                 if (isLight) R.drawable.widget_glass_background_light else R.drawable.widget_glass_background_dark
             )
 
+            val pendingCount = pendingTasks.size
+            val countText = if (pendingCount > 0) "$pendingCount Pending" else "All Clear"
+            views.setTextViewText(R.id.widget_task_count_badge, countText)
+
             if (isLight) {
                 views.setTextColor(R.id.widget_title, Color.parseColor("#E6000000"))
+                views.setTextColor(R.id.widget_task_count_badge, Color.parseColor("#7C3AED"))
                 views.setTextColor(R.id.empty_state, Color.parseColor("#90000000"))
                 views.setInt(R.id.widget_divider, "setBackgroundColor", Color.parseColor("#20000000"))
             } else {
                 views.setTextColor(R.id.widget_title, Color.parseColor("#E0A855F7"))
+                views.setTextColor(R.id.widget_task_count_badge, Color.parseColor("#FFA855F7"))
                 views.setTextColor(R.id.empty_state, Color.parseColor("#99FFFFFF"))
                 views.setInt(R.id.widget_divider, "setBackgroundColor", Color.parseColor("#40FFFFFF"))
             }

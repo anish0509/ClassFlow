@@ -22,10 +22,10 @@
         <!-- Left accent bar (colored by course/status) — FrameLayout required by RemoteViews -->
         <FrameLayout
             android:id="@+id/class_status_dot"
-            android:layout_width="3dp"
-            android:layout_height="28dp"
+            android:layout_width="4dp"
+            android:layout_height="30dp"
             android:background="#FF2DD4BF"
-            android:layout_marginRight="12dp" />
+            android:layout_marginRight="10dp" />
 
         <!-- Main content -->
         <LinearLayout
@@ -47,20 +47,20 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:textColor="#F5FFFFFF"
-                    android:textSize="13sp"
+                    android:textSize="13.5sp"
                     android:textStyle="bold"
                     android:ellipsize="end"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/class_status_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FF2DD4BF"
-                    android:textSize="9sp"
+                    android:textSize="9.5sp"
                     android:textStyle="bold"
-                    android:letterSpacing="0.10"
-                    android:layout_marginLeft="8dp" />
+                    android:letterSpacing="0.08"
+                    android:layout_marginLeft="6dp" />
             </LinearLayout>
 
             <!-- Time + room row -->
