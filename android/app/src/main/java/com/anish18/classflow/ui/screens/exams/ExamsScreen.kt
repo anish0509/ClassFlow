@@ -497,15 +497,51 @@ fun ExamFormDialog(
     var title by remember { mutableStateOf(examToEdit?.title ?: "") }
     var examType by remember { mutableStateOf(examToEdit?.examType ?: "Midterm") }
     var selectedCourseId by remember { mutableStateOf<String?>(examToEdit?.courseId) }
-    var examDate by remember { mutableStateOf(examToEdit?.examDate ?: LocalDate.now().plusDays(7).toString()) }
-    var examTime by remember { mutableStateOf(examToEdit?.examTime ?: "09:00 AM") }
+    val initialLocalDate = remember {
+        try {
+            if (!examToEdit?.examDate.isNullOrBlank()) LocalDate.parse(examToEdit!!.examDate) else LocalDate.now().plusDays(7)
+        } catch (e: Exception) {
+            LocalDate.now().plusDays(7)
+        }
+    }
+    var examDateObj by remember { mutableStateOf(initialLocalDate) }
+    var examHour by remember {
+        mutableIntStateOf(
+            try {
+                val timeStr = examToEdit?.examTime ?: "09:00 AM"
+                val isPm = timeStr.contains("PM", ignoreCase = true)
+                val parts = timeStr.replace("AM", "").replace("PM", "").trim().split(":")
+                var h = parts[0].toInt()
+                if (isPm && h < 12) h += 12
+                if (!isPm && h == 12) h = 0
+                h
+            } catch (e: Exception) { 9 }
+        )
+    }
+    var examMinute by remember {
+        mutableIntStateOf(
+            try {
+                val timeStr = examToEdit?.examTime ?: "09:00 AM"
+                val parts = timeStr.replace("AM", "").replace("PM", "").trim().split(":")
+                parts[1].toInt()
+            } catch (e: Exception) { 0 }
+        )
+    }
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
     var location by remember { mutableStateOf(examToEdit?.location ?: "") }
     var notes by remember { mutableStateOf(examToEdit?.notes ?: "") }
     var reminderMinutes by remember { mutableIntStateOf(examToEdit?.reminderMinutesBefore ?: 60) }
 
+    val formattedExamDate = examDateObj.toString()
+    val formattedExamTime = String.format(Locale.US, "%02d:%02d %s", if (examHour % 12 == 0) 12 else examHour % 12, examMinute, if (examHour >= 12) "PM" else "AM")
+
     GlassDialog(
         visible = true,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        captureEnabled = !showDatePicker && !showTimePicker
     ) {
         Column(
             modifier = Modifier
@@ -583,25 +619,124 @@ fun ExamFormDialog(
                 }
             }
 
-            // Date & Time Inputs
+            // Date & Time Selectors
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Date Selector
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Exam Date (YYYY-MM-DD)", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                    AppTextField(
-                        value = examDate,
-                        onValueChange = { examDate = it },
-                        placeholder = { Text("2026-10-15") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Text("Date", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                            .clickable {
+                                showDatePicker = !showDatePicker
+                                showTimePicker = false
+                            }
+                            .padding(horizontal = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = null,
+                                tint = WaterBlue,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US)
+                            Text(
+                                text = examDateObj.format(dateFormatter),
+                                color = TextPrimary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
                 }
 
+                // Time Selector
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Exam Time", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                    AppTextField(
-                        value = examTime,
-                        onValueChange = { examTime = it },
-                        placeholder = { Text("09:00 AM") },
-                        modifier = Modifier.fillMaxWidth()
+                    Text("Time", color = TextSecondary, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                            .clickable {
+                                showTimePicker = !showTimePicker
+                                showDatePicker = false
+                            }
+                            .padding(horizontal = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                tint = WaterBlue,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = formattedExamTime,
+                                color = TextPrimary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = showDatePicker,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                        .padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WheelDatePickerInline(
+                        initialDate = examDateObj,
+                        onDateChanged = { date ->
+                            examDateObj = date
+                        }
+                    )
+                }
+            }
+
+            AnimatedVisibility(
+                visible = showTimePicker,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(CardBackground.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                        .padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WheelTimePickerInline(
+                        initialHour = examHour,
+                        initialMinute = examMinute,
+                        onTimeChanged = { h, m ->
+                            examHour = h
+                            examMinute = m
+                        }
                     )
                 }
             }
@@ -644,7 +779,7 @@ fun ExamFormDialog(
                         if (title.isBlank()) {
                             Toast.makeText(context, "Please enter an exam title", Toast.LENGTH_SHORT).show()
                         } else {
-                            onSave(title, examType, selectedCourseId, examDate, examTime, location, notes, reminderMinutes)
+                            onSave(title, examType, selectedCourseId, formattedExamDate, formattedExamTime, location, notes, reminderMinutes)
                         }
                     },
                     accentColor = WaterBlue
