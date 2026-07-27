@@ -230,7 +230,11 @@ fun MainScreen(
                                     popExitTransition = { fadeOut(animationSpec = tween(150)) }
                                 ) {
                                     HelpScreen(
-                                        onBack = { navController.popBackStack() }
+                                        onBack = { navController.popBackStack() },
+                                        onStartTutorial = {
+                                            navController.popBackStack()
+                                            tutorialController.start()
+                                        }
                                     )
                                 }
                                 composable(

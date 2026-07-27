@@ -30,6 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.anish18.classflow.ui.components.AppTextField
 import com.anish18.classflow.ui.components.LocalHazeState
 import com.anish18.classflow.ui.theme.*
 import dev.chrisbanes.haze.hazeChild
@@ -232,11 +235,29 @@ private val helpSections = listOf(
 
 @Composable
 fun HelpScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onStartTutorial: () -> Unit = {}
 ) {
     val isDark = ThemeState.isDark
-    val hazeState = LocalHazeState.current
+    val haptic = LocalHapticFeedback.current
+    var searchQuery by remember { mutableStateOf("") }
     val expandedIndices = remember { mutableStateListOf<Int>() }
+
+    val filteredSections = remember(searchQuery) {
+        if (searchQuery.isBlank()) helpSections
+        else {
+            helpSections.mapNotNull { section ->
+                val matchesTitle = section.title.contains(searchQuery, ignoreCase = true)
+                val matchingItems = section.items.filter {
+                    it.question.contains(searchQuery, ignoreCase = true) ||
+                    it.answer.contains(searchQuery, ignoreCase = true)
+                }
+                if (matchesTitle || matchingItems.isNotEmpty()) {
+                    section.copy(items = if (matchingItems.isNotEmpty()) matchingItems else section.items)
+                } else null
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -321,16 +342,111 @@ fun HelpScreen(
                             fontSize = 14.sp,
                             modifier = Modifier.padding(top = 4.dp)
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // App Tour Launcher Card
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(
+                                            NeonBlue.copy(alpha = if (isDark) 0.22f else 0.14f),
+                                            NeonPurple.copy(alpha = if (isDark) 0.22f else 0.14f)
+                                        )
+                                    )
+                                )
+                                .border(
+                                    1.dp,
+                                    Brush.horizontalGradient(
+                                        listOf(
+                                            NeonBlue.copy(alpha = 0.45f),
+                                            NeonPurple.copy(alpha = 0.45f)
+                                        )
+                                    ),
+                                    RoundedCornerShape(18.dp)
+                                )
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onStartTutorial()
+                                }
+                                .padding(14.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape)
+                                            .background(NeonBlue.copy(alpha = 0.25f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("🚀", fontSize = 18.sp)
+                                    }
+                                    Column {
+                                        Text(
+                                            text = "Interactive App Tour",
+                                            color = TextPrimary,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Replay step-by-step walkthrough",
+                                            color = TextSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(WaterBlue)
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text("Start", color = Color.White, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                                        Icon(Icons.Default.PlayArrow, null, tint = Color.White, modifier = Modifier.size(12.dp))
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Search Bar
+                        AppTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Search guide topics...", color = TextMuted, fontSize = 13.sp) },
+                            leadingIcon = { Icon(Icons.Default.Search, null, tint = TextMuted, modifier = Modifier.size(16.dp)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
 
             // Sections
-            itemsIndexed(helpSections) { sectionIndex, section ->
+            itemsIndexed(filteredSections) { sectionIndex, section ->
+                val isExpanded = searchQuery.isNotBlank() || sectionIndex in expandedIndices
                 HelpSectionCard(
                     section = section,
-                    isExpanded = sectionIndex in expandedIndices,
+                    isExpanded = isExpanded,
                     onToggle = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         if (sectionIndex in expandedIndices) {
                             expandedIndices.remove(sectionIndex)
                         } else {

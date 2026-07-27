@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import com.anish18.classflow.ui.theme.*
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -86,6 +88,7 @@ fun TutorialOverlay(
     if (!controller.isActive) return
 
     val density       = LocalDensity.current
+    val haptic        = LocalHapticFeedback.current
     val screenHeightPx = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
     val isDark        = ThemeState.isDark
     val step          = controller.steps[controller.currentStep]
@@ -115,12 +118,19 @@ fun TutorialOverlay(
             .fillMaxSize()
             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawBehind {
-                drawRect(Color(0xBB000000))
+                drawRect(Color(0xCC000000))
                 if (rect != null && animR > 0f) {
-                    // Outer pulse
+                    // Outer pulse 1 (NeonPurple)
                     drawCircle(
-                        WaterBlue.copy(pulseAlpha * 0.35f),
-                        animR + 30.dp.toPx() * pulseScale,
+                        NeonPurple.copy(pulseAlpha * 0.30f),
+                        animR + 36.dp.toPx() * pulseScale,
+                        Offset(animCx, animCy),
+                        blendMode = BlendMode.Plus
+                    )
+                    // Outer pulse 2 (WaterBlue)
+                    drawCircle(
+                        WaterBlue.copy(pulseAlpha * 0.40f),
+                        animR + 22.dp.toPx() * pulseScale,
                         Offset(animCx, animCy),
                         blendMode = BlendMode.Plus
                     )
@@ -128,9 +138,9 @@ fun TutorialOverlay(
                     drawCircle(Color.Black, animR, Offset(animCx, animCy),
                         blendMode = BlendMode.Clear)
                     // Glow ring
-                    drawCircle(WaterBlue.copy(0.65f), animR + 2.dp.toPx(),
+                    drawCircle(WaterBlue.copy(0.85f), animR + 2.dp.toPx(),
                         Offset(animCx, animCy),
-                        style = Stroke(2.5.dp.toPx()),
+                        style = Stroke(3.dp.toPx()),
                         blendMode = BlendMode.Plus)
                 }
             }
@@ -150,9 +160,18 @@ fun TutorialOverlay(
                 stepIndex  = idx,
                 totalSteps = controller.steps.size,
                 isDark     = isDark,
-                onNext     = { if (idx == controller.steps.size - 1) { controller.finish(); onDone() } else controller.next() },
-                onPrev     = { controller.prev() },
-                onSkip     = { controller.finish(); onDone() },
+                onNext     = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (idx == controller.steps.size - 1) { controller.finish(); onDone() } else controller.next()
+                },
+                onPrev     = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    controller.prev()
+                },
+                onSkip     = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    controller.finish(); onDone()
+                },
             )
         }
     }
@@ -277,6 +296,29 @@ private fun TutorialCard(
                         .clip(CircleShape)
                         .background(Brush.horizontalGradient(listOf(WaterBlue, NeonBlue)))
                 )
+            }
+
+            // ── Step Dots Indicator ──────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(totalSteps) { idx ->
+                    val isCurrent = idx == stepIndex
+                    val dotWidth by animateDpAsState(if (isCurrent) 16.dp else 6.dp, label = "dotW")
+                    val dotColor = if (isCurrent) WaterBlue else trackColor
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 3.dp)
+                            .height(6.dp)
+                            .width(dotWidth)
+                            .clip(CircleShape)
+                            .background(dotColor)
+                    )
+                }
             }
 
             Spacer(Modifier.height(18.dp))
