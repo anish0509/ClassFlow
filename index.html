@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClassFlow — Your Timetable, Beautifully Refined</title>
-    <meta name="description" content="An open-source Android app to manage your lectures, track class attendance, and organize tasks under a unified glass design.">
+    <meta name="description" content="An open-source Android app to manage your lectures, track class attendance, reschedule sessions with Shift Class, and organize tasks under a liquid glass design.">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -43,8 +43,8 @@
                     <path d="M12 5L13.5 10.5L19 12L13.5 13.5L12 19L10.5 13.5L5 12L10.5 10.5L12 5Z" fill="white" />
                     <defs>
                         <linearGradient id="brand-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#8b5cf6" />
-                            <stop offset="1" stop-color="#0ea5e9" />
+                            <stop stop-color="#4f46e5" />
+                            <stop offset="1" stop-color="#0284c7" />
                         </linearGradient>
                     </defs>
                 </svg>
@@ -52,8 +52,10 @@
             </a>
             
             <nav class="nav-links">
+                <a href="#highlights">Highlights</a>
                 <a href="#showcase">Screenshots</a>
                 <a href="#features">Features</a>
+                <a href="#faq">FAQ</a>
                 <a href="#developer">Developer</a>
             </nav>
             
@@ -69,13 +71,13 @@
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="hero-content">
-                <div class="tagline-badge">Open Source Android Timetable</div>
-                <h1 class="hero-title">Your college schedule,<br><span class="gradient-text">beautifully refined.</span></h1>
+                <div class="tagline-badge">🔮 Liquid Glass Design Engine • Open Source Android App</div>
+                <h1 class="hero-title">Master your academic flow,<br><span class="gradient-text">beautifully & effortlessly.</span></h1>
                 <p class="hero-desc">
-                    Organize lectures, track attendance targets, and manage tasks under a unified glass design that adapts directly to your device layout.
+                    Organize lectures, track attendance targets with ring progress UI, reschedule classes on the fly with Shift Class, and sync tasks under a liquid glass interface.
                 </p>
                 <div class="hero-actions">
-                    <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-primary">Download APK</a>
+                    <a href="https://github.com/anish0509/ClassFlow/releases" target="_blank" class="btn-primary">Download APK (v1.0)</a>
                     <a href="https://github.com/anish0509/ClassFlow" target="_blank" class="btn-secondary">View on GitHub</a>
                 </div>
                 
@@ -93,6 +95,10 @@
                         <div class="stat-num">100%</div>
                         <div class="stat-label">Free & Ad-Free</div>
                     </div>
+                    <div class="stat-item">
+                        <div class="stat-num">0</div>
+                        <div class="stat-label">Data Tracked</div>
+                    </div>
                 </div>
 
                 <!-- Hero Phone Showcase Mockup -->
@@ -106,11 +112,53 @@
             </div>
         </section>
 
-        <!-- Section 2: Screenshot Horizontal Stack Scroll Gallery -->
+        <!-- Section 2: Key App Highlights -->
+        <section id="highlights" class="showcase-section" style="padding-top: 60px;">
+            <h2 class="section-title">Built for Modern Students</h2>
+            <p class="section-desc">
+                Engineered with practical features that solve real college scheduling problems.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon icon-purple">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                    </div>
+                    <h3>Attendance Ring UI</h3>
+                    <p>Visual circular progress rings tracking present percentage per course with instant threshold alert warnings when you fall below targets.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-blue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                    </div>
+                    <h3>Shift Class Engine</h3>
+                    <p>Swipe a class card left to reschedule a single lecture to another date or room without altering your recurring weekly timetable.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-green">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </div>
+                    <h3>Auto-Mute Study Mode</h3>
+                    <p>Automated DND scheduler that silences disruptive calls and notifications strictly during active lecture time slots.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon icon-cyan">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+                    </div>
+                    <h3>Wallpaper-Adaptive Widgets</h3>
+                    <p>Home screen widgets programmatically scan wallpaper brightness to dynamically switch text colors for maximum legibility.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Screenshot Horizontal Stack Scroll Gallery -->
         <section id="showcase" class="showcase-section">
             <h2 class="section-title">Designed for Visual Harmony</h2>
             <p class="section-desc">
-                Swipe horizontally to browse key layouts. Each view is optimized for immediate data retrieval and high-contrast styling.
+                Swipe horizontally to browse key app screens. Tap any card to inspect full resolution screenshot.
             </p>
             
             <!-- Horizontal Stack Scroll Deck -->
@@ -124,7 +172,7 @@
                     </div>
                     <div class="card-info">
                         <h3>Home Dashboard</h3>
-                        <p>Live countdowns, quick widgets, and class attendance tracking.</p>
+                        <p>Live countdowns, quick widgets, and attendance logging.</p>
                     </div>
                 </div>
 
@@ -136,7 +184,7 @@
                     </div>
                     <div class="card-info">
                         <h3>Week Schedule</h3>
-                        <p>Full hourly color-coded grid representing room designations.</p>
+                        <p>Full hourly color-coded grid with Saturday mapping.</p>
                     </div>
                 </div>
 
@@ -148,7 +196,7 @@
                     </div>
                     <div class="card-info">
                         <h3>My Courses</h3>
-                        <p>Detailed attendance analytics with target limit indicators.</p>
+                        <p>Attendance ring UI, stats analytics, and shifted sessions.</p>
                     </div>
                 </div>
 
@@ -160,7 +208,7 @@
                     </div>
                     <div class="card-info">
                         <h3>Pending Tasks</h3>
-                        <p>Academic assignments and projects sorted by deadlines.</p>
+                        <p>Assignments and projects linked to courses with due dates.</p>
                     </div>
                 </div>
 
@@ -172,7 +220,7 @@
                     </div>
                     <div class="card-info">
                         <h3>App Settings</h3>
-                        <p>Manage semesters, notifications, and Study Mode buffers.</p>
+                        <p>Theme customization, JSON data backup, and Study Mode.</p>
                     </div>
                 </div>
 
@@ -183,18 +231,18 @@
                         <img src="assets/screen_about.jpg" alt="About Screen" class="phone-screen">
                     </div>
                     <div class="card-info">
-                        <h3>About Screen</h3>
-                        <p>Easter Egg customization lab and developer details.</p>
+                        <h3>About & Tour Guide</h3>
+                        <p>Interactive app tour replay and developer details.</p>
                     </div>
                 </div>
 
             </div>
         </section>
 
-        <!-- Section 3: Features List -->
+        <!-- Section 4: Full Features Grid -->
         <section id="features" class="features-section">
-            <h2 class="section-title">Core Features</h2>
-            <p class="section-desc">The application is built for speed, offline reliability, and deep Android customization.</p>
+            <h2 class="section-title">Complete Technical Stack</h2>
+            <p class="section-desc">ClassFlow combines native Android performance with offline storage and privacy.</p>
             
             <div class="features-grid">
                 
@@ -203,7 +251,7 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <h3>Unified Week Layout</h3>
-                    <p>Features perfect Saturday grid mapping with clean overflow layouts, ensuring weekend lectures remain visible and aligned.</p>
+                    <p>Perfect Saturday grid mapping with clean overflow layouts, ensuring weekend lectures remain visible and aligned.</p>
                 </div>
 
                 <div class="feature-card">
@@ -211,7 +259,7 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     </div>
                     <h3>Wallpaper-Adaptive Widgets</h3>
-                    <p>Scans system wallpaper color palettes programmatically to swap widget text colors (deep dark vs neon white) maintaining readability.</p>
+                    <p>Scans system wallpaper color palettes programmatically to swap widget text colors maintaining optimal readability.</p>
                 </div>
 
                 <div class="feature-card">
@@ -249,9 +297,37 @@
             </div>
         </section>
 
+        <!-- Section 5: FAQ Section -->
+        <section id="faq" class="showcase-section" style="padding-top: 40px;">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-desc">Quick answers to common questions about ClassFlow.</p>
+            
+            <div style="max-width: 720px; margin: 0 auto; text-align: left; display: flex; flex-direction: column; gap: 16px;">
+                <div class="feature-card" style="padding: 24px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Does ClassFlow require internet or an account?</h3>
+                    <p>No! ClassFlow is 100% offline and privacy-focused. All your courses, tasks, and attendance data remain stored locally on your device.</p>
+                </div>
+
+                <div class="feature-card" style="padding: 24px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">How does the Shift Class feature work?</h3>
+                    <p>Swipe left on any class card on the Home screen or tap the ⇄ icon. You can pick a new date, time, or venue for that single session without affecting your recurring timetable.</p>
+                </div>
+
+                <div class="feature-card" style="padding: 24px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">How do I back up or restore my timetable?</h3>
+                    <p>Go to Settings → Export Backup to generate a JSON backup file. You can import this file anytime on any device running ClassFlow.</p>
+                </div>
+
+                <div class="feature-card" style="padding: 24px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Can I export my timetable to Google or Apple Calendar?</h3>
+                    <p>Yes! Go to Settings → Export ICS to save a standard `.ics` file that can be imported directly into Google Calendar, Outlook, or Apple Calendar.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Developer Section -->
         <section id="developer" class="developer-section">
-            <h2 class="section-title">Developer</h2>
+            <h2 class="section-title">Developer & Tech Stack</h2>
             <p class="section-desc">ClassFlow is designed and engineered by Anish Kumar.</p>
             
             <div class="developer-card">
@@ -259,6 +335,16 @@
                     <h3>Anish Kumar</h3>
                     <p>Creator & Lead Engineer of ClassFlow</p>
                 </div>
+
+                <!-- Tech Stack Badges -->
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px;">
+                    <span style="font-size: 0.75rem; font-weight: 700; background: rgba(79, 70, 229, 0.08); color: #4f46e5; border: 1px solid rgba(79,70,229,0.2); padding: 4px 12px; border-radius: 14px;">Kotlin</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; background: rgba(2, 132, 199, 0.08); color: #0284c7; border: 1px solid rgba(2,132,199,0.2); padding: 4px 12px; border-radius: 14px;">Jetpack Compose</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.08); color: #10b981; border: 1px solid rgba(16,185,129,0.2); padding: 4px 12px; border-radius: 14px;">Room SQLite</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; background: rgba(124, 58, 237, 0.08); color: #7c3aed; border: 1px solid rgba(124,58,237,0.2); padding: 4px 12px; border-radius: 14px;">Hilt DI</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; background: rgba(225, 29, 72, 0.08); color: #e11d48; border: 1px solid rgba(225,29,72,0.2); padding: 4px 12px; border-radius: 14px;">GLSL Shaders</span>
+                </div>
+
                 <div class="dev-links">
                     <a href="https://github.com/anish0509" target="_blank" class="dev-btn">GitHub</a>
                     <a href="https://www.linkedin.com/in/anish-kumar-94331a324?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="dev-btn">LinkedIn</a>
@@ -273,7 +359,7 @@
     <!-- Footer -->
     <footer class="site-footer">
         <p>ClassFlow — your academic schedule companion, everywhere.</p>
-        <p class="copyright">&copy; 2026 ClassFlow. All rights reserved.</p>
+        <p class="copyright">&copy; 2026 ClassFlow. Open source under Apache 2.0 License.</p>
     </footer>
 
     <!-- Interactive script file -->
