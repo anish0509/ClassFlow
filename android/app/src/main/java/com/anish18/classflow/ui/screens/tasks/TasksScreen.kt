@@ -90,10 +90,6 @@ fun TasksScreen(
             )
     }
     val completedTasks = remember(tasks) { tasks.filter { it.status == "completed" } }
-    val overdueTasks = remember(pendingTasks) {
-        val today = java.time.LocalDate.now().toString()
-        pendingTasks.filter { !it.dueDate.isNullOrEmpty() && it.dueDate < today }
-    }
 
     val localHazeState = remember { HazeState() }
 
@@ -142,73 +138,7 @@ fun TasksScreen(
                     }
                 }
 
-                if (overdueTasks.isNotEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(WarnSalmon.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                .border(1.dp, WarnSalmon.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(32.dp)
-                                            .background(WarnSalmon.copy(alpha = 0.2f), RoundedCornerShape(16.dp)),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Warning,
-                                            contentDescription = null,
-                                            tint = WarnSalmon,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
-                                    Column {
-                                        Text(
-                                            text = "${overdueTasks.size} Overdue Task${if (overdueTasks.size > 1) "s" else ""}",
-                                            color = TextPrimary,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Needs attention or rescheduling",
-                                            color = WarnSalmon,
-                                            fontSize = 11.5.sp
-                                        )
-                                    }
-                                }
 
-                                Box(
-                                    modifier = Modifier
-                                        .background(WarnSalmon.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
-                                        .border(1.dp, WarnSalmon.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .clickable { showAddTaskDialog = true }
-                                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Icon(Icons.Default.Bolt, null, tint = WarnSalmon, modifier = Modifier.size(12.dp))
-                                        Text("Reschedule", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if (pendingTasks.isNotEmpty()) {
                     item {
@@ -535,6 +465,8 @@ fun TaskCard(
     } ?: NeonPink
 
     val isCompleted = task.status == "completed"
+    val todayStr = remember { java.time.LocalDate.now().toString() }
+    val isOverdue = task.status == "pending" && !task.dueDate.isNullOrEmpty() && task.dueDate < todayStr
 
     val haptics = LocalHapticFeedback.current
     val dismissState = rememberSwipeToDismissBoxState(
@@ -656,7 +588,7 @@ fun TaskCard(
     ) {
         GlassCard(
             modifier = Modifier.fillMaxWidth(),
-            glowColor = if (task.status == "pending") courseColor else Color.Transparent,
+            glowColor = if (isOverdue) WarnSalmon else if (task.status == "pending") courseColor else Color.Transparent,
             hazeEnabled = dismissState.progress == 0f
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -701,9 +633,45 @@ fun TaskCard(
                             val timeStr = if (!task.dueTime.isNullOrEmpty()) " at ${task.dueTime}" else ""
                             Text(
                                 text = "Due: ${task.dueDate}$timeStr",
-                                color = TextSecondary,
-                                fontSize = 11.sp
+                                color = if (isOverdue) WarnSalmon else TextSecondary,
+                                fontSize = 11.sp,
+                                fontWeight = if (isOverdue) FontWeight.SemiBold else FontWeight.Normal
                             )
+
+                            if (isOverdue) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = WarnSalmon.copy(alpha = if (ThemeState.isDark) 0.20f else 0.14f),
+                                            shape = RoundedCornerShape(6.dp)
+                                        )
+                                        .border(
+                                            0.8.dp,
+                                            WarnSalmon.copy(alpha = if (ThemeState.isDark) 0.40f else 0.28f),
+                                            RoundedCornerShape(6.dp)
+                                        )
+                                        .padding(horizontal = 7.dp, vertical = 2.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = WarnSalmon,
+                                            modifier = Modifier.size(10.dp)
+                                        )
+                                        Text(
+                                            text = "OVERDUE",
+                                            color = WarnSalmon,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
