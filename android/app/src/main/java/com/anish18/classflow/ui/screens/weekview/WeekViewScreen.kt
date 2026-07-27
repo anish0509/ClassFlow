@@ -99,15 +99,15 @@ fun WeekViewScreen(
         baseDate.plusWeeks((pagerState.currentPage - 5000).toLong())
             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     }
-    val currentSaturday = remember(currentMonday) { currentMonday.plusDays(5) }
+    val currentSunday = remember(currentMonday) { currentMonday.plusDays(6) }
 
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMM", Locale.US) }
     val dayNumFormatter = remember { DateTimeFormatter.ofPattern("d", Locale.US) }
-    val rangeStr = remember(currentMonday, currentSaturday) {
+    val rangeStr = remember(currentMonday, currentSunday) {
         val startMonth = currentMonday.format(monthFormatter)
-        val endMonth = currentSaturday.format(monthFormatter)
+        val endMonth = currentSunday.format(monthFormatter)
         val startDay = currentMonday.format(dayNumFormatter)
-        val endDay = currentSaturday.format(dayNumFormatter)
+        val endDay = currentSunday.format(dayNumFormatter)
         if (startMonth == endMonth) "$startMonth $startDay – $endDay" else "$startMonth $startDay – $endMonth $endDay"
     }
 
@@ -125,7 +125,7 @@ fun WeekViewScreen(
         }
     }
 
-    var viewDaysMode by remember { mutableIntStateOf(6) } // 6, 3, or 1 days per view page
+    var viewDaysMode by remember { mutableIntStateOf(7) } // 7, 3, or 1 days per view page
 
     val hourHeight = 62.dp
     val startHour = 0
@@ -228,7 +228,8 @@ fun WeekViewScreen(
                                 "Wednesday" to targetMonday.plusDays(2),
                                 "Thursday" to targetMonday.plusDays(3),
                                 "Friday" to targetMonday.plusDays(4),
-                                "Saturday" to targetMonday.plusDays(5)
+                                "Saturday" to targetMonday.plusDays(5),
+                                "Sunday" to targetMonday.plusDays(6)
                             )
                         }
                         val targetWeekDays = remember(allWeekDays, viewDaysMode) {
@@ -561,13 +562,13 @@ fun WeekViewScreen(
             hazeState = localHazeState,
             actions = {
                 GlassIconButton(
-                    icon = if (viewDaysMode == 6) Icons.Default.ViewColumn else if (viewDaysMode == 3) Icons.Default.ViewWeek else Icons.Default.CalendarViewDay,
+                    icon = if (viewDaysMode == 7) Icons.Default.ViewColumn else if (viewDaysMode == 3) Icons.Default.ViewWeek else Icons.Default.CalendarViewDay,
                     contentDescription = "Toggle View Days",
                     onClick = {
                         viewDaysMode = when (viewDaysMode) {
-                            6 -> 3
+                            7 -> 3
                             3 -> 1
-                            else -> 6
+                            else -> 7
                         }
                     },
                     size = 40.dp,
