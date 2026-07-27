@@ -243,211 +243,287 @@ fun CourseDetailsScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ------------------ CARD 1: COURSE INFO & SCHEDULE CARD ------------------
-            GlassCard(
-                modifier = Modifier.fillMaxWidth(),
-                glowColor = courseColor,
-                hazeEnabled = false
+            // ------------------ CARD 1: COURSE INFO & SCHEDULE CARD WITH AMBIENT LIGHTING ------------------
+            Box(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
+                // Subtle Radial Ambient Accent Lighting Glow Aura
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .matchParentSize()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(
+                            androidx.compose.ui.graphics.Brush.radialGradient(
+                                colors = listOf(
+                                    courseColor.copy(alpha = 0.35f),
+                                    courseColor.copy(alpha = 0.12f),
+                                    Color.Transparent
+                                ),
+                                center = Offset(500f, 300f),
+                                radius = 900f
+                            )
+                        )
+                )
+
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    glowColor = courseColor,
+                    hazeEnabled = false
                 ) {
-                    // Top Row: Credits badge and action buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Credits Badge
-                        Box(
-                            modifier = Modifier
-                                .background(CardBackground.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text = "${course?.credits ?: 3} CREDITS",
-                                color = TextPrimary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp
-                            )
-                        }
-
-                        // Action Buttons Row (Add slot, Prof info, Delete course)
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Calendar button to add slots
-                            GlassIconButton(
-                                icon = Icons.Default.CalendarToday,
-                                contentDescription = "Add slot",
-                                onClick = { showAddScheduleDialog = true },
-                                size = 36.dp,
-                                iconSize = 16.dp,
-                                tint = TextPrimary
-                            )
-
-                            // Info button for Professor contact details
-                            GlassIconButton(
-                                icon = Icons.Default.Person,
-                                contentDescription = "Professor info",
-                                onClick = { showProfInfoDialog = true },
-                                size = 36.dp,
-                                iconSize = 16.dp,
-                                tint = TextPrimary
-                            )
-
-                            // Edit Course Button
-                            GlassIconButton(
-                                icon = Icons.Default.Edit,
-                                contentDescription = "Edit course",
-                                onClick = { showEditCourseDialog = true },
-                                size = 36.dp,
-                                iconSize = 16.dp,
-                                tint = TextPrimary
-                            )
-
-                            // Delete button (Red Trash Icon)
-                            GlassIconButton(
-                                icon = Icons.Default.Delete,
-                                contentDescription = "Delete course",
-                                onClick = { showDeleteConfirmDialog = true },
-                                size = 36.dp,
-                                iconSize = 16.dp,
-                                tint = NeonRed,
-                                accentColor = NeonRed
-                            )
-                        }
-                    }
-
-                    // Course Code & Name
-                    Column {
-                        Text(
-                            text = course?.name ?: "Subject",
-                            color = TextPrimary,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "by ${course?.professor ?: "Unknown"}",
-                            color = TextSecondary,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    // Schedule list stacked vertically
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (classes.isEmpty()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp)
-                                    .background(CardBackground.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
-                                contentAlignment = Alignment.Center
+                        // Top Row: Credits badge and action buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Credits Badge & Course Code Tag
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("no class schedules defined", color = TextSecondary, fontSize = 13.sp)
-                            }
-                        } else {
-                            classes.forEach { session ->
-                                Row(
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                                                colors = if (ThemeState.isDark)
-                                                    listOf(Color.White.copy(alpha = 0.06f), CardBackground.copy(alpha = 0.12f))
-                                                else
-                                                    listOf(Color.White.copy(alpha = 0.55f), CardBackground.copy(alpha = 0.25f))
-                                            ),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                        .border(0.8.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-                                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .background(CardBackground.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                        .border(1.dp, FrostedGlassBorder.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
                                 ) {
-                                    // Day Tag — glowing glass chip
+                                    Text(
+                                        text = "${course?.credits ?: 3} CREDITS",
+                                        color = TextPrimary,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 1.sp
+                                    )
+                                }
+
+                                val cleanCode = course?.shortName?.takeIf { !it.startsWith("icb", ignoreCase = true) }
+                                if (cleanCode != null) {
                                     Box(
                                         modifier = Modifier
-                                            .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
-                                            .border(1.dp, courseColor.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
-                                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                                            .background(courseColor.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
+                                            .border(1.dp, courseColor.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = session.dayOfWeek.take(3).uppercase(),
+                                            text = cleanCode.uppercase(),
                                             color = courseColor,
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.ExtraBold,
                                             letterSpacing = 0.5.sp
                                         )
                                     }
+                                }
+                            }
 
-                                    Spacer(modifier = Modifier.width(12.dp))
+                            // Action Buttons Row (Add slot, Prof info, Edit, Delete)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                GlassIconButton(
+                                    icon = Icons.Default.CalendarToday,
+                                    contentDescription = "Add slot",
+                                    onClick = { showAddScheduleDialog = true },
+                                    size = 36.dp,
+                                    iconSize = 16.dp,
+                                    tint = TextPrimary
+                                )
 
-                                    // Time with clock icon
+                                GlassIconButton(
+                                    icon = Icons.Default.Person,
+                                    contentDescription = "Professor info",
+                                    onClick = { showProfInfoDialog = true },
+                                    size = 36.dp,
+                                    iconSize = 16.dp,
+                                    tint = TextPrimary
+                                )
+
+                                GlassIconButton(
+                                    icon = Icons.Default.Edit,
+                                    contentDescription = "Edit course",
+                                    onClick = { showEditCourseDialog = true },
+                                    size = 36.dp,
+                                    iconSize = 16.dp,
+                                    tint = TextPrimary
+                                )
+
+                                GlassIconButton(
+                                    icon = Icons.Default.Delete,
+                                    contentDescription = "Delete course",
+                                    onClick = { showDeleteConfirmDialog = true },
+                                    size = 36.dp,
+                                    iconSize = 16.dp,
+                                    tint = NeonRed,
+                                    accentColor = NeonRed
+                                )
+                            }
+                        }
+
+                        // Course Code & Name Header
+                        Column {
+                            Text(
+                                text = course?.name ?: "Subject",
+                                color = TextPrimary,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "by ${course?.professor ?: "Unknown"}",
+                                color = TextSecondary,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        // Schedule list stacked vertically
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (classes.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .background(CardBackground.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("no class schedules defined", color = TextSecondary, fontSize = 13.sp)
+                                }
+                            } else {
+                                classes.forEach { session ->
                                     Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Schedule,
-                                            contentDescription = null,
-                                            tint = courseColor.copy(alpha = 0.7f),
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Text(
-                                            text = "${session.startTime}–${session.endTime}",
-                                            color = TextPrimary,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.width(12.dp))
-
-                                    // Location/Room with place icon
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Place,
-                                            contentDescription = null,
-                                            tint = TextSecondary.copy(alpha = 0.7f),
-                                            modifier = Modifier.size(13.dp)
-                                        )
-                                        Text(
-                                            text = session.room ?: "–",
-                                            color = TextSecondary,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.weight(1f))
-
-                                    // Delete Session — soft circular icon button
-                                    Box(
                                         modifier = Modifier
-                                            .size(28.dp)
-                                            .background(NeonRed.copy(alpha = 0.10f), CircleShape)
-                                            .border(0.6.dp, NeonRed.copy(alpha = 0.25f), CircleShape)
-                                            .clickable { viewModel.deleteClassSession(session) },
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .background(
+                                                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                                    colors = if (ThemeState.isDark)
+                                                        listOf(Color.White.copy(alpha = 0.06f), CardBackground.copy(alpha = 0.12f))
+                                                    else
+                                                        listOf(Color.White.copy(alpha = 0.55f), CardBackground.copy(alpha = 0.25f))
+                                                ),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                            .border(0.8.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                            .clickable {
+                                                selectedClassForShift = session
+                                                shiftDate = java.time.LocalDate.now()
+                                                shiftOriginalDate = java.time.LocalDate.now()
+                                                shiftRoom = session.room ?: ""
+                                                try {
+                                                    val startParts = session.startTime.split(":")
+                                                    shiftStartHour = startParts[0].toInt()
+                                                    shiftStartMinute = startParts[1].toInt()
+                                                    val endParts = session.endTime.split(":")
+                                                    shiftEndHour = endParts[0].toInt()
+                                                    shiftEndMinute = endParts[1].toInt()
+                                                } catch (e: Exception) {
+                                                    shiftStartHour = 9
+                                                    shiftStartMinute = 0
+                                                    shiftEndHour = 9
+                                                    shiftEndMinute = 50
+                                                }
+                                                showShiftModal = true
+                                            }
+                                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Close,
-                                            contentDescription = "Delete slot",
-                                            tint = NeonRed.copy(alpha = 0.8f),
-                                            modifier = Modifier.size(13.dp)
-                                        )
+                                        // Day Tag — glowing glass chip
+                                        Box(
+                                            modifier = Modifier
+                                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                                                .border(1.dp, courseColor.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
+                                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                        ) {
+                                            Text(
+                                                text = session.dayOfWeek.take(3).uppercase(),
+                                                color = courseColor,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                letterSpacing = 0.5.sp
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.width(10.dp))
+
+                                        // Time with clock icon
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Schedule,
+                                                contentDescription = null,
+                                                tint = courseColor.copy(alpha = 0.75f),
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                            Text(
+                                                text = "${session.startTime}–${session.endTime}",
+                                                color = TextPrimary,
+                                                fontSize = 13.sp,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.width(10.dp))
+
+                                        // Room Highlight Pill Badge — interactive tap to view/shift
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    if (session.room.isNullOrBlank()) CardBackground.copy(alpha = 0.3f)
+                                                    else courseColor.copy(alpha = 0.12f),
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .border(
+                                                    0.8.dp,
+                                                    if (session.room.isNullOrBlank()) FrostedGlassBorder.copy(alpha = 0.15f)
+                                                    else courseColor.copy(alpha = 0.3f),
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Place,
+                                                    contentDescription = null,
+                                                    tint = if (session.room.isNullOrBlank()) TextMuted else courseColor,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
+                                                Text(
+                                                    text = session.room?.let { "Room $it" } ?: "No room",
+                                                    color = if (session.room.isNullOrBlank()) TextMuted else TextPrimary,
+                                                    fontSize = 11.5.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        // Delete Session — soft circular icon button
+                                        Box(
+                                            modifier = Modifier
+                                                .size(28.dp)
+                                                .background(NeonRed.copy(alpha = 0.10f), CircleShape)
+                                                .border(0.6.dp, NeonRed.copy(alpha = 0.25f), CircleShape)
+                                                .clickable { viewModel.deleteClassSession(session) },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Close,
+                                                contentDescription = "Delete slot",
+                                                tint = NeonRed.copy(alpha = 0.8f),
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -1424,10 +1500,17 @@ fun CourseDetailsScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        val cleanSubtitleCode = course?.shortName?.takeIf { !it.startsWith("icb", ignoreCase = true) }
+        val headerSubtitle = if (cleanSubtitleCode != null && !course?.name.isNullOrBlank() && !course?.name.equals(cleanSubtitleCode, ignoreCase = true)) {
+            "$cleanSubtitleCode • ${course?.name}"
+        } else {
+            course?.name ?: cleanSubtitleCode ?: "Course"
+        }
+
         // Top Frosted Glass Header matching other screens
         GlassHeader(
             title = "Subject Details",
-            subtitle = course?.shortName ?: course?.name ?: "Course",
+            subtitle = headerSubtitle,
             navigationIcon = {
                 GlassIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
