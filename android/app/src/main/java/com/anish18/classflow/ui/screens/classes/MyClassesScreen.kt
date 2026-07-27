@@ -219,34 +219,97 @@ fun MyClassesScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            // Top Row: Course Name & Attendance Percentage Badge
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = course.name,
-                                    color = TextPrimary,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.weight(1f)
-                                )
+                                // Left Column: Course Title + Code & Professor Pills
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = course.name,
+                                        color = TextPrimary,
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
 
-                                Spacer(modifier = Modifier.width(12.dp))
+                                    if (course.professor.isNotEmpty() || course.shortName.isNotEmpty()) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            if (course.shortName.isNotEmpty()) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .background(
+                                                            color = courseColorVal.copy(alpha = if (ThemeState.isDark) 0.20f else 0.14f),
+                                                            shape = RoundedCornerShape(8.dp)
+                                                        )
+                                                        .border(
+                                                            0.8.dp,
+                                                            courseColorVal.copy(alpha = if (ThemeState.isDark) 0.35f else 0.25f),
+                                                            RoundedCornerShape(8.dp)
+                                                        )
+                                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                                ) {
+                                                    Text(
+                                                        text = course.shortName.uppercase(Locale.ROOT),
+                                                        color = if (ThemeState.isDark) courseColorVal else courseColorVal.copy(alpha = 0.95f),
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
 
+                                            if (course.professor.isNotEmpty()) {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                                    modifier = Modifier
+                                                        .background(PillBackground, RoundedCornerShape(8.dp))
+                                                        .border(1.dp, PillBorder, RoundedCornerShape(8.dp))
+                                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Person,
+                                                        contentDescription = null,
+                                                        tint = TextSecondary,
+                                                        modifier = Modifier.size(11.dp)
+                                                    )
+                                                    Text(
+                                                        text = course.professor,
+                                                        color = TextSecondary,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                // Right Side: Bigger & Thicker Circular Progress Ring (Centered Vertically)
                                 val isSafe = attendanceRate >= 75
                                 val ringColor = if (isSafe) NeonGreen else WarnSalmon
                                 val progressFloat = (attendanceRate.toFloat() / 100f).coerceIn(0f, 1f)
 
                                 Box(
-                                    modifier = Modifier.size(42.dp),
+                                    modifier = Modifier.size(54.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-                                        val strokeWidth = 3.5.dp.toPx()
+                                        val strokeWidth = 5.5.dp.toPx()
                                         drawCircle(
-                                            color = ringColor.copy(alpha = 0.2f),
+                                            color = ringColor.copy(alpha = 0.18f),
                                             style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
                                         )
                                         drawArc(
@@ -256,68 +319,16 @@ fun MyClassesScreen(
                                             useCenter = false,
                                             style = androidx.compose.ui.graphics.drawscope.Stroke(
                                                 width = strokeWidth,
-                                                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                                cap = StrokeCap.Round
                                             )
                                         )
                                     }
                                     Text(
                                         text = "$attendanceRate%",
                                         color = ringColor,
-                                        fontSize = 11.sp,
+                                        fontSize = 12.5.sp,
                                         fontWeight = FontWeight.Bold
                                     )
-                                }
-                            }
-
-                            // Bottom Row: Professor & Course Code Badges
-                            if (course.professor.isNotEmpty() || course.shortName.isNotEmpty()) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    if (course.shortName.isNotEmpty()) {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(
-                                                    color = courseColorVal.copy(alpha = 0.15f),
-                                                    shape = RoundedCornerShape(8.dp)
-                                                )
-                                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                                        ) {
-                                            Text(
-                                                text = course.shortName.uppercase(Locale.ROOT),
-                                                color = courseColorVal,
-                                                fontSize = 9.5.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
-                                    }
-
-                                    if (course.professor.isNotEmpty()) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                            modifier = Modifier
-                                                .background(PillBackground, RoundedCornerShape(8.dp))
-                                                .border(1.dp, PillBorder, RoundedCornerShape(8.dp))
-                                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Person,
-                                                contentDescription = null,
-                                                tint = TextSecondary,
-                                                modifier = Modifier.size(10.dp)
-                                            )
-                                            Text(
-                                                text = course.professor,
-                                                color = TextSecondary,
-                                                fontSize = 9.5.sp,
-                                                fontWeight = FontWeight.Medium,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                        }
-                                    }
                                 }
                             }
                         }
