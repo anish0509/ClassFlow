@@ -578,19 +578,25 @@ fun WeekViewScreen(
         )
 
         // Premium Glass Dialog for Class Details
-        val activeClass = selectedClassForDetail
-        if (activeClass != null) {
-            val associatedCourse = courses.find { it.id == activeClass.courseId }
-            val courseColor = try {
-                Color(android.graphics.Color.parseColor(associatedCourse?.color))
-            } catch(e: Exception) {
-                WaterBlue
+        var lastSelectedClass by remember { mutableStateOf<ClassSession?>(null) }
+        LaunchedEffect(selectedClassForDetail) {
+            if (selectedClassForDetail != null) {
+                lastSelectedClass = selectedClassForDetail
             }
+        }
+        val activeClass = selectedClassForDetail ?: lastSelectedClass
+        val associatedCourse = activeClass?.let { ac -> courses.find { it.id == ac.courseId } }
+        val courseColor = try {
+            Color(android.graphics.Color.parseColor(associatedCourse?.color))
+        } catch(e: Exception) {
+            WaterBlue
+        }
 
-            GlassDialog(
-                visible = selectedClassForDetail != null,
-                onDismissRequest = { selectedClassForDetail = null }
-            ) {
+        GlassDialog(
+            visible = selectedClassForDetail != null,
+            onDismissRequest = { selectedClassForDetail = null }
+        ) {
+            if (activeClass != null) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
