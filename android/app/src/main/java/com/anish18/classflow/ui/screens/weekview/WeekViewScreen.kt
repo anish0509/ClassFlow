@@ -93,39 +93,22 @@ fun WeekViewScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val baseDate = remember { LocalDate.now() }
+    val baseMonday = remember(baseDate) {
+        baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+    }
     val pagerState = rememberPagerState(initialPage = 5000) { 10000 }
 
-    val currentMonday = remember(pagerState.currentPage) {
-        baseDate.plusWeeks((pagerState.currentPage - 5000).toLong())
-            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+    var viewDaysMode by remember { mutableIntStateOf(7) } // 7, 3, or 1 days per view page
+
+    val currentMonday = remember(pagerState.currentPage, viewDaysMode, baseMonday, baseDate) {
+        val pageOffset = (pagerState.currentPage - 5000).toLong()
+        when (viewDaysMode) {
+            1 -> baseDate.plusDays(pageOffset).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            3 -> baseMonday.plusDays(pageOffset * 3L).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            else -> baseMonday.plusDays(pageOffset * 7L)
+        }
     }
     val currentSunday = remember(currentMonday) { currentMonday.plusDays(6) }
-
-    val monthFormatter = remember { DateTimeFormatter.ofPattern("MMM", Locale.US) }
-    val dayNumFormatter = remember { DateTimeFormatter.ofPattern("d", Locale.US) }
-    val rangeStr = remember(currentMonday, currentSunday) {
-        val startMonth = currentMonday.format(monthFormatter)
-        val endMonth = currentSunday.format(monthFormatter)
-        val startDay = currentMonday.format(dayNumFormatter)
-        val endDay = currentSunday.format(dayNumFormatter)
-        if (startMonth == endMonth) "$startMonth $startDay – $endDay" else "$startMonth $startDay – $endMonth $endDay"
-    }
-
-    val weekNumber = remember(currentMonday, activeSemester) {
-        val semStart = activeSemester?.startDate?.let {
-            try { LocalDate.parse(it) } catch(e: Exception) { null }
-        }
-        if (semStart != null && !currentMonday.isBefore(semStart.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)))) {
-            val semStartMonday = semStart.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(semStartMonday, currentMonday)
-            val weekNum = (daysBetween / 7) + 1
-            "Week $weekNum"
-        } else {
-            "Week Schedule"
-        }
-    }
-
-    var viewDaysMode by remember { mutableIntStateOf(7) } // 7, 3, or 1 days per view page
 
     val hourHeight = 48.dp
     val startHour = 0
@@ -217,26 +200,30 @@ fun WeekViewScreen(
                             .weight(1f)
                             .fillMaxHeight()
                     ) { page ->
-                        val targetMonday = remember(page) {
-                            baseDate.plusWeeks((page - 5000).toLong())
-                                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                        }
-                        val allWeekDays = remember(targetMonday) {
-                            listOf(
-                                "Monday" to targetMonday,
-                                "Tuesday" to targetMonday.plusDays(1),
-                                "Wednesday" to targetMonday.plusDays(2),
-                                "Thursday" to targetMonday.plusDays(3),
-                                "Friday" to targetMonday.plusDays(4),
-                                "Saturday" to targetMonday.plusDays(5),
-                                "Sunday" to targetMonday.plusDays(6)
-                            )
-                        }
-                        val targetWeekDays = remember(allWeekDays, viewDaysMode) {
+                        val pageOffset = (page - 5000).toLong()
+                        val targetWeekDays = remember(page, viewDaysMode, baseMonday, baseDate) {
                             when (viewDaysMode) {
-                                1 -> listOf(allWeekDays[0])
-                                3 -> allWeekDays.take(3)
-                                else -> allWeekDays
+                                1 -> {
+                                    val date = baseDate.plusDays(pageOffset)
+                                    val dayName = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.US)
+                                    listOf(dayName to date)
+                                }
+                                3 -> {
+                                    val startDate = baseMonday.plusDays(pageOffset * 3L)
+                                    (0..2).map { offset ->
+                                        val date = startDate.plusDays(offset.toLong())
+                                        val dayName = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.US)
+                                        dayName to date
+                                    }
+                                }
+                                else -> {
+                                    val startDate = baseMonday.plusDays(pageOffset * 7L)
+                                    (0..6).map { offset ->
+                                        val date = startDate.plusDays(offset.toLong())
+                                        val dayName = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.US)
+                                        dayName to date
+                                    }
+                                }
                             }
                         }
                         val numDays = targetWeekDays.size
@@ -569,6 +556,9 @@ fun WeekViewScreen(
                             7 -> 3
                             3 -> 1
                             else -> 7
+                        }
+                        coroutineScope.launch {
+                            pagerState.scrollToPage(5000)
                         }
                     },
                     size = 40.dp,
