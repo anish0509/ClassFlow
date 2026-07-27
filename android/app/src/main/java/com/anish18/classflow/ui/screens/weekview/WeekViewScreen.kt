@@ -600,9 +600,10 @@ fun WeekViewScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 24.dp),
+                        .padding(horizontal = 20.dp, vertical = 22.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // Header Row with glowing course icon and code tag
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -610,71 +611,238 @@ fun WeekViewScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(36.dp)
-                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(18.dp))
-                                .border(1.dp, courseColor.copy(alpha = 0.3f), RoundedCornerShape(18.dp)),
+                                .size(42.dp)
+                                .background(courseColor.copy(alpha = 0.18f), RoundedCornerShape(14.dp))
+                                .border(1.dp, courseColor.copy(alpha = 0.35f), RoundedCornerShape(14.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.MenuBook,
                                 contentDescription = null,
                                 tint = courseColor,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                         Column(modifier = Modifier.weight(1f)) {
+                            val courseTitle = associatedCourse?.name?.takeIf { it.isNotBlank() } ?: "Class Session"
                             Text(
-                                text = associatedCourse?.name ?: "Class details",
+                                text = courseTitle,
                                 color = TextPrimary,
-                                fontSize = 18.sp,
+                                fontSize = 17.sp,
                                 fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
                             )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            val profName = associatedCourse?.professor?.takeIf { it.isNotBlank() }
+                            val subtitleStr = if (profName != null) "Prof. $profName" else "Subject Session"
                             Text(
-                                text = associatedCourse?.shortName ?: "CLASS",
+                                text = subtitleStr,
                                 color = TextSecondary,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                        }
+
+                        // Course Code Glass Badge
+                        val codeTag = associatedCourse?.shortName?.takeIf { it.isNotBlank() && !it.matches(Regex("^[a-z]{2}\\d{3,}$")) } ?: "CLASS"
+                        Box(
+                            modifier = Modifier
+                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                .border(0.8.dp, courseColor.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 9.dp, vertical = 5.dp)
+                        ) {
+                            Text(
+                                text = codeTag.uppercase(),
+                                color = courseColor,
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
 
                     HorizontalDivider(color = CardBackground.copy(alpha = 0.2f))
 
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        DetailItemRow(
-                            icon = Icons.Default.CalendarToday,
-                            label = "Day of Week",
-                            value = activeClass.dayOfWeek,
-                            tintColor = NeonBlue
-                        )
-                        DetailItemRow(
-                            icon = Icons.Default.Schedule,
-                            label = "Time Slot",
-                            value = "${activeClass.startTime} – ${activeClass.endTime}",
-                            tintColor = NeonPurple
-                        )
-                        DetailItemRow(
-                            icon = Icons.Default.Room,
-                            label = "Classroom / Room",
-                            value = if (activeClass.room.isNullOrEmpty()) "Not specified" else activeClass.room,
-                            tintColor = NeonGreen
-                        )
+                    // 2x2 Glass Metadata Chips Grid
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // Chip 1: Time Slot
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .border(1.dp, NeonPurple.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Schedule,
+                                            contentDescription = null,
+                                            tint = NeonPurple,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Text(
+                                            text = "TIME SLOT",
+                                            color = TextSecondary,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 0.5.sp
+                                        )
+                                    }
+                                    Text(
+                                        text = "${activeClass.startTime} – ${activeClass.endTime}",
+                                        color = TextPrimary,
+                                        fontSize = 12.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+
+                            // Chip 2: Classroom
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .border(1.dp, NeonGreen.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Room,
+                                            contentDescription = null,
+                                            tint = NeonGreen,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Text(
+                                            text = "CLASSROOM",
+                                            color = TextSecondary,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 0.5.sp
+                                        )
+                                    }
+                                    val roomStr = activeClass.room?.takeIf { it.isNotBlank() } ?: associatedCourse?.room?.takeIf { it.isNotBlank() } ?: "Not set"
+                                    Text(
+                                        text = roomStr,
+                                        color = TextPrimary,
+                                        fontSize = 12.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // Chip 3: Day of Week
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .border(1.dp, NeonBlue.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CalendarToday,
+                                            contentDescription = null,
+                                            tint = NeonBlue,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Text(
+                                            text = "DAY OF WEEK",
+                                            color = TextSecondary,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 0.5.sp
+                                        )
+                                    }
+                                    val formattedDay = activeClass.dayOfWeek.replaceFirstChar { it.uppercase() }
+                                    Text(
+                                        text = formattedDay,
+                                        color = TextPrimary,
+                                        fontSize = 12.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+
+                            // Chip 4: Instructor / Credits
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(CardBackground.copy(alpha = 0.4f), RoundedCornerShape(14.dp))
+                                    .border(1.dp, NeonOrange.copy(alpha = 0.25f), RoundedCornerShape(14.dp))
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Person,
+                                            contentDescription = null,
+                                            tint = NeonOrange,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Text(
+                                            text = "INSTRUCTOR",
+                                            color = TextSecondary,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 0.5.sp
+                                        )
+                                    }
+                                    val instructorStr = associatedCourse?.professor?.takeIf { it.isNotBlank() } ?: "3 Credits"
+                                    Text(
+                                        text = instructorStr,
+                                        color = TextPrimary,
+                                        fontSize = 12.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
+                    // Quick Action Buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        // 1. View Course Button
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(48.dp)
-                                .background(courseColor.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
-                                .border(1.dp, courseColor.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
-                                .clip(RoundedCornerShape(24.dp))
+                                .height(44.dp)
+                                .background(courseColor.copy(alpha = 0.18f), RoundedCornerShape(22.dp))
+                                .border(1.dp, courseColor.copy(alpha = 0.4f), RoundedCornerShape(22.dp))
+                                .clip(RoundedCornerShape(22.dp))
                                 .clickable {
                                     selectedClassForDetail = null
                                     associatedCourse?.id?.let { onCourseClick(it) }
@@ -689,25 +857,26 @@ fun WeekViewScreen(
                                     imageVector = Icons.Default.Visibility,
                                     contentDescription = null,
                                     tint = courseColor,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(15.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "View Course",
                                     color = TextPrimary,
-                                    fontSize = 14.sp,
+                                    fontSize = 13.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                         }
 
+                        // 2. Close Button
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(48.dp)
-                                .background(CardBackground.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
-                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
-                                .clip(RoundedCornerShape(24.dp))
+                                .height(44.dp)
+                                .background(CardBackground.copy(alpha = 0.5f), RoundedCornerShape(22.dp))
+                                .border(1.dp, FrostedGlassBorder.copy(alpha = 0.2f), RoundedCornerShape(22.dp))
+                                .clip(RoundedCornerShape(22.dp))
                                 .clickable {
                                     selectedClassForDetail = null
                                 },
@@ -721,13 +890,13 @@ fun WeekViewScreen(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = null,
                                     tint = TextSecondary,
-                                    modifier = Modifier.size(18.dp)
+                                    modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "Close",
                                     color = TextPrimary,
-                                    fontSize = 14.sp,
+                                    fontSize = 13.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
