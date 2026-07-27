@@ -127,7 +127,7 @@ fun WeekViewScreen(
 
     var viewDaysMode by remember { mutableIntStateOf(7) } // 7, 3, or 1 days per view page
 
-    val hourHeight = 62.dp
+    val hourHeight = 48.dp
     val startHour = 0
     val totalHours = 24
 
@@ -163,7 +163,7 @@ fun WeekViewScreen(
                     .weight(1f)
             ) {
                 val totalWidth = maxWidth
-                val timelineWidth = 42.dp
+                val timelineWidth = 36.dp
                 val contentWidth = totalWidth - timelineWidth
 
                 Row(
@@ -200,10 +200,10 @@ fun WeekViewScreen(
                                     Text(
                                         text = displayHour,
                                         color = TextSecondary,
-                                        fontSize = 9.sp,
+                                        fontSize = 8.5.sp,
                                         fontFamily = FontFamily.Monospace,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(top = 2.dp)
+                                        modifier = Modifier.offset(y = (-6).dp)
                                     )
                                 }
                             }
