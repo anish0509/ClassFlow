@@ -107,4 +107,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     `;
     document.head.appendChild(styleSheet);
+
+    // ==========================================
+    // 3. Mobile Navigation Drawer Toggle
+    // ==========================================
+    const navToggle = document.getElementById("nav-toggle");
+    const navLinks = document.querySelector(".nav-links");
+
+    if (navToggle && navLinks) {
+        navToggle.addEventListener("click", () => {
+            navLinks.classList.toggle("mobile-open");
+        });
+
+        // Close mobile drawer when clicking any link
+        navLinks.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                navLinks.classList.remove("mobile-open");
+            });
+        });
+    }
 });

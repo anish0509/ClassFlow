@@ -653,6 +653,23 @@ body {
     opacity: 0.7;
 }
 
+/* ─── Mobile Navigation Hamburger Toggle & Drawer ───────────────────────────── */
+.nav-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    padding: 6px;
+    border-radius: 8px;
+    margin-left: 12px;
+    transition: background-color 0.2s;
+}
+
+.nav-toggle:hover {
+    background-color: var(--bg-alt);
+}
+
 /* ─── Responsive Queries ─────────────────────────────────────────────────────── */
 @media (max-width: 968px) {
     .hero-title {
@@ -668,27 +685,122 @@ body {
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .nav-links {
-        display: none;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 20px 24px;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-links.mobile-open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+
+    .nav-links a {
+        font-size: 1.05rem;
+        padding: 8px 0;
+    }
+
+    .hero-section {
+        padding: 50px 0 40px;
     }
 
     .hero-title {
-        font-size: 2.5rem;
+        font-size: clamp(2.1rem, 7.5vw, 3.2rem);
         letter-spacing: -1.2px;
     }
 
-    .section-title {
-        font-size: 2.1rem;
+    .hero-desc {
+        font-size: 1.05rem;
+        margin-bottom: 30px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        margin-bottom: 40px;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
     }
 
     .hero-stats-row {
-        flex-direction: column;
-        align-items: center;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+        width: 100%;
     }
 
     .stat-item {
-        width: 100%;
+        padding: 14px 12px;
+    }
+
+    .stat-num {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .section-title {
+        font-size: clamp(1.8rem, 6.5vw, 2.4rem);
+    }
+
+    .showcase-scroll-container {
+        padding: 20px 16px;
+        gap: 16px;
+    }
+
+    .showcase-card {
+        width: 240px;
+        padding: 18px;
+    }
+
+    .mockup-phone {
+        width: 190px;
+        height: 400px;
+        border-width: 6px;
+        border-radius: 28px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .developer-card {
+        padding: 26px 20px;
+    }
+
+    .lightbox-close {
+        top: 16px;
+        right: 20px;
+        font-size: 32px;
     }
 }
+
