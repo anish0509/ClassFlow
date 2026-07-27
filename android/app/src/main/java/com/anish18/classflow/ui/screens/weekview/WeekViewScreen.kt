@@ -164,278 +164,291 @@ fun WeekViewScreen(
             ) {
                 val totalWidth = maxWidth
                 val timelineWidth = 42.dp
+                val contentWidth = totalWidth - timelineWidth
 
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize()
-                ) { page ->
-                    val targetMonday = remember(page) {
-                        baseDate.plusWeeks((page - 5000).toLong())
-                            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                    }
-                    val allWeekDays = remember(targetMonday) {
-                        listOf(
-                            "Monday" to targetMonday,
-                            "Tuesday" to targetMonday.plusDays(1),
-                            "Wednesday" to targetMonday.plusDays(2),
-                            "Thursday" to targetMonday.plusDays(3),
-                            "Friday" to targetMonday.plusDays(4),
-                            "Saturday" to targetMonday.plusDays(5)
-                        )
-                    }
-                    val targetWeekDays = remember(allWeekDays, viewDaysMode) {
-                        when (viewDaysMode) {
-                            1 -> listOf(allWeekDays[0])
-                            3 -> allWeekDays.take(3)
-                            else -> allWeekDays
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned { coordinates ->
+                            gridBounds = coordinates.boundsInWindow()
                         }
-                    }
-                    val numDays = targetWeekDays.size
-                    val columnWidth = if (totalWidth > timelineWidth) (totalWidth - timelineWidth) / numDays else (totalWidth / numDays)
-
+                ) {
+                    // 1. FIXED LEFT TIME TIMELINE (Outside HorizontalPager, stays stationary during horizontal swipes)
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .onGloballyPositioned { coordinates ->
-                                if (pagerState.currentPage == page) {
-                                    gridBounds = coordinates.boundsInWindow()
-                                }
-                            }
+                            .width(timelineWidth)
+                            .fillMaxHeight()
                     ) {
-                        // Week Calendar Grid Header (Mon - Sat)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Spacer(modifier = Modifier.width(timelineWidth))
+                        // Top Header Spacer
+                        Spacer(modifier = Modifier.height(54.dp))
 
-                            targetWeekDays.forEach { (dayName, date) ->
-                                val isSelectedDay = date.isEqual(LocalDate.now())
-                                val isHolidayDay = holidays.any { it.date == date.toString() }
-                                
-                                Box(
-                                    modifier = Modifier
-                                        .width(columnWidth)
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = dayName.substring(0, 3).uppercase(),
-                                            color = if (isHolidayDay) NeonOrange else if (isSelectedDay) WaterBlue else TextSecondary,
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 0.5.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = date.dayOfMonth.toString(),
-                                            color = if (isHolidayDay) NeonOrange else if (isSelectedDay) WaterBlue else TextPrimary,
-                                            fontSize = 16.sp,
-                                            fontFamily = FontFamily.Serif,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        // Timetable Scrollable Grid Container
-                        Row(
+                        // Vertical Scrollable Time Labels (Shared verticalScrollState with grid)
+                        Column(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                                 .verticalScroll(verticalScrollState)
+                                .padding(end = 4.dp),
+                            horizontalAlignment = Alignment.End
                         ) {
-                            // 1. Sticky Hours Timeline on the left axis (24 Hours Format)
-                            Column(
+                            (startHour until startHour + totalHours).forEach { hour ->
+                                Box(
+                                    modifier = Modifier.height(hourHeight),
+                                    contentAlignment = Alignment.TopEnd
+                                ) {
+                                    val displayHour = String.format(Locale.US, "%02d:00", hour)
+                                    Text(
+                                        text = displayHour,
+                                        color = TextSecondary,
+                                        fontSize = 9.sp,
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(top = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. SWIPABLE DAY CARDS & SCHEDULE GRID (Inside HorizontalPager)
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    ) { page ->
+                        val targetMonday = remember(page) {
+                            baseDate.plusWeeks((page - 5000).toLong())
+                                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                        }
+                        val allWeekDays = remember(targetMonday) {
+                            listOf(
+                                "Monday" to targetMonday,
+                                "Tuesday" to targetMonday.plusDays(1),
+                                "Wednesday" to targetMonday.plusDays(2),
+                                "Thursday" to targetMonday.plusDays(3),
+                                "Friday" to targetMonday.plusDays(4),
+                                "Saturday" to targetMonday.plusDays(5)
+                            )
+                        }
+                        val targetWeekDays = remember(allWeekDays, viewDaysMode) {
+                            when (viewDaysMode) {
+                                1 -> listOf(allWeekDays[0])
+                                3 -> allWeekDays.take(3)
+                                else -> allWeekDays
+                            }
+                        }
+                        val numDays = targetWeekDays.size
+                        val columnWidth = if (contentWidth > 0.dp) contentWidth / numDays else (totalWidth / numDays)
+
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            // Week Calendar Grid Header (Mon - Sat)
+                            Row(
                                 modifier = Modifier
-                                    .width(timelineWidth)
-                                    .padding(end = 4.dp),
-                                horizontalAlignment = Alignment.End
+                                    .fillMaxWidth()
+                                    .height(54.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                (startHour until startHour + totalHours).forEach { hour ->
+                                targetWeekDays.forEach { (dayName, date) ->
+                                    val isSelectedDay = date.isEqual(LocalDate.now())
+                                    val isHolidayDay = holidays.any { it.date == date.toString() }
+                                    
                                     Box(
-                                        modifier = Modifier.height(hourHeight),
-                                        contentAlignment = Alignment.TopEnd
+                                        modifier = Modifier
+                                            .width(columnWidth)
+                                            .padding(vertical = 4.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        val displayHour = String.format(Locale.US, "%02d:00", hour)
-                                        Text(
-                                            text = displayHour,
-                                            color = TextSecondary,
-                                            fontSize = 9.sp,
-                                            fontFamily = FontFamily.Monospace,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(top = 2.dp)
-                                        )
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text(
+                                                text = dayName.substring(0, 3).uppercase(),
+                                                color = if (isHolidayDay) NeonOrange else if (isSelectedDay) WaterBlue else TextSecondary,
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                letterSpacing = 0.5.sp
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = date.dayOfMonth.toString(),
+                                                color = if (isHolidayDay) NeonOrange else if (isSelectedDay) WaterBlue else TextPrimary,
+                                                fontSize = 16.sp,
+                                                fontFamily = FontFamily.Serif,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
                                     }
                                 }
                             }
 
-                            // 2. Calendar Columns & Cards overlay (NO HORIZONTAL SCROLL)
+                            // Timetable Scrollable Grid Container
                             Box(
                                 modifier = Modifier
-                                    .width(columnWidth * numDays)
-                                    .height(hourHeight * totalHours)
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .verticalScroll(verticalScrollState)
                             ) {
-                                // Draw horizontal hourly lines
-                                (0..totalHours).forEach { i ->
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .offset(y = hourHeight * i)
-                                            .height(1.dp)
-                                            .background(FrostedGlassBorder.copy(alpha = 0.2f))
-                                    )
-                                }
-
-                                // Draw vertical day lines
-                                (0..numDays).forEach { i ->
-                                    Box(
-                                        modifier = Modifier
-                                            .offset(x = columnWidth * i)
-                                            .fillMaxHeight()
-                                            .width(1.dp)
-                                            .background(FrostedGlassBorder.copy(alpha = 0.2f))
-                                    )
-                                }
-
-                                // Draw current day vertical highlight overlay
-                                targetWeekDays.forEachIndexed { dayIndex, (_, date) ->
-                                    if (date.isEqual(LocalDate.now())) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(columnWidth * numDays)
+                                        .height(hourHeight * totalHours)
+                                ) {
+                                    // Draw horizontal hourly lines
+                                    (0..totalHours).forEach { i ->
                                         Box(
                                             modifier = Modifier
-                                                .offset(x = columnWidth * dayIndex)
-                                                .width(columnWidth)
-                                                .fillMaxHeight()
-                                                .background(
-                                                    if (ThemeState.isDark) NeonBlue.copy(alpha = 0.04f)
-                                                    else NeonBlue.copy(alpha = 0.02f)
-                                                )
-                                                .border(
-                                                    width = 0.8.dp,
-                                                    color = NeonBlue.copy(alpha = 0.15f)
-                                                )
+                                                .fillMaxWidth()
+                                                .offset(y = hourHeight * i)
+                                                .height(1.dp)
+                                                .background(FrostedGlassBorder.copy(alpha = 0.2f))
                                         )
                                     }
-                                }
 
-                                // Render Course cards overlay
-                                targetWeekDays.forEachIndexed { dayIndex, (dayName, date) ->
-                                    val isWithinSemester = activeSemester?.let { sem ->
-                                        val dateStr = date.toString()
-                                        dateStr >= sem.startDate && dateStr <= sem.endDate
-                                    } ?: true
-
-                                    fun normalizeDay(d: String): String = when {
-                                        d.startsWith("MON", ignoreCase = true) -> "Monday"
-                                        d.startsWith("TUE", ignoreCase = true) -> "Tuesday"
-                                        d.startsWith("WED", ignoreCase = true) -> "Wednesday"
-                                        d.startsWith("THU", ignoreCase = true) -> "Thursday"
-                                        d.startsWith("FRI", ignoreCase = true) -> "Friday"
-                                        d.startsWith("SAT", ignoreCase = true) -> "Saturday"
-                                        d.startsWith("SUN", ignoreCase = true) -> "Sunday"
-                                        else -> d
-                                    }
-                                    val targetDayNormalized = normalizeDay(dayName)
-
-                                    val dayClasses = if (isWithinSemester) {
-                                        classes.filter { normalizeDay(it.dayOfWeek).equals(targetDayNormalized, ignoreCase = true) }
-                                            .sortedBy { timeToMinutes(it.startTime) }
-                                    } else {
-                                        emptyList()
+                                    // Draw vertical day lines
+                                    (0..numDays).forEach { i ->
+                                        Box(
+                                            modifier = Modifier
+                                                .offset(x = columnWidth * i)
+                                                .fillMaxHeight()
+                                                .width(1.dp)
+                                                .background(FrostedGlassBorder.copy(alpha = 0.2f))
+                                        )
                                     }
 
-                                    val columns = mutableListOf<MutableList<ClassSession>>()
-                                    dayClasses.forEach { s ->
-                                        var placed = false
-                                        for (col in columns) {
-                                            val last = col.last()
-                                            if (timeToMinutes(s.startTime) >= timeToMinutes(last.endTime)) {
-                                                col.add(s)
-                                                placed = true
-                                                break
-                                            }
-                                        }
-                                        if (!placed) {
-                                            columns.add(mutableListOf(s))
+                                    // Draw current day vertical highlight overlay
+                                    targetWeekDays.forEachIndexed { dayIndex, (_, date) ->
+                                        if (date.isEqual(LocalDate.now())) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .offset(x = columnWidth * dayIndex)
+                                                    .width(columnWidth)
+                                                    .fillMaxHeight()
+                                                    .background(
+                                                        if (ThemeState.isDark) NeonBlue.copy(alpha = 0.04f)
+                                                        else NeonBlue.copy(alpha = 0.02f)
+                                                    )
+                                                    .border(
+                                                        width = 0.8.dp,
+                                                        color = NeonBlue.copy(alpha = 0.15f)
+                                                    )
+                                            )
                                         }
                                     }
 
-                                    for (colIndex in columns.indices) {
-                                        val colSessions = columns[colIndex]
-                                        for (session in colSessions) {
-                                            val associatedCourse = courses.find { it.id == session.courseId }
-                                            val courseColor = try {
-                                                Color(android.graphics.Color.parseColor(associatedCourse?.color))
-                                            } catch(e: Exception) {
-                                                WaterBlue
+                                    // Render Course cards overlay
+                                    targetWeekDays.forEachIndexed { dayIndex, (dayName, date) ->
+                                        val isWithinSemester = activeSemester?.let { sem ->
+                                            val dateStr = date.toString()
+                                            dateStr >= sem.startDate && dateStr <= sem.endDate
+                                        } ?: true
+
+                                        fun normalizeDay(d: String): String = when {
+                                            d.startsWith("MON", ignoreCase = true) -> "Monday"
+                                            d.startsWith("TUE", ignoreCase = true) -> "Tuesday"
+                                            d.startsWith("WED", ignoreCase = true) -> "Wednesday"
+                                            d.startsWith("THU", ignoreCase = true) -> "Thursday"
+                                            d.startsWith("FRI", ignoreCase = true) -> "Friday"
+                                            d.startsWith("SAT", ignoreCase = true) -> "Saturday"
+                                            d.startsWith("SUN", ignoreCase = true) -> "Sunday"
+                                            else -> d
+                                        }
+                                        val targetDayNormalized = normalizeDay(dayName)
+
+                                        val dayClasses = if (isWithinSemester) {
+                                            classes.filter { normalizeDay(it.dayOfWeek).equals(targetDayNormalized, ignoreCase = true) }
+                                                .sortedBy { timeToMinutes(it.startTime) }
+                                        } else {
+                                            emptyList()
+                                        }
+
+                                        val columns = mutableListOf<MutableList<ClassSession>>()
+                                        dayClasses.forEach { s ->
+                                            var placed = false
+                                            for (col in columns) {
+                                                val last = col.last()
+                                                if (timeToMinutes(s.startTime) >= timeToMinutes(last.endTime)) {
+                                                    col.add(s)
+                                                    placed = true
+                                                    break
+                                                }
                                             }
+                                            if (!placed) {
+                                                columns.add(mutableListOf(s))
+                                            }
+                                        }
 
-                                            val startMin = timeToMinutes(session.startTime) - (startHour * 60)
-                                            val endMin = timeToMinutes(session.endTime) - (startHour * 60)
-                                            val durationMin = endMin - startMin
+                                        for (colIndex in columns.indices) {
+                                            val colSessions = columns[colIndex]
+                                            for (session in colSessions) {
+                                                val associatedCourse = courses.find { it.id == session.courseId }
+                                                val courseColor = try {
+                                                    Color(android.graphics.Color.parseColor(associatedCourse?.color))
+                                                } catch(e: Exception) {
+                                                    WaterBlue
+                                                }
 
-                                            if (startMin >= 0 && durationMin > 0) {
-                                                val baseCardWidth = columnWidth - 4.dp
-                                                val colWidth = baseCardWidth / columns.size
-                                                val leftOffset = columnWidth * dayIndex + 2.dp + (colWidth * colIndex)
-                                                
-                                                val cardY = (startMin.toFloat() / 60f * hourHeight.value).dp
-                                                val cardHeight = (durationMin.toFloat() / 60f * hourHeight.value).dp
-         
-                                                val isHolidayDay = holidays.any { it.date == date.toString() }
+                                                val startMin = timeToMinutes(session.startTime) - (startHour * 60)
+                                                val endMin = timeToMinutes(session.endTime) - (startHour * 60)
+                                                val durationMin = endMin - startMin
 
-                                                GlassCard(
-                                                    modifier = Modifier
-                                                        .offset(x = leftOffset, y = cardY)
-                                                        .width(colWidth)
-                                                        .height(cardHeight)
-                                                        .then(if (isHolidayDay) Modifier.graphicsLayer(alpha = 0.55f) else Modifier),
-                                                    glowColor = if (isHolidayDay) NeonOrange else courseColor,
-                                                    cornerRadius = 8.dp,
-                                                    stripeWidth = 4.dp,
-                                                    hazeEnabled = false,
-                                                    contentPadding = PaddingValues(start = 7.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
-                                                    onClick = { selectedClassForDetail = session }
-                                                ) {
-                                                    Row(
-                                                        modifier = Modifier.fillMaxSize(),
-                                                        verticalAlignment = Alignment.CenterVertically
+                                                if (startMin >= 0 && durationMin > 0) {
+                                                    val baseCardWidth = columnWidth - 4.dp
+                                                    val colWidth = baseCardWidth / columns.size
+                                                    val leftOffset = columnWidth * dayIndex + 2.dp + (colWidth * colIndex)
+                                                    
+                                                    val cardY = (startMin.toFloat() / 60f * hourHeight.value).dp
+                                                    val cardHeight = (durationMin.toFloat() / 60f * hourHeight.value).dp
+                                             
+                                                    val isHolidayDay = holidays.any { it.date == date.toString() }
+
+                                                    GlassCard(
+                                                        modifier = Modifier
+                                                            .offset(x = leftOffset, y = cardY)
+                                                            .width(colWidth)
+                                                            .height(cardHeight)
+                                                            .then(if (isHolidayDay) Modifier.graphicsLayer(alpha = 0.55f) else Modifier),
+                                                        glowColor = if (isHolidayDay) NeonOrange else courseColor,
+                                                        cornerRadius = 8.dp,
+                                                        stripeWidth = 4.dp,
+                                                        hazeEnabled = false,
+                                                        contentPadding = PaddingValues(start = 7.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                                        onClick = { selectedClassForDetail = session }
                                                     ) {
-                                                        Column(
-                                                            modifier = Modifier.fillMaxHeight(),
-                                                            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)
+                                                        Row(
+                                                            modifier = Modifier.fillMaxSize(),
+                                                            verticalAlignment = Alignment.CenterVertically
                                                         ) {
-                                                            Text(
-                                                                text = associatedCourse?.shortName ?: "CLASS",
-                                                                color = TextPrimary,
-                                                                fontSize = if (columns.size > 1) 8.sp else 11.sp,
-                                                                fontFamily = FontFamily.Serif,
-                                                                fontWeight = FontWeight.Bold,
-                                                                maxLines = 1
-                                                            )
-                                                            val locationStr = session.room?.takeIf { it.isNotBlank() } ?: associatedCourse?.room?.takeIf { it.isNotBlank() }
+                                                            Column(
+                                                                modifier = Modifier.fillMaxHeight(),
+                                                                verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)
+                                                            ) {
+                                                                Text(
+                                                                    text = associatedCourse?.shortName ?: "CLASS",
+                                                                    color = TextPrimary,
+                                                                    fontSize = if (columns.size > 1) 8.sp else 11.sp,
+                                                                    fontFamily = FontFamily.Serif,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    maxLines = 1
+                                                                )
+                                                                val locationStr = session.room?.takeIf { it.isNotBlank() } ?: associatedCourse?.room?.takeIf { it.isNotBlank() }
 
-                                                            if (!locationStr.isNullOrBlank()) {
-                                                                Text(
-                                                                    text = locationStr,
-                                                                    color = TextSecondary,
-                                                                    fontSize = if (numDays > 3 || columns.size > 1) 7.5.sp else 8.5.sp,
-                                                                    fontWeight = FontWeight.Medium,
-                                                                    maxLines = 1
-                                                                )
-                                                            }
-                                                            if (locationStr.isNullOrBlank() || durationMin >= 45 || numDays <= 3) {
-                                                                Text(
-                                                                    text = "${session.startTime} - ${session.endTime}",
-                                                                    color = TextSecondary,
-                                                                    fontSize = if (numDays > 3 || columns.size > 1) 7.sp else 8.sp,
-                                                                    fontWeight = FontWeight.Medium,
-                                                                    maxLines = 1
-                                                                )
+                                                                if (!locationStr.isNullOrBlank()) {
+                                                                    Text(
+                                                                        text = locationStr,
+                                                                        color = TextSecondary,
+                                                                        fontSize = if (numDays > 3 || columns.size > 1) 7.5.sp else 8.5.sp,
+                                                                        fontWeight = FontWeight.Medium,
+                                                                        maxLines = 1
+                                                                    )
+                                                                }
+                                                                if (locationStr.isNullOrBlank() || durationMin >= 45 || numDays <= 3) {
+                                                                    Text(
+                                                                        text = "${session.startTime} - ${session.endTime}",
+                                                                        color = TextSecondary,
+                                                                        fontSize = if (numDays > 3 || columns.size > 1) 7.sp else 8.sp,
+                                                                        fontWeight = FontWeight.Medium,
+                                                                        maxLines = 1
+                                                                    )
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -443,95 +456,95 @@ fun WeekViewScreen(
                                             }
                                         }
                                     }
-                                }
 
-                            // Render Tasks overlay (if enabled)
-                            if (showTasksOnTimetable) {
-                                targetWeekDays.forEachIndexed { dayIndex, (_, date) ->
-                                    val dateStr = date.toString()
-                                    val dayTasks = tasks.filter { it.dueDate == dateStr }
-                                    
-                                    dayTasks.forEach { task ->
-                                        val dueTimeStr = task.dueTime?.trim()?.ifEmpty { "09:00" } ?: "09:00"
-                                        val dueMin = timeToMinutes(dueTimeStr)
-                                        val startMin = dueMin - (startHour * 60)
-                                        if (startMin >= 0) {
-                                            val leftOffset = columnWidth * dayIndex + 2.dp
-                                            val topOffset = (startMin.toFloat() / 60f * hourHeight.value).dp - 10.dp
-                                            val isCompleted = task.status.equals("completed", ignoreCase = true)
-                                            val accentColor = if (isCompleted) NeonGreen else NeonPink
+                                    // Render Tasks overlay (if enabled)
+                                    if (showTasksOnTimetable) {
+                                        targetWeekDays.forEachIndexed { dayIndex, (_, date) ->
+                                            val dateStr = date.toString()
+                                            val dayTasks = tasks.filter { it.dueDate == dateStr }
                                             
-                                            Box(
-                                                modifier = Modifier
-                                                    .offset(x = leftOffset, y = topOffset)
-                                                    .width(columnWidth - 4.dp)
-                                                    .height(20.dp)
-                                                    .background(accentColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
-                                                    .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-                                                    .padding(horizontal = 4.dp),
-                                                contentAlignment = Alignment.CenterStart
-                                            ) {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(3.dp)
-                                                ) {
-                                                    Icon(
-                                                        imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.Flag,
-                                                        contentDescription = null,
-                                                        tint = accentColor,
-                                                        modifier = Modifier.size(10.dp)
-                                                    )
-                                                    Text(
-                                                        text = task.title,
-                                                        color = TextPrimary,
-                                                        fontSize = 8.sp,
-                                                        fontWeight = FontWeight.Bold,
-                                                        maxLines = 1,
-                                                        style = if (isCompleted) androidx.compose.ui.text.TextStyle(
-                                                            textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
-                                                        ) else androidx.compose.ui.text.TextStyle.Default
-                                                    )
+                                            dayTasks.forEach { task ->
+                                                val dueTimeStr = task.dueTime?.trim()?.ifEmpty { "09:00" } ?: "09:00"
+                                                val dueMin = timeToMinutes(dueTimeStr)
+                                                val startMin = dueMin - (startHour * 60)
+                                                if (startMin >= 0) {
+                                                    val leftOffset = columnWidth * dayIndex + 2.dp
+                                                    val topOffset = (startMin.toFloat() / 60f * hourHeight.value).dp - 10.dp
+                                                    val isCompleted = task.status.equals("completed", ignoreCase = true)
+                                                    val accentColor = if (isCompleted) NeonGreen else NeonPink
+                                                    
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .offset(x = leftOffset, y = topOffset)
+                                                            .width(columnWidth - 4.dp)
+                                                            .height(20.dp)
+                                                            .background(accentColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                                                            .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                                                            .padding(horizontal = 4.dp),
+                                                        contentAlignment = Alignment.CenterStart
+                                                    ) {
+                                                        Row(
+                                                            verticalAlignment = Alignment.CenterVertically,
+                                                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.Flag,
+                                                                contentDescription = null,
+                                                                tint = accentColor,
+                                                                modifier = Modifier.size(10.dp)
+                                                            )
+                                                            Text(
+                                                                text = task.title,
+                                                                color = TextPrimary,
+                                                                fontSize = 8.sp,
+                                                                fontWeight = FontWeight.Bold,
+                                                                maxLines = 1,
+                                                                style = if (isCompleted) androidx.compose.ui.text.TextStyle(
+                                                                    textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                                                                ) else androidx.compose.ui.text.TextStyle.Default
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                            }
 
-                            // Option A: Today-Column restricted Current Time Tracker overlay
-                            val now = LocalTime.now()
-                            val totalCurrentMin = now.hour * 60 + now.minute - (startHour * 60)
-                            if (totalCurrentMin in 0..(totalHours * 60)) {
-                                val trackerY = (totalCurrentMin.toFloat() / 60f * hourHeight.value).dp - 3.dp
-                                
-                                val todayIndex = targetWeekDays.indexOfFirst { it.second.isEqual(LocalDate.now()) }
-                                if (todayIndex != -1) {
-                                    val leftOffset = columnWidth * todayIndex
-                                    Box(
-                                        modifier = Modifier
-                                            .offset(x = leftOffset, y = trackerY)
-                                            .width(columnWidth)
-                                            .height(6.dp),
-                                        contentAlignment = Alignment.CenterStart
-                                    ) {
-                                        androidx.compose.foundation.Canvas(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(1.dp)
-                                        ) {
-                                            drawLine(
-                                                color = NeonBlue.copy(alpha = 0.6f),
-                                                start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                                                end = androidx.compose.ui.geometry.Offset(size.width, 0f),
-                                                strokeWidth = 1.dp.toPx(),
-                                                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
-                                            )
+                                    // Option A: Today-Column restricted Current Time Tracker overlay
+                                    val now = LocalTime.now()
+                                    val totalCurrentMin = now.hour * 60 + now.minute - (startHour * 60)
+                                    if (totalCurrentMin in 0..(totalHours * 60)) {
+                                        val trackerY = (totalCurrentMin.toFloat() / 60f * hourHeight.value).dp - 3.dp
+                                        val todayIndex = targetWeekDays.indexOfFirst { it.second.isEqual(LocalDate.now()) }
+                                        if (todayIndex != -1) {
+                                            val leftOffset = columnWidth * todayIndex
+                                            Box(
+                                                modifier = Modifier
+                                                    .offset(x = leftOffset, y = trackerY)
+                                                    .width(columnWidth)
+                                                    .height(6.dp),
+                                                contentAlignment = Alignment.CenterStart
+                                            ) {
+                                                androidx.compose.foundation.Canvas(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(1.dp)
+                                                ) {
+                                                    drawLine(
+                                                        color = NeonBlue.copy(alpha = 0.6f),
+                                                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                                                        end = androidx.compose.ui.geometry.Offset(size.width, 0f),
+                                                        strokeWidth = 1.dp.toPx(),
+                                                        pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
+                                                    )
+                                                }
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(5.dp)
+                                                        .background(NeonBlue, RoundedCornerShape(100.dp))
+                                                )
+                                            }
                                         }
-                                        Box(
-                                            modifier = Modifier
-                                                .size(5.dp)
-                                                .background(NeonBlue, RoundedCornerShape(100.dp))
-                                        )
                                     }
                                 }
                             }
@@ -540,7 +553,6 @@ fun WeekViewScreen(
                 }
             }
         }
-    }
 
         // Frosted Glass Header overlay
         GlassHeader(
