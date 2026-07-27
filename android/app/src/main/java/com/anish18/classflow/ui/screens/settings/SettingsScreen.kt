@@ -375,13 +375,57 @@ fun SettingsScreen(
                         .border(1.dp, FrostedGlassBorder.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                 ) {
                     Column {
+                        val semProgress = remember(activeSemester) {
+                            val startDate = activeSemester?.startDate
+                            val endDate = activeSemester?.endDate
+                            if (startDate == null || endDate == null) 0f else {
+                                try {
+                                    val start = java.time.LocalDate.parse(startDate)
+                                    val end   = java.time.LocalDate.parse(endDate)
+                                    val today = java.time.LocalDate.now()
+                                    val total = java.time.temporal.ChronoUnit.DAYS.between(start, end).toFloat()
+                                    val elapsed = java.time.temporal.ChronoUnit.DAYS.between(start, today).toFloat()
+                                    if (total <= 0f) 0f else (elapsed / total).coerceIn(0f, 1f)
+                                } catch (e: Exception) { 0f }
+                            }
+                        }
+                        val semPct = (semProgress * 100).toInt()
+
                         SettingItem(
-                            icon = Icons.Default.CalendarMonth,
-                            iconTint = NeonPurple,
                             title = "Current Semester",
                             subtitle = activeSemester?.name ?: "No active semester",
                             onClick = { showSemesterSelectDialog = true },
                             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                            customIcon = {
+                                Box(
+                                    modifier = Modifier.size(38.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+                                        val strokeWidth = 3.dp.toPx()
+                                        drawCircle(
+                                            color = NeonPurple.copy(alpha = 0.2f),
+                                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                                        )
+                                        drawArc(
+                                            color = NeonPurple,
+                                            startAngle = -90f,
+                                            sweepAngle = 360f * semProgress,
+                                            useCenter = false,
+                                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                                width = strokeWidth,
+                                                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                            )
+                                        )
+                                    }
+                                    Text(
+                                        text = "$semPct%",
+                                        color = NeonPurple,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            },
                             trailingContent = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
@@ -1997,8 +2041,9 @@ fun SettingSectionHeader(title: String) {
 
 @Composable
 fun SettingItem(
-    icon: ImageVector,
+    icon: ImageVector = Icons.Default.CalendarMonth,
     iconTint: Color = NeonBlue,
+    customIcon: @Composable (() -> Unit)? = null,
     title: String,
     subtitle: String? = null,
     onClick: () -> Unit = {},
@@ -2018,13 +2063,17 @@ fun SettingItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .background(iconTint.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(icon, null, tint = iconTint, modifier = Modifier.size(20.dp))
+            if (customIcon != null) {
+                customIcon()
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .background(iconTint.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(icon, null, tint = iconTint, modifier = Modifier.size(20.dp))
+                }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {

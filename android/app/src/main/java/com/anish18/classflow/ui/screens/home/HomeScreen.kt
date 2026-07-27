@@ -340,14 +340,7 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
 
-            // Semester progress bar
-            SemesterProgressBar(
-                startDate = activeSemester?.startDate,
-                endDate   = activeSemester?.endDate,
-                modifier  = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            )
 
             if (currentStreak > 0) {
                 Spacer(modifier = Modifier.height(10.dp))
