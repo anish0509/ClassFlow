@@ -1460,30 +1460,30 @@ fun CourseDetailsScreen(
         } else null
     }
 
-    if (dateStrForAttendance != null && attendanceDetails != null) {
-        AttendanceDialog(
-            currentStatus = attendanceDetails.third,
-            isFuture = attendanceDetails.first,
-            visible = true,
-            onDismissRequest = { 
-                selectedDateForAttendance = null 
-            },
-            onMarkAttendance = { status ->
-                viewModel.markAttendance(dateStrForAttendance, status)
-                selectedDateForAttendance = null
-            },
-            onClearAttendance = {
-                viewModel.markAttendance(dateStrForAttendance, null)
-                selectedDateForAttendance = null
-            },
-            onShiftClick = {
-                val session = attendanceDetails.second
+    val showAttendanceModal = dateStrForAttendance != null && attendanceDetails != null
+    AttendanceDialog(
+        currentStatus = attendanceDetails?.third,
+        isFuture = attendanceDetails?.first ?: false,
+        visible = showAttendanceModal,
+        onDismissRequest = { 
+            selectedDateForAttendance = null 
+        },
+        onMarkAttendance = { status ->
+            dateStrForAttendance?.let { viewModel.markAttendance(it, status) }
+            selectedDateForAttendance = null
+        },
+        onClearAttendance = {
+            dateStrForAttendance?.let { viewModel.markAttendance(it, null) }
+            selectedDateForAttendance = null
+        },
+        onShiftClick = {
+            attendanceDetails?.second?.let { session ->
                 selectedClassForShift = session
-                val parsedDate = java.time.LocalDate.parse(dateStrForAttendance)
-                shiftDate = parsedDate
-                shiftOriginalDate = parsedDate
-                shiftRoom = session.room ?: ""
                 try {
+                    val parsedDate = java.time.LocalDate.parse(dateStrForAttendance)
+                    shiftDate = parsedDate
+                    shiftOriginalDate = parsedDate
+                    shiftRoom = session.room ?: ""
                     val startParts = session.startTime.split(":")
                     shiftStartHour = startParts[0].toInt()
                     shiftStartMinute = startParts[1].toInt()
@@ -1497,21 +1497,20 @@ fun CourseDetailsScreen(
                     shiftEndMinute = 0
                 }
                 showShiftModal = true
-                selectedDateForAttendance = null
             }
-        )
-    }
+            selectedDateForAttendance = null
+        }
+    )
 
-    if (showAddScheduleDialog) {
-        GlassDialog(
-            visible = true,
-            onDismissRequest = { showAddScheduleDialog = false },
-            captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
-        ) {
-        var dayOfWeek by remember { mutableStateOf("Monday") }
-        var startTime by remember { mutableStateOf("09:00") }
-        var endTime by remember { mutableStateOf("09:50") }
-        var room by remember { mutableStateOf("") }
+    GlassDialog(
+        visible = showAddScheduleDialog,
+        onDismissRequest = { showAddScheduleDialog = false },
+        captureEnabled = !showScheduleStartTimePicker && !showScheduleEndTimePicker
+    ) {
+        var dayOfWeek by remember(showAddScheduleDialog) { mutableStateOf("Monday") }
+        var startTime by remember(showAddScheduleDialog) { mutableStateOf("09:00") }
+        var endTime by remember(showAddScheduleDialog) { mutableStateOf("09:50") }
+        var room by remember(showAddScheduleDialog) { mutableStateOf("") }
 
         // Dialog Form Content Column
         Column(
@@ -2423,4 +2422,3 @@ fun CourseDetailsScreen(
             }
         }
     }
-}
