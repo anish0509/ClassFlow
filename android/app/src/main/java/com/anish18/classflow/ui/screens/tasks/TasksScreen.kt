@@ -595,18 +595,24 @@ fun TaskCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (associatedCourse != null) {
+                            val codeTag = associatedCourse.shortName.takeIf { it.isNotBlank() } ?: associatedCourse.name
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        color = courseColor.copy(alpha = 0.15f),
+                                        color = courseColor.copy(alpha = if (ThemeState.isDark) 0.18f else 0.12f),
                                         shape = RoundedCornerShape(8.dp)
                                     )
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                                    .border(
+                                        0.8.dp,
+                                        courseColor.copy(alpha = if (ThemeState.isDark) 0.35f else 0.25f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text = associatedCourse.name.uppercase(Locale.ROOT),
+                                    text = codeTag.uppercase(Locale.ROOT),
                                     color = courseColor,
-                                    fontSize = 9.sp,
+                                    fontSize = 9.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }

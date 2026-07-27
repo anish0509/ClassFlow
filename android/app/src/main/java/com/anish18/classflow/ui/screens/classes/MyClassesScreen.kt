@@ -235,22 +235,23 @@ fun MyClassesScreen(
 
                                 Spacer(modifier = Modifier.width(12.dp))
 
-                                val badgeColor = if (attendanceRate < 75) WarnSalmon else WaterBlue
-                                val badgeBgColor = badgeColor.copy(alpha = 0.15f)
+                                val isSafe = attendanceRate >= 75
+                                val badgeColor = if (isSafe) NeonGreen else WarnSalmon
+                                val badgeBgColor = if (ThemeState.isDark) badgeColor.copy(alpha = 0.18f) else badgeColor.copy(alpha = 0.12f)
                                 Box(
                                     modifier = Modifier
-                                        .background(badgeBgColor, RoundedCornerShape(8.dp))
+                                        .background(badgeBgColor, RoundedCornerShape(10.dp))
                                         .border(
                                             1.dp,
-                                            badgeColor.copy(alpha = 0.30f),
-                                            RoundedCornerShape(8.dp)
+                                            badgeColor.copy(alpha = if (ThemeState.isDark) 0.35f else 0.28f),
+                                            RoundedCornerShape(10.dp)
                                         )
-                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                        .padding(horizontal = 9.dp, vertical = 4.dp)
                                 ) {
                                     Text(
-                                        text = "$attendanceRate% PRESENT",
+                                        text = "$attendanceRate% ${if (isSafe) "SAFE" else "LOW"}",
                                         color = badgeColor,
-                                        fontSize = 9.5.sp,
+                                        fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }

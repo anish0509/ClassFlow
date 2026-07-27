@@ -178,7 +178,23 @@ fun GlassCard(
     val density = LocalDensity.current.density
     val finalShape = shape ?: RoundedCornerShape(cornerRadius)
 
-    val shadowModifier = Modifier
+    val isDark = ThemeState.isDark
+
+    val shadowModifier = if (!isDark) {
+        Modifier.shadow(
+            elevation = 5.dp,
+            shape = finalShape,
+            ambientColor = if (glowColor != Color.Transparent) glowColor.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.08f),
+            spotColor = Color.Black.copy(alpha = 0.08f)
+        )
+    } else {
+        Modifier.shadow(
+            elevation = 3.dp,
+            shape = finalShape,
+            ambientColor = if (glowColor != Color.Transparent) glowColor.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.3f),
+            spotColor = Color.Black.copy(alpha = 0.3f)
+        )
+    }
 
     val clickModifier = when {
         onLongClick != null -> Modifier.iosLongClickable(onLongClick = onLongClick)
@@ -254,16 +270,15 @@ fun GlassCard(
             Modifier
         }
 
-        val isDark = ThemeState.isDark
         val cardBgColor = if (isDark) {
-            Color.White.copy(alpha = 0.08f)
+            Color(0xFF13151D).copy(alpha = 0.82f)
         } else {
-            Color.White.copy(alpha = 0.35f)
+            Color.White.copy(alpha = 0.88f)
         }
         val cardBorderColor = if (isDark) {
-            Color.White.copy(alpha = 0.30f)
+            Color.White.copy(alpha = 0.22f)
         } else {
-            Color.White.copy(alpha = 0.65f)
+            Color.White.copy(alpha = 0.95f)
         }
 
         Box(
