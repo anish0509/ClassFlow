@@ -236,22 +236,34 @@ fun MyClassesScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
 
                                 val isSafe = attendanceRate >= 75
-                                val badgeColor = if (isSafe) NeonGreen else WarnSalmon
-                                val badgeBgColor = if (ThemeState.isDark) badgeColor.copy(alpha = 0.18f) else badgeColor.copy(alpha = 0.12f)
+                                val ringColor = if (isSafe) NeonGreen else WarnSalmon
+                                val progressFloat = (attendanceRate.toFloat() / 100f).coerceIn(0f, 1f)
+
                                 Box(
-                                    modifier = Modifier
-                                        .background(badgeBgColor, RoundedCornerShape(10.dp))
-                                        .border(
-                                            1.dp,
-                                            badgeColor.copy(alpha = if (ThemeState.isDark) 0.35f else 0.28f),
-                                            RoundedCornerShape(10.dp)
-                                        )
-                                        .padding(horizontal = 9.dp, vertical = 4.dp)
+                                    modifier = Modifier.size(42.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
+                                    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+                                        val strokeWidth = 3.5.dp.toPx()
+                                        drawCircle(
+                                            color = ringColor.copy(alpha = 0.2f),
+                                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                                        )
+                                        drawArc(
+                                            color = ringColor,
+                                            startAngle = -90f,
+                                            sweepAngle = 360f * progressFloat,
+                                            useCenter = false,
+                                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                                width = strokeWidth,
+                                                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                            )
+                                        )
+                                    }
                                     Text(
-                                        text = "$attendanceRate% ${if (isSafe) "SAFE" else "LOW"}",
-                                        color = badgeColor,
-                                        fontSize = 10.sp,
+                                        text = "$attendanceRate%",
+                                        color = ringColor,
+                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
